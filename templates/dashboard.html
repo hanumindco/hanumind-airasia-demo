@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirAsia Ride — Operations Intelligence</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0F1E; color: #E8EAF0; font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 14px; }
+:root { --red: #FF0000; --red-dim: #cc0000; --green: #00C853; --amber: #FFB300; --blue: #00B0FF; --grey: #4A5568; --panel: #0F1629; --border: #1E2A45; }
+
+/* HEADER */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: #080D1A; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo { font-size: 20px; font-weight: 800; color: var(--red); letter-spacing: 2px; }
+.logo span { color: #fff; }
+.system-title { font-size: 13px; color: #8892A4; letter-spacing: 1px; text-transform: uppercase; }
+.header-right { display: flex; align-items: center; gap: 24px; }
+.status-pill { display: flex; align-items: center; gap: 8px; background: #0a1f0a; border: 1px solid #00C853; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #00C853; }
+.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #00C853; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+.timestamp { font-size: 12px; color: #8892A4; }
+
+/* LAYOUT */
+.container { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
+.section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 24px; overflow: hidden; }
+.section-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-left: 4px solid var(--red); border-bottom: 1px solid var(--border); }
+.section-title { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); }
+.section-subtitle { font-size: 12px; color: #8892A4; }
+.section-body { padding: 20px 24px; }
+
+/* STATS ROW */
+.stats-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-card { background: #0A0F1E; border: 1px solid var(--border); border-radius: 6px; padding: 14px 20px; flex: 1; min-width: 120px; }
+.stat-value { font-size: 28px; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 11px; color: #8892A4; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.stat-red { color: var(--red); }
+.stat-green { color: var(--green); }
+.stat-amber { color: var(--amber); }
+.stat-blue { color: var(--blue); }
+.stat-white { color: #fff; }
+
+/* TABLES */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 12px; background: #080D1A; color: #8892A4; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid #141C2E; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #131929; }
+
+/* BADGES */
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #0a2e0a; color: #00C853; border: 1px solid #00C853; }
+.badge-red { background: #2e0a0a; color: #FF4444; border: 1px solid #FF4444; }
+.badge-amber { background: #2e1f0a; color: #FFB300; border: 1px solid #FFB300; }
+.badge-blue { background: #0a1f2e; color: #00B0FF; border: 1px solid #00B0FF; }
+.badge-grey { background: #1a1f2e; color: #8892A4; border: 1px solid #4A5568; }
+.badge-orange { background: #2e1a0a; color: #FF6D00; border: 1px solid #FF6D00; }
+.badge-blocked { background: #3d0000; color: #FF4444; border: 1px solid #FF4444; font-weight: 800; }
+
+/* EXPIRY FLASH */
+.expiry-flash { animation: flashred 1s infinite; }
+@keyframes flashred { 0%,100%{color:#FF4444} 50%{color:#ff8888} }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+/* DEMAND CHART */
+.demand-chart { margin: 16px 0; }
+.demand-bar-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.demand-time { width: 45px; font-size: 11px; color: #8892A4; text-align: right; }
+.demand-bar-bg { flex: 1; background: #141C2E; border-radius: 4px; height: 20px; overflow: hidden; }
+.demand-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; transition: width 0.5s; }
+.bar-low { background: #1a3a1a; color: #00C853; }
+.bar-medium { background: #2a2a0a; color: #FFB300; }
+.bar-high { background: #2a1a0a; color: #FF6D00; }
+.bar-surge { background: #3d0a0a; color: #FF4444; }
+
+/* COMPLIANCE BAR */
+.compliance-bar-wrap { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 12px 0; }
+.comp-green { background: #00C853; }
+.comp-amber { background: #FFB300; }
+.comp-red { background: #FF4444; }
+
+/* PANEL MINI */
+.mini-panel { background: #0A0F1E; border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+.mini-panel h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8892A4; margin-bottom: 12px; }
+
+/* BUTTON */
+.btn { display: inline-block; padding: 8px 20px; border-radius: 4px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: var(--red-dim); }
+
+/* PRODUCTION NOTE */
+.prod-note { font-size: 11px; color: #FFB300; background: #1a1500; border: 1px solid #3a3000; border-radius: 4px; padding: 8px 12px; margin-top: 12px; }
+
+/* SECTION DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* LOADING */
+.loading { color: #8892A4; font-size: 13px; padding: 20px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="logo">AIRASIA <span>RIDE</span></div>
+      <div class="system-title">Operations Intelligence</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill">
+      <div class="pulse-dot"></div>
+      All Agents Running
+    </div>
+    <div class="timestamp" id="clock"></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- RELAY SECTION -->
+  <div class="section" id="relay-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">RELAY — Customer & Driver Communications</div>
+        <div class="section-subtitle">WATI message classification and auto-response agent</div>
+      </div>
+      <div class="prod-note">Production: live WATI webhook replaces this sheet feed — zero rebuild required</div>
+    </div>
+    <div class="section-body">
+      <div class="stats-row" id="relay-stats">
+        <div class="stat-card"><div class="stat-value stat-white" id="r-total">--</div><div class="stat-label">Messages Today</div></div>
+        <div class="stat-card"><div class="stat-value stat-green" id="r-resolved">--</div><div class="stat-label">Auto-Resolved</div></div>
+        <div class="stat-card"><div class="stat-value stat-amber" id="r-escalated">--</div><div class="stat-label">Escalated</div></div>
+        <div class="stat-card"><div class="stat-value stat-red expiry-flash" id="r-expiry">--</div><div class="stat-label">Approaching Expiry</div></div>
+      </div>
+      <div class="table-wrap">
+        <table id="wati-table">
+          <thead><tr>
+            <th>ID</th><th>Time</th><th>Sender</th><th>Type</th><th>Message</th>
+            <th>Auto Response</th><th>Escalated To</th><th>Status</th><th>Expiry</th>
+          </tr></thead>
+          <tbody id="wati-body"><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOWER SECTION -->
+  <div class="section" id="tower-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">TOWER — Booking Operations</div>
+        <div class="section-subtitle">B2B intake, shift monitoring, driver reminders, cancellation visibility</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value stat-white" id="t-total">--</div><div class="stat-label">Total Bookings</div></div>
+        <div class="stat-card"><div class="stat-value stat-green" id="t-ontrack">--</div><div class="stat-label">On Track</div></div>
+        <div class="stat-card"><div class="stat-value stat-red" id="t-urgent">--</div><div class="stat-label">Urgent</div></div>
+        <div class="stat-card"><div class="stat-value stat-blue" id="t-completed">--</div><div class="stat-label">Completed</div></div>
+        <div class="stat-card"><div class="stat-value stat-grey" id="t-cancelled">--</div><div class="stat-label">Cancelled</div></div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="mini-panel">
+          <h4>B2B Intake — Today</h4>
+          <div id="b2b-breakdown"></div>
+        </div>
+        <div class="mini-panel">
+          <h4>Cancellation Alerts — Control Tower Notified</h4>
+          <div id="cancel-alerts"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="bookings-table">
+          <thead><tr>
+            <th>Booking ID</th><th>Source</th><th>Customer</th><th>Pickup</th><th>Time</th>
+            <th>Driver</th><th>Status</th><th>Reminder</th><th>Response</th><th>Escalation</th><th>Value (RM)</th>
+          </tr></thead>
+          <tbody id="bookings-body"><tr><td colspan="11" class="loading">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPARK SECTION -->
+  <div class="section" id="spark-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">SPARK — Supply Intelligence & Event Management</div>
+        <div class="section-subtitle">Flight demand forecasting, driver positioning, incentive recommendations</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value stat-white" id="s-flights">--</div><div class="stat-label">Flights Today</div></div>
+        <div class="stat-card"><div class="stat-value stat-red" id="s-surge">--</div><div class="stat-label">Surge Zones</div></div>
+        <div class="stat-card"><div class="stat-value stat-amber" id="s-incentives">--</div><div class="stat-label">Active Incentives</div></div>
+        <div class="stat-card"><div class="stat-value stat-green" id="s-brief">06:00</div><div class="stat-label">Last Brief Sent</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="mini-panel" style="margin-bottom:16px;">
+            <h4>KLIA2 Demand Timeline — Today</h4>
+            <div class="demand-chart" id="demand-chart"></div>
+          </div>
+          <div class="mini-panel">
+            <h4>Next 3 Arriving Flights</h4>
+            <div id="next-flights"></div>
+          </div>
+        </div>
+        <div>
+          <div class="mini-panel" style="margin-bottom:16px;">
+            <h4>Zone Demand Map — Klang Valley</h4>
+            <div id="zone-map"></div>
+          </div>
+          <div class="mini-panel">
+            <h4>Active Incentives</h4>
+            <div id="incentives-panel"></div>
+            <div class="prod-note" style="margin-top:8px;">Production: incentives push directly to AAR driver app via internal API</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PULSE SECTION -->
+  <div class="section" id="pulse-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">PULSE — Regulatory Compliance</div>
+        <div class="section-subtitle">PSV, EVP, Insurance, PUSPAKOM monitoring — BUDI95 and APAD reporting</div>
+      </div>
+      <button class="btn btn-red" onclick="generateApadReport()">Generate APAD Report</button>
+    </div>
+    <div class="section-body">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value stat-white" id="p-total">--</div><div class="stat-label">Total Drivers</div></div>
+        <div class="stat-card"><div class="stat-value stat-green" id="p-compliant">--</div><div class="stat-label">Compliant</div></div>
+        <div class="stat-card"><div class="stat-value stat-amber" id="p-lapsing">--</div><div class="stat-label">Lapsing</div></div>
+        <div class="stat-card"><div class="stat-value stat-red" id="p-lapsed">--</div><div class="stat-label">Lapsed</div></div>
+        <div class="stat-card"><div class="stat-value stat-red" id="p-blocked">--</div><div class="stat-label">Jobs Blocked Today</div></div>
+      </div>
+
+      <div class="compliance-bar-wrap" id="compliance-bar"></div>
+
+      <div class="grid-2">
+        <div>
+          <div class="mini-panel" style="margin-bottom:16px;">
+            <h4>Lapsing Drivers — Action Required</h4>
+            <div class="table-wrap">
+              <table id="lapsing-table">
+                <thead><tr><th>Driver</th><th>Document</th><th>Expiry</th><th>Reminder</th></tr></thead>
+                <tbody id="lapsing-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="mini-panel">
+            <h4>BUDI95 Subsidy Tiers</h4>
+            <div id="budi-panel"></div>
+          </div>
+        </div>
+        <div class="mini-panel">
+          <h4>Lapsed Drivers — Jobs Blocked</h4>
+          <div class="table-wrap">
+            <table id="lapsed-table">
+              <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Status</th></tr></thead>
+              <tbody id="lapsed-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="apad-report" style="display:none; margin-top:20px;">
+        <div class="mini-panel">
+          <h4>APAD Compliance Report — Generated <span id="apad-time"></span></h4>
+          <div id="apad-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent = now.toLocaleString("en-MY", {
+    weekday:"short", day:"2-digit", month:"short", year:"numeric",
+    hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:true
+  });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Badge helpers
+function statusBadge(s) {
+  const map = {
+    "Confirmed":"badge-blue","On The Way":"badge-blue","Arrived":"badge-amber",
+    "On Board":"badge-amber","Completed":"badge-green","Cancelled":"badge-grey","No Show":"badge-red"
+  };
+  return `<span class="badge ${map[s]||'badge-grey'}">${s}</span>`;
+}
+function sourceBadge(s) {
+  const b2b = ["KLOOK","KKdays","KPJ","Sunway Medical","Hospital Form"];
+  return b2b.includes(s)
+    ? `<span class="badge badge-red">${s}</span>`
+    : `<span class="badge badge-grey">${s}</span>`;
+}
+function compBadge(s) {
+  const map = {"Active":"badge-green","Lapsing":"badge-amber","Lapsed":"badge-red"};
+  return `<span class="badge ${map[s]||'badge-grey'}">${s}</span>`;
+}
+function watiTypeBadge(t) {
+  const map = {
+    "Driver Status Check":"badge-blue","Refund Request":"badge-amber",
+    "Reschedule Request":"badge-orange","Driver Complaint":"badge-red","General Enquiry":"badge-grey"
+  };
+  return `<span class="badge ${map[t]||'badge-grey'}">${t}</span>`;
+}
+function demandBadge(l) {
+  const map = {"Low":"badge-green","Medium":"badge-amber","High":"badge-orange","Surge":"badge-red"};
+  return `<span class="badge ${map[l]||'badge-grey'}">${l}</span>`;
+}
+
+// RELAY
+async function loadRelay() {
+  const [wati, stats] = await Promise.all([
+    fetch("/api/wati").then(r=>r.json()),
+    fetch("/api/stats").then(r=>r.json())
+  ]);
+  document.getElementById("r-total").textContent = stats.wati.total;
+  document.getElementById("r-resolved").textContent = stats.wati.auto_resolved;
+  document.getElementById("r-escalated").textContent = stats.wati.escalated;
+  document.getElementById("r-expiry").textContent = stats.wati.expiry_warning;
+
+  const tbody = document.getElementById("wati-body");
+  tbody.innerHTML = wati.slice(0,10).map(m => {
+    const hrs = parseFloat(m["Hours Until Expiry"]) || 99;
+    const expClass = hrs < 2 ? "expiry-flash" : "";
+    const expText = hrs < 2 ? `<span class="${expClass}">⚠ ${hrs}h</span>` : `${hrs}h`;
+    return `<tr>
+      <td>${m["Message ID"]}</td>
+      <td>${m["Timestamp"]||""}</td>
+      <td>${m["Sender Name"]||""}<br><small style="color:#8892A4">${m["Sender Phone"]||""}</small></td>
+      <td>${watiTypeBadge(m["Classified Type"])}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${m["Message Content"]||""}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;color:#8892A4">${m["Auto Response Content"]||""}</td>
+      <td>${m["Escalated To"]||"None"}</td>
+      <td><span class="badge ${m["Resolution Status"]==="Resolved"?"badge-green":m["Resolution Status"]==="Escalated"?"badge-amber":"badge-grey"}">${m["Resolution Status"]}</span></td>
+      <td>${expText}</td>
+    </tr>`;
+  }).join("");
+}
+
+// TOWER
+async function loadTower() {
+  const [bookings, stats] = await Promise.all([
+    fetch("/api/bookings").then(r=>r.json()),
+    fetch("/api/stats").then(r=>r.json())
+  ]);
+  document.getElementById("t-total").textContent = stats.bookings.total;
+  document.getElementById("t-ontrack").textContent = stats.bookings.on_track;
+  document.getElementById("t-urgent").textContent = stats.bookings.urgent;
+  document.getElementById("t-completed").textContent = stats.bookings.completed;
+  document.getElementById("t-cancelled").textContent = stats.bookings.cancelled;
+
+  // B2B breakdown
+  const b2bSources = ["KLOOK","KKdays","KPJ","Sunway Medical","Hospital Form"];
+  const b2bCounts = {};
+  b2bSources.forEach(s => b2bCounts[s] = bookings.filter(b => b["Source"] === s).length);
+  document.getElementById("b2b-breakdown").innerHTML = b2bSources.map(s =>
+    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1E2A45">
+      <span>${sourceBadge(s)}</span>
+      <span style="font-weight:700;color:#fff">${b2bCounts[s]} bookings</span>
+    </div>`
+  ).join("");
+
+  // Cancellation alerts
+  const cancels = bookings.filter(b => b["Escalation Status"] === "Control Tower Notified");
+  document.getElementById("cancel-alerts").innerHTML = cancels.length === 0
+    ? `<div style="color:#8892A4;font-size:12px;padding:8px 0">No active cancellation alerts</div>`
+    : cancels.map(b => `
+      <div style="padding:8px 0;border-bottom:1px solid #1E2A45">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#FF6D00;font-weight:700">${b["Booking ID"]}</span>
+          ${sourceBadge(b["Source"])}
+        </div>
+        <div style="font-size:12px;color:#8892A4;margin-top:4px">${b["Customer Name"]} — ${b["Pickup Location"]}</div>
+        <div style="font-size:12px;color:#FF4444;margin-top:2px">Reason: ${b["Cancellation Reason"]||"Not specified"}</div>
+      </div>`
+    ).join("");
+
+  // Bookings table — show urgent first, then all
+  const sorted = [...bookings].sort((a,b) => {
+    if (a["Escalation Status"]==="Flagged") return -1;
+    if (b["Escalation Status"]==="Flagged") return 1;
+    return 0;
+  });
+  const tbody = document.getElementById("bookings-body");
+  tbody.innerHTML = sorted.slice(0,30).map(b => {
+    let rowStyle = "";
+    if (b["Escalation Status"]==="Flagged") rowStyle = "background:#1a0a0a";
+    else if (b["Booking Status"]==="Cancelled") rowStyle = "background:#0f0f0f";
+    else if (b["Escalation Status"]==="Control Tower Notified") rowStyle = "background:#1a0f00";
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:700">${b["Booking ID"]}</td>
+      <td>${sourceBadge(b["Source"])}</td>
+      <td>${b["Customer Name"]||""}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${b["Pickup Location"]||""}</td>
+      <td>${b["Pickup Time"]||""}</td>
+      <td>${b["Driver Name"]||"<span style='color:#FF4444'>Unassigned</span>"}</td>
+      <td>${statusBadge(b["Booking Status"])}</td>
+      <td><span class="badge ${b["Reminder Sent"]==="Yes"?"badge-green":"badge-amber"}">${b["Reminder Sent"]||"No"}</span></td>
+      <td><span class="badge ${b["Driver Response"]==="Confirmed"?"badge-green":b["Driver Response"]==="No Response"?"badge-red":"badge-grey"}">${b["Driver Response"]||"N/A"}</span></td>
+      <td><span class="badge ${b["Escalation Status"]==="Flagged"?"badge-red":b["Escalation Status"]==="Control Tower Notified"?"badge-orange":"badge-grey"}">${b["Escalation Status"]||"None"}</span></td>
+      <td>RM ${b["Booking Value (RM)"]||"0"}</td>
+    </tr>`;
+  }).join("");
+}
+
+// SPARK
+async function loadSpark() {
+  const [flights, stats] = await Promise.all([
+    fetch("/api/flights").then(r=>r.json()),
+    fetch("/api/stats").then(r=>r.json())
+  ]);
+  document.getElementById("s-flights").textContent = stats.flights.total;
+  document.getElementById("s-surge").textContent = stats.flights.surge_zones;
+  document.getElementById("s-incentives").textContent = stats.flights.active_incentives;
+
+  // Demand chart — group by hour
+  const hourMap = {};
+  flights.forEach(f => {
+    const hr = (f["Scheduled Arrival Time"]||"00:00").split(":")[0];
+    if (!hourMap[hr]) hourMap[hr] = {demand:0, level:"Low"};
+    hourMap[hr].demand += parseInt(f["Expected Ride Demand"]||0);
+    if (f["Zone Demand Level"]==="Surge") hourMap[hr].level="Surge";
+    else if (f["Zone Demand Level"]==="High" && hourMap[hr].level!=="Surge") hourMap[hr].level="High";
+    else if (f["Zone Demand Level"]==="Medium" && !["Surge","High"].includes(hourMap[hr].level)) hourMap[hr].level="Medium";
+  });
+  const maxDemand = Math.max(...Object.values(hourMap).map(h=>h.demand), 1);
+  const barClass = {Low:"bar-low",Medium:"bar-medium",High:"bar-high",Surge:"bar-surge"};
+  const chartHtml = Object.keys(hourMap).sort().map(hr => {
+    const h = hourMap[hr];
+    const pct = Math.round((h.demand/maxDemand)*100);
+    return `<div class="demand-bar-wrap">
+      <div class="demand-time">${hr}:00</div>
+      <div class="demand-bar-bg">
+        <div class="demand-bar ${barClass[h.level]||'bar-low'}" style="width:${pct}%">${h.level} — ${h.demand} est. rides</div>
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("demand-chart").innerHTML = chartHtml || "<div style='color:#8892A4'>No data</div>";
+
+  // Next 3 flights
+  const sorted = [...flights].sort((a,b) => (a["Scheduled Arrival Time"]||"").localeCompare(b["Scheduled Arrival Time"]||""));
+  document.getElementById("next-flights").innerHTML = sorted.slice(0,3).map(f =>
+    `<div style="padding:10px 0;border-bottom:1px solid #1E2A45">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:#fff">${f["Flight Number"]}</span>
+        ${demandBadge(f["Zone Demand Level"])}
+      </div>
+      <div style="font-size:12px;color:#8892A4;margin-top:4px">
+        From ${f["Origin City"]} (${f["Origin Airport Code"]}) — Arrives ${f["Scheduled Arrival Time"]}
+        ${parseInt(f["Delay (minutes)"]||0)>0?`<span style="color:#FF4444"> +${f["Delay (minutes)"]}min delay</span>`:""}
+      </div>
+      <div style="font-size:12px;margin-top:2px">
+        ${f["Passenger Count"]} pax — Est. ${f["Expected Ride Demand"]} rides — ${f["Recommended Driver Count"]} drivers recommended
+      </div>
+    </div>`
+  ).join("");
+
+  // Zone map
+  const zones = ["KLIA","KLIA2","Petaling Jaya","Subang","Shah Alam","Cheras","Ampang","Klang"];
+  const zoneData = {};
+  zones.forEach(z => { zoneData[z] = {level:"Low",drivers:3}; });
+  flights.forEach(f => {
+    const lvl = f["Zone Demand Level"];
+    const rec = parseInt(f["Recommended Driver Count"]||0);
+    zones.forEach(z => {
+      if (!zoneData[z] || lvl==="Surge") { zoneData[z] = {level:lvl,drivers:rec}; }
+    });
+  });
+  document.getElementById("zone-map").innerHTML = zones.map(z => {
+    const d = zoneData[z]; const bc = {Low:"badge-green",Medium:"badge-amber",High:"badge-orange",Surge:"badge-red"};
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1E2A45">
+      <span style="color:#fff">${z}</span>
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="badge ${bc[d.level]||'badge-grey'}">${d.level}</span>
+        <span style="color:#8892A4;font-size:12px">${d.drivers} drivers</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  // Incentives
+  const active = flights.filter(f => f["Incentive Triggered"]==="Yes");
+  document.getElementById("incentives-panel").innerHTML = active.length === 0
+    ? `<div style="color:#8892A4;font-size:12px">No active incentives</div>`
+    : active.slice(0,5).map(f =>
+      `<div style="padding:8px 0;border-bottom:1px solid #1E2A45">
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-weight:700;color:#FFB300">${f["Incentive Type"]}</span>
+          <span style="color:#00C853;font-weight:700">RM ${f["Incentive Value (RM)"]}/trip</span>
+        </div>
+        <div style="font-size:12px;color:#8892A4;margin-top:2px">Triggered by ${f["Flight Number"]} — ${f["Zone Demand Level"]} demand</div>
+      </div>`
+    ).join("");
+}
+
+// PULSE
+async function loadPulse() {
+  const [drivers, stats] = await Promise.all([
+    fetch("/api/drivers").then(r=>r.json()),
+    fetch("/api/stats").then(r=>r.json())
+  ]);
+  document.getElementById("p-total").textContent = stats.drivers.total;
+  document.getElementById("p-compliant").textContent = stats.drivers.compliant;
+  document.getElementById("p-lapsing").textContent = stats.drivers.lapsing;
+  document.getElementById("p-lapsed").textContent = stats.drivers.lapsed;
+  document.getElementById("p-blocked").textContent = stats.drivers.lapsed;
+
+  // Compliance bar
+  const t = stats.drivers.total;
+  document.getElementById("compliance-bar").innerHTML = `
+    <div class="comp-green" style="width:${(stats.drivers.compliant/t*100).toFixed(1)}%" title="Compliant"></div>
+    <div class="comp-amber" style="width:${(stats.drivers.lapsing/t*100).toFixed(1)}%" title="Lapsing"></div>
+    <div class="comp-red" style="width:${(stats.drivers.lapsed/t*100).toFixed(1)}%" title="Lapsed"></div>`;
+
+  // Lapsing table
+  const lapsing = drivers.filter(d => d["Compliance Status"]==="Lapsing");
+  document.getElementById("lapsing-body").innerHTML = lapsing.slice(0,10).map(d => {
+    const docs = [];
+    if (d["PSV Expiry Date"] && new Date(d["PSV Expiry Date"]) < new Date(Date.now()+30*864e5)) docs.push({doc:"PSV Licence",exp:d["PSV Expiry Date"]});
+    if (d["EVP Expiry Date"] && new Date(d["EVP Expiry Date"]) < new Date(Date.now()+30*864e5)) docs.push({doc:"EVP",exp:d["EVP Expiry Date"]});
+    if (d["Insurance Expiry Date"] && new Date(d["Insurance Expiry Date"]) < new Date(Date.now()+30*864e5)) docs.push({doc:"Insurance",exp:d["Insurance Expiry Date"]});
+    const doc = docs[0] || {doc:"Document",exp:"Soon"};
+    return `<tr>
+      <td>${d["Driver Name"]}</td>
+      <td><span class="badge badge-amber">${doc.doc}</span></td>
+      <td style="color:#FFB300">${doc.exp}</td>
+      <td><span class="badge ${d["Reminder Sent"]==="Yes"?"badge-green":"badge-red"}">${d["Reminder Sent"]==="Yes"?"Sent":"Not Sent"}</span></td>
+    </tr>`;
+  }).join("");
+
+  // Lapsed table
+  const lapsed = drivers.filter(d => d["Compliance Status"]==="Lapsed");
+  document.getElementById("lapsed-body").innerHTML = lapsed.map(d =>
+    `<tr>
+      <td>${d["Driver Name"]}</td>
+      <td>${d["Zone"]}</td>
+      <td>Insurance / Documents</td>
+      <td><span class="badge badge-blocked">BLOCKED</span></td>
+    </tr>`
+  ).join("");
+
+  // BUDI95
+  const tier1 = drivers.filter(d => d["BUDI95 Tier"]==="Tier 1").length;
+  const tier2 = drivers.filter(d => d["BUDI95 Tier"]==="Tier 2").length;
+  document.getElementById("budi-panel").innerHTML = `
+    <div style="display:flex;gap:16px;margin-top:8px">
+      <div class="stat-card" style="flex:1">
+        <div class="stat-value stat-amber">${tier1}</div>
+        <div class="stat-label">Tier 1 — Below 2,000km</div>
+      </div>
+      <div class="stat-card" style="flex:1">
+        <div class="stat-value stat-green">${tier2}</div>
+        <div class="stat-label">Tier 2 — Above 2,000km</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#8892A4;margin-top:12px">Next BUDI95 submission: 1st of next month at 9:00 AM</div>`;
+}
+
+// APAD Report
+function generateApadReport() {
+  fetch("/api/stats").then(r=>r.json()).then(stats => {
+    const now = new Date().toLocaleString("en-MY");
+    document.getElementById("apad-time").textContent = now;
+    document.getElementById("apad-content").innerHTML = `
+      <div style="font-family:monospace;font-size:12px;color:#E8EAF0;line-height:2">
+        <div style="color:#FF0000;font-weight:700;margin-bottom:12px">APAD FLEET COMPLIANCE REPORT — ${new Date().toLocaleDateString("en-MY")}</div>
+        <div>Total Fleet Size: <strong>${stats.drivers.total}</strong></div>
+        <div>Fully Compliant: <strong style="color:#00C853">${stats.drivers.compliant}</strong> (${(stats.drivers.compliant/stats.drivers.total*100).toFixed(1)}%)</div>
+        <div>Documents Lapsing (within 30 days): <strong style="color:#FFB300">${stats.drivers.lapsing}</strong></div>
+        <div>Documents Lapsed (non-compliant): <strong style="color:#FF4444">${stats.drivers.lapsed}</strong></div>
+        <div>Jobs Blocked Today: <strong style="color:#FF4444">${stats.drivers.lapsed}</strong></div>
+        <div style="margin-top:12px;color:#8892A4">Report generated: ${now}</div>
+        <div style="color:#8892A4">Prepared by: PULSE — AirAsia Ride Operations Intelligence</div>
+      </div>`;
+    document.getElementById("apad-report").style.display = "block";
+  });
+}
+
+// Load all and refresh every 30 seconds
+async function loadAll() {
+  await Promise.all([loadRelay(), loadTower(), loadSpark(), loadPulse()]);
+}
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>
