@@ -121,6 +121,31 @@ tr:hover td { background: #131929; }
   </div>
 </div>
 
+<div style="background:#080D1A;border-bottom:1px solid #1E2A45;padding:0 32px;display:flex;gap:0">
+  <button class="tab-btn active" onclick="showTab('ops')" id="tab-ops">Operations</button>
+  <button class="tab-btn" onclick="showTab('companion')" id="tab-companion">Driver AI Companion</button>
+</div>
+<style>
+.tab-btn{padding:14px 24px;background:transparent;border:none;color:#8892A4;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:1px;text-transform:uppercase}
+.tab-btn.active{color:#FF0000;border-bottom:2px solid #FF0000}
+.tab-btn:hover{color:#fff}
+#companion-tab{display:none}
+.phone-frame-wrap{display:flex;justify-content:center;align-items:flex-start;padding:40px 20px;min-height:80vh}
+.phone-frame{width:390px;height:780px;background:#000;border-radius:50px;border:8px solid #1a1a1a;box-shadow:0 0 0 2px #333,0 40px 80px rgba(0,0,0,0.8);overflow:hidden;position:relative;flex-shrink:0}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#000;border-radius:0 0 20px 20px;z-index:10}
+.phone-screen{width:100%;height:100%;border:none;border-radius:42px}
+.phone-info{margin-left:48px;max-width:400px;padding-top:40px}
+.phone-info h2{color:#fff;font-size:22px;font-weight:700;margin-bottom:16px}
+.phone-info p{color:#8892A4;font-size:14px;line-height:1.7;margin-bottom:12px}
+.phone-info .highlight{color:#FF0000;font-weight:700}
+.layer-card{background:#0F1629;border:1px solid #1E2A45;border-radius:8px;padding:14px 18px;margin-bottom:10px}
+.layer-card .layer-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.layer-card p{font-size:12px;color:#8892A4;line-height:1.5}
+.layer-faq .layer-title{color:#00C853}
+.layer-cache .layer-title{color:#FFB300}
+.layer-api .layer-title{color:#00B0FF}
+</style>
+<div id="ops-tab">
 <div class="container">
 
   <!-- RELAY SECTION -->
@@ -607,6 +632,46 @@ async function loadAll() {
 }
 loadAll();
 setInterval(loadAll, 30000);
+</script>
+</div>
+<div id="companion-tab">
+  <div class="phone-frame-wrap">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <iframe class="phone-screen" id="companion-iframe" src="/companion?driver=1"></iframe>
+    </div>
+    <div class="phone-info">
+      <h2>Driver AI Companion</h2>
+      <p>A personal AI assistant built into the AirAsia Ride driver app. Every driver gets an assistant that knows their earnings, compliance status, zones, and history.</p>
+      <p>Try it — type a question in the phone. Switch the language to BM. Watch it respond with <span class="highlight">this driver's actual data.</span></p>
+      <p style="margin-bottom:24px">Three-layer intelligence system that reduces API costs by up to 55%:</p>
+      <div class="layer-card layer-faq">
+        <div class="layer-title">Layer 1 — FAQ Cache</div>
+        <p>Common questions answered instantly from a pre-built knowledge base. Zero API cost. Covers PSV renewal, EVP, BUDI95, earnings, zones, incentives.</p>
+      </div>
+      <div class="layer-card layer-cache">
+        <div class="layer-title">Layer 2 — Response Cache</div>
+        <p>Repeat questions served from 24-hour cache. Zero API cost. If 100 drivers ask the same question today, Claude is called once.</p>
+      </div>
+      <div class="layer-card layer-api">
+        <div class="layer-title">Layer 3 — Personalised AI</div>
+        <p>Unique questions answered by Claude with this driver's actual data injected — earnings, target gap, tomorrow's peak zones, compliance status. Every answer is personal.</p>
+      </div>
+      <div style="margin-top:20px;padding:14px 18px;background:#1a0000;border:1px solid #FF0000;border-radius:8px">
+        <div style="font-size:12px;font-weight:700;color:#FF0000;margin-bottom:4px">PRODUCTION PATH</div>
+        <div style="font-size:12px;color:#8892A4">Embedded directly into the AirAsia Ride driver app. One config change removes the demo badge. Driver ID passed from the app session. No rebuild required.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(tab) {
+  document.getElementById('ops-tab').style.display = tab === 'ops' ? 'block' : 'none';
+  document.getElementById('companion-tab').style.display = tab === 'companion' ? 'block' : 'none';
+  document.getElementById('tab-ops').className = 'tab-btn' + (tab === 'ops' ? ' active' : '');
+  document.getElementById('tab-companion').className = 'tab-btn' + (tab === 'companion' ? ' active' : '');
+}
 </script>
 </body>
 </html>

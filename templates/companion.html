@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AirAsia Ride — Driver AI</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { background: #0A0F1E; font-family: 'Segoe UI', Arial, sans-serif; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* HEADER */
+.header { background: #FF0000; padding: 36px 16px 12px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.back-btn { color: #fff; font-size: 20px; cursor: pointer; padding: 4px 8px 4px 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: #cc0000; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.driver-info { flex: 1; }
+.driver-name { font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.driver-status { font-size: 11px; color: rgba(255,255,255,0.8); }
+.lang-toggle { display: flex; gap: 4px; }
+.lang-btn { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(255,255,255,0.5); background: transparent; color: #fff; }
+.lang-btn.active { background: #fff; color: #FF0000; border-color: #fff; }
+
+/* DRIVER STATS BAR */
+.stats-bar { background: #0F1629; padding: 10px 16px; display: flex; gap: 0; border-bottom: 1px solid #1E2A45; flex-shrink: 0; overflow-x: auto; }
+.stat-item { flex: 1; min-width: 60px; text-align: center; padding: 0 4px; border-right: 1px solid #1E2A45; }
+.stat-item:last-child { border-right: none; }
+.stat-val { font-size: 13px; font-weight: 700; color: #fff; }
+.stat-val.green { color: #00C853; }
+.stat-val.amber { color: #FFB300; }
+.stat-val.red { color: #FF4444; }
+.stat-lbl { font-size: 9px; color: #8892A4; margin-top: 2px; }
+
+/* CHAT AREA */
+.chat-area { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* MESSAGES */
+.msg-wrap { display: flex; flex-direction: column; max-width: 85%; }
+.msg-wrap.user { align-self: flex-end; align-items: flex-end; }
+.msg-wrap.bot { align-self: flex-start; align-items: flex-start; }
+.msg-bubble { padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.5; }
+.msg-wrap.user .msg-bubble { background: #FF0000; color: #fff; border-bottom-right-radius: 4px; }
+.msg-wrap.bot .msg-bubble { background: #1A2235; color: #E8EAF0; border-bottom-left-radius: 4px; }
+.msg-meta { font-size: 10px; color: #8892A4; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+.source-badge { padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+.src-faq { background: #0a2e0a; color: #00C853; }
+.src-cache { background: #2e1f0a; color: #FFB300; }
+.src-api { background: #0a1f2e; color: #00B0FF; }
+
+/* TYPING INDICATOR */
+.typing-wrap { align-self: flex-start; }
+.typing-bubble { background: #1A2235; padding: 12px 16px; border-radius: 18px; border-bottom-left-radius: 4px; display: flex; gap: 4px; align-items: center; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #8892A4; animation: bounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+/* QUICK REPLIES */
+.quick-replies { padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; flex-shrink: 0; padding-bottom: 4px; }
+.quick-replies::-webkit-scrollbar { display: none; }
+.qr-btn { white-space: nowrap; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #FF0000; background: transparent; color: #FF0000; flex-shrink: 0; }
+.qr-btn:active { background: #FF0000; color: #fff; }
+
+/* INPUT */
+.input-area { background: #0F1629; padding: 10px 16px; display: flex; gap: 10px; align-items: flex-end; border-top: 1px solid #1E2A45; flex-shrink: 0; }
+.input-wrap { flex: 1; background: #1A2235; border-radius: 22px; padding: 10px 16px; }
+textarea { width: 100%; background: transparent; border: none; outline: none; color: #E8EAF0; font-size: 14px; font-family: inherit; resize: none; max-height: 100px; line-height: 1.4; }
+textarea::placeholder { color: #8892A4; }
+.send-btn { width: 44px; height: 44px; border-radius: 50%; background: #FF0000; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.send-btn:active { background: #cc0000; }
+.send-icon { color: #fff; font-size: 18px; }
+
+/* WELCOME */
+.welcome-msg { text-align: center; padding: 20px; }
+.welcome-msg .icon { font-size: 40px; margin-bottom: 12px; }
+.welcome-msg h3 { color: #fff; font-size: 16px; margin-bottom: 8px; }
+.welcome-msg p { color: #8892A4; font-size: 13px; line-height: 1.5; }
+
+/* SCROLLBAR */
+.chat-area::-webkit-scrollbar { width: 3px; }
+.chat-area::-webkit-scrollbar-track { background: transparent; }
+.chat-area::-webkit-scrollbar-thumb { background: #1E2A45; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="avatar" id="driver-avatar">A</div>
+  <div class="driver-info">
+    <div class="driver-name" id="driver-name">Loading...</div>
+    <div class="driver-status" id="driver-status">AirAsia Ride Driver</div>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-ms" onclick="setLang('ms')">BM</button>
+  </div>
+</div>
+
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-item"><div class="stat-lbl">Today</div><div class="stat-val green" id="s-earnings">--</div></div>
+  <div class="stat-item"><div class="stat-lbl">Week</div><div class="stat-val" id="s-weekly">--</div></div>
+  <div class="stat-item"><div class="stat-lbl">Rating</div><div class="stat-val" id="s-rating">--</div></div>
+  <div class="stat-item"><div class="stat-lbl">Trips</div><div class="stat-val" id="s-trips">--</div></div>
+  <div class="stat-item"><div class="stat-lbl">Docs</div><div class="stat-val" id="s-compliance">--</div></div>
+</div>
+
+<div class="chat-area" id="chat-area">
+  <div class="welcome-msg">
+    <div class="icon">
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Glow background -->
+  <circle cx="40" cy="40" r="38" fill="#0F1629" stroke="#FF0000" stroke-width="1.5" opacity="0.6"/>
+  <!-- Neck -->
+  <rect x="34" y="52" width="12" height="8" rx="3" fill="#1a1a2e"/>
+  <!-- Uniform body -->
+  <rect x="20" y="58" width="40" height="20" rx="8" fill="#CC0000"/>
+  <!-- Uniform collar -->
+  <polygon points="40,58 33,65 40,63 47,65" fill="#990000"/>
+  <!-- Gold epaulettes -->
+  <rect x="18" y="58" width="10" height="5" rx="2" fill="#C9A84C"/>
+  <rect x="52" y="58" width="10" height="5" rx="2" fill="#C9A84C"/>
+  <!-- Gold stripes on epaulettes -->
+  <line x1="20" y1="60" x2="26" y2="60" stroke="#FFD700" stroke-width="1"/>
+  <line x1="20" y1="62" x2="26" y2="62" stroke="#FFD700" stroke-width="1"/>
+  <line x1="54" y1="60" x2="60" y2="60" stroke="#FFD700" stroke-width="1"/>
+  <line x1="54" y1="62" x2="60" y2="62" stroke="#FFD700" stroke-width="1"/>
+  <!-- Head -->
+  <ellipse cx="40" cy="36" rx="16" ry="18" fill="#F5C5A3"/>
+  <!-- Hair -->
+  <ellipse cx="40" cy="22" rx="16" ry="8" fill="#1a0a00"/>
+  <rect x="24" y="20" width="4" height="14" rx="2" fill="#1a0a00"/>
+  <rect x="52" y="20" width="4" height="14" rx="2" fill="#1a0a00"/>
+  <!-- Futuristic visor/headset -->
+  <rect x="25" y="24" width="30" height="8" rx="4" fill="#0A0F1E" opacity="0.85"/>
+  <rect x="26" y="25" width="28" height="6" rx="3" fill="#001133" opacity="0.9"/>
+  <!-- Visor glow line -->
+  <rect x="27" y="27" width="26" height="2" rx="1" fill="#00B0FF" opacity="0.8"/>
+  <!-- Visor side pieces -->
+  <rect x="22" y="25" width="5" height="6" rx="2" fill="#CC0000"/>
+  <rect x="53" y="25" width="5" height="6" rx="2" fill="#CC0000"/>
+  <!-- Eyes below visor -->
+  <ellipse cx="34" cy="37" rx="4" ry="3.5" fill="#fff"/>
+  <ellipse cx="46" cy="37" rx="4" ry="3.5" fill="#fff"/>
+  <ellipse cx="34" cy="37" rx="2.5" ry="2.5" fill="#1a0a00"/>
+  <ellipse cx="46" cy="37" rx="2.5" ry="2.5" fill="#1a0a00"/>
+  <!-- Eye shine -->
+  <circle cx="35" cy="36" r="0.8" fill="#fff"/>
+  <circle cx="47" cy="36" r="0.8" fill="#fff"/>
+  <!-- Nose -->
+  <ellipse cx="40" cy="42" rx="2" ry="1.5" fill="#e8a882"/>
+  <!-- Smile -->
+  <path d="M 35 46 Q 40 50 45 46" stroke="#cc7755" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Pilot cap -->
+  <ellipse cx="40" cy="19" rx="17" ry="5" fill="#CC0000"/>
+  <rect x="23" y="14" width="34" height="7" rx="4" fill="#CC0000"/>
+  <!-- Cap badge -->
+  <ellipse cx="40" cy="15" rx="5" ry="3" fill="#C9A84C"/>
+  <ellipse cx="40" cy="15" rx="3" ry="2" fill="#FFD700"/>
+  <!-- Cap brim -->
+  <ellipse cx="40" cy="20" rx="19" ry="3" fill="#990000"/>
+  <!-- Wings badge on uniform -->
+  <path d="M 32 68 L 28 65 L 32 67 L 36 64 L 40 67 L 44 64 L 48 67 L 52 65 L 48 68 Z" fill="#C9A84C" opacity="0.9"/>
+</svg>
+</div>
+    <h3 id="welcome-title">Hi! I'm your AirAsia Ride AI</h3>
+    <p id="welcome-text">Ask me anything about your earnings, compliance, zones, or how to grow your income. I'm here to help.</p>
+  </div>
+</div>
+
+<div class="quick-replies" id="quick-replies">
+  <button class="qr-btn" onclick="sendQuick(this.textContent)">Am I on track this week?</button>
+  <button class="qr-btn" onclick="sendQuick(this.textContent)">Best zones tonight?</button>
+  <button class="qr-btn" onclick="sendQuick(this.textContent)">How to renew PSV?</button>
+  <button class="qr-btn" onclick="sendQuick(this.textContent)">How do incentives work?</button>
+  <button class="qr-btn" onclick="sendQuick(this.textContent)">When do I get paid?</button>
+</div>
+
+<div class="input-area">
+  <div class="input-wrap">
+    <textarea id="msg-input" rows="1" placeholder="Ask anything..." 
+      oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+  </div>
+  <button class="send-btn" onclick="sendMessage()">
+    <span class="send-icon">➤</span>
+  </button>
+</div>
+
+<script>
+const DRIVER_ID = new URLSearchParams(window.location.search).get('driver') || '1';
+const DEMO_MODE = true; // Set to false before embedding in production app
+let currentLang = 'en';
+let driverData = null;
+
+const labels = {
+  en: {
+    welcome: "Hi! I'm your AirAsia Ride AI",
+    welcomeText: "Ask me anything about your earnings, compliance, zones, or how to grow your income.",
+    placeholder: "Ask anything...",
+    quickReplies: ["Am I on track this week?","Best zones tonight?","How to renew PSV?","How do incentives work?","When do I get paid?"],
+    status: "AirAsia Ride Driver"
+  },
+  ms: {
+    welcome: "Hai! Saya AI AirAsia Ride anda",
+    welcomeText: "Tanya saya apa-apa tentang pendapatan, dokumen, zon terbaik, atau cara tingkatkan pendapatan anda.",
+    placeholder: "Tanya apa sahaja...",
+    quickReplies: ["Adakah saya on track minggu ini?","Zon terbaik malam ini?","Cara renew PSV?","Macam mana insentif berfungsi?","Bila saya dapat bayaran?"],
+    status: "Pemandu AirAsia Ride"
+  }
+};
+
+async function loadDriver() {
+  try {
+    const res = await fetch(`/api/companion/driver/${DRIVER_ID}`);
+    driverData = await res.json();
+    document.getElementById('driver-name').textContent = driverData.name || 'Driver';
+    document.getElementById('driver-avatar').textContent = (driverData.name || 'D')[0].toUpperCase();
+    document.getElementById('s-earnings').textContent = `RM ${parseFloat(driverData.earnings_today||0).toFixed(0)}`;
+    const onTrack = driverData.on_track;
+    const weeklyEl = document.getElementById('s-weekly');
+    weeklyEl.textContent = onTrack === 'Yes' ? 'On Track' : 'Behind';
+    weeklyEl.className = `stat-val ${onTrack === 'Yes' ? 'green' : 'amber'}`;
+    document.getElementById('s-rating').textContent = driverData.rating || '--';
+    document.getElementById('s-trips').textContent = driverData.total_trips || '--';
+    const compEl = document.getElementById('s-compliance');
+    compEl.textContent = driverData.compliance_status || '--';
+    compEl.className = `stat-val ${driverData.compliance_status === 'Active' ? 'green' : driverData.compliance_status === 'Lapsing' ? 'amber' : 'red'}`;
+  } catch(e) {
+    document.getElementById('driver-name').textContent = 'Driver';
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-en').className = `lang-btn ${lang==='en'?'active':''}`;
+  document.getElementById('btn-ms').className = `lang-btn ${lang==='ms'?'active':''}`;
+  document.getElementById('welcome-title').textContent = labels[lang].welcome;
+  document.getElementById('welcome-text').textContent = labels[lang].welcomeText;
+  document.getElementById('msg-input').placeholder = labels[lang].placeholder;
+  document.getElementById('driver-status').textContent = labels[lang].status;
+  const qrs = document.getElementById('quick-replies');
+  qrs.innerHTML = labels[lang].quickReplies.map(q =>
+    `<button class="qr-btn" onclick="sendQuick(this.textContent)">${q}</button>`
+  ).join('');
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function sendQuick(text) {
+  document.getElementById('msg-input').value = text;
+  sendMessage();
+}
+
+function formatText(text) {
+  // Remove em dashes and markdown symbols
+  text = text.replace(/—/g, ' ').replace(/–/g, ' ');
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+  // Remove lone asterisks
+  text = text.replace(/\*/g, '');
+  // Numbered list items — wrap in styled divs
+  text = text.replace(/^(\d+)\) (.+)$/gm, '<div style="padding:3px 0 3px 8px;border-left:2px solid #FF0000;margin:4px 0"><strong>$1)</strong> $2</div>');
+  // Line breaks
+  text = text.replace(/\n\n/g, '<br>');
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+function addMessage(text, role, source, tokens) {
+  const chat = document.getElementById('chat-area');
+  const wrap = document.createElement('div');
+  wrap.className = `msg-wrap ${role}`;
+  const srcMap = {faq_cache:'FAQ', response_cache:'Cached', api_call:'AI'};
+  const srcClass = {faq_cache:'src-faq', response_cache:'src-cache', api_call:'src-api'};
+  const metaHtml = role === 'bot' && source && DEMO_MODE
+    ? `<div class="msg-meta">
+        <span class="source-badge ${srcClass[source]||'src-api'}">${srcMap[source]||'AI'}</span>
+       </div>`
+    : '';
+  const formatted = role === 'bot' ? formatText(text) : text.replace(/\n/g,'<br>');
+  wrap.innerHTML = `
+    <div class="msg-bubble">${formatted}</div>
+    ${metaHtml}
+  `;
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat-area');
+  const wrap = document.createElement('div');
+  wrap.className = 'typing-wrap';
+  wrap.id = 'typing-indicator';
+  wrap.innerHTML = `<div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addMessage(text, 'user', null, null);
+  showTyping();
+  try {
+    const res = await fetch('/api/companion/ask', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({driver_id: DRIVER_ID, question: text, language: currentLang})
+    });
+    const data = await res.json();
+    hideTyping();
+    addMessage(data.answer, 'bot', data.source, data.tokens);
+  } catch(e) {
+    hideTyping();
+    addMessage('Sorry, something went wrong. Please try again.', 'bot', null, null);
+  }
+}
+
+loadDriver();
+</script>
+</body>
+</html>
