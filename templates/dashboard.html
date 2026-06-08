@@ -1,677 +1,1548 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AirAsia Ride — Operations Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
+:root[data-theme="dark"] {
+  --neon-opacity: 0.28;
+  --neon-opacity-hover: 0.45;
+  --neon-panel-opacity: 0.2;
+  --bg: #060912;
+  --bg2: #0A0F1C;
+  --bg3: #0F1628;
+  --bg4: #141D35;
+  --border: #1A2440;
+  --border2: #243055;
+  --text: #E8ECF4;
+  --text2: #8894A8;
+  --text3: #4A5568;
+  --red: #E8002D;
+  --red-glow: rgba(232,0,45,0.15);
+  --red-dim: #B8002A;
+  --green: #00D26A;
+  --amber: #F0A500;
+  --blue: #0088FF;
+  --card-bg: linear-gradient(145deg, #0F1628 0%, #0C1220 100%);
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px #1A2440;
+  --glow-red: 0 0 30px rgba(232,0,45,0.08);
+  --header-bg: rgba(6,9,18,0.95);
+  --tab-bg: #060912;
+  --alert-bg: #0C1220;
+  --mode-icon: '☀️';
+}
+:root[data-theme="light"] {
+  --neon-opacity: 0.08;
+  --neon-opacity-hover: 0.15;
+  --neon-panel-opacity: 0.06;
+  --bg: #F0F2F7;
+  --bg2: #FFFFFF;
+  --bg3: #F8F9FC;
+  --bg4: #EEF0F7;
+  --border: #DDE2EE;
+  --border2: #C8D0E4;
+  --text: #0F1628;
+  --text2: #4A5568;
+  --text3: #8894A8;
+  --red: #D40028;
+  --red-glow: rgba(212,0,40,0.08);
+  --red-dim: #AA0020;
+  --green: #008844;
+  --amber: #CC8800;
+  --blue: #0066CC;
+  --card-bg: linear-gradient(145deg, #FFFFFF 0%, #F8F9FC 100%);
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(212,0,40,0.12), 0 0 20px rgba(212,0,40,0.05);
+  --glow-red: 0 4px 16px rgba(212,0,40,0.1);
+  --header-bg: rgba(240,242,247,0.95);
+  --tab-bg: #FFFFFF;
+  --alert-bg: #F8F9FC;
+  --mode-icon: '🌙';
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0A0F1E; color: #E8EAF0; font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 14px; }
-:root { --red: #FF0000; --red-dim: #cc0000; --green: #00C853; --amber: #FFB300; --blue: #00B0FF; --grey: #4A5568; --panel: #0F1629; --border: #1E2A45; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
 
 /* HEADER */
-.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: #080D1A; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-.header-left { display: flex; align-items: center; gap: 16px; }
-.logo { font-size: 20px; font-weight: 800; color: var(--red); letter-spacing: 2px; }
-.logo span { color: #fff; }
-.system-title { font-size: 13px; color: #8892A4; letter-spacing: 1px; text-transform: uppercase; }
-.header-right { display: flex; align-items: center; gap: 24px; }
-.status-pill { display: flex; align-items: center; gap: 8px; background: #0a1f0a; border: 1px solid #00C853; border-radius: 20px; padding: 6px 14px; font-size: 12px; color: #00C853; }
-.pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #00C853; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
-.timestamp { font-size: 12px; color: #8892A4; }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 36px;
+  height: 58px;
+  background: var(--header-bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-/* LAYOUT */
-.container { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
-.section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 24px; overflow: hidden; }
-.section-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-left: 4px solid var(--red); border-bottom: 1px solid var(--border); }
-.section-title { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); }
-.section-subtitle { font-size: 12px; color: #8892A4; }
-.section-body { padding: 20px 24px; }
+.logo-wrap { display: flex; align-items: center; gap: 14px; }
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--red);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.logo span { color: var(--text); }
+.logo-divider { width: 1px; height: 20px; background: var(--border2); }
+.logo-sub { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
 
-/* STATS ROW */
-.stats-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-.stat-card { background: #0A0F1E; border: 1px solid var(--border); border-radius: 6px; padding: 14px 20px; flex: 1; min-width: 120px; }
-.stat-value { font-size: 28px; font-weight: 700; line-height: 1; }
-.stat-label { font-size: 11px; color: #8892A4; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
-.stat-red { color: var(--red); }
-.stat-green { color: var(--green); }
-.stat-amber { color: var(--amber); }
-.stat-blue { color: var(--blue); }
-.stat-white { color: #fff; }
+.header-right { display: flex; align-items: center; gap: 16px; }
 
-/* TABLES */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th { text-align: left; padding: 10px 12px; background: #080D1A; color: #8892A4; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 10px 12px; border-bottom: 1px solid #141C2E; white-space: nowrap; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: #131929; }
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.4)} }
 
-/* BADGES */
-.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-.badge-green { background: #0a2e0a; color: #00C853; border: 1px solid #00C853; }
-.badge-red { background: #2e0a0a; color: #FF4444; border: 1px solid #FF4444; }
-.badge-amber { background: #2e1f0a; color: #FFB300; border: 1px solid #FFB300; }
-.badge-blue { background: #0a1f2e; color: #00B0FF; border: 1px solid #00B0FF; }
-.badge-grey { background: #1a1f2e; color: #8892A4; border: 1px solid #4A5568; }
-.badge-orange { background: #2e1a0a; color: #FF6D00; border: 1px solid #FF6D00; }
-.badge-blocked { background: #3d0000; color: #FF4444; border: 1px solid #FF4444; font-weight: 800; }
+.clock { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text3); }
 
-/* EXPIRY FLASH */
-.expiry-flash { animation: flashred 1s infinite; }
-@keyframes flashred { 0%,100%{color:#FF4444} 50%{color:#ff8888} }
+.mode-btn {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; transition: all 0.2s;
+}
+.mode-btn:hover { border-color: var(--border2); }
+
+/* SIGNAL LINE */
+.signal-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--red) 20%, var(--red) 80%, transparent 100%);
+  opacity: 0.4;
+  animation: signal 3s ease-in-out infinite;
+}
+@keyframes signal { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
+
+/* TABS */
+.tabs {
+  display: flex;
+  background: var(--tab-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 36px;
+  overflow-x: auto;
+  gap: 2px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text3);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { color: var(--red); border-bottom: 2px solid var(--red); }
+.tab-icon { margin-right: 7px; font-size: 13px; }
+
+/* CONTENT */
+.tab-content { display: none; padding: 28px 36px; }
+.tab-content.active { display: block; }
+
+/* SECTION LABEL */
+.section-label {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 3px; height: 12px;
+  background: var(--red);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* KPI CARDS */
+.kpi-grid { display: grid; gap: 12px; margin-bottom: 6px; }
+.kpi-6 { grid-template-columns: repeat(6, 1fr); }
+.kpi-4 { grid-template-columns: repeat(4, 1fr); }
+.kpi-8 { grid-template-columns: repeat(8, 1fr); }
+
+.kpi-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 18px 20px 16px;
+  position: relative;
+  overflow: visible;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(0) translateZ(0);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.5),
+    0 8px 16px rgba(0,0,0,0.4);
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 8%;
+  right: 8%;
+  height: 20px;
+  background: #E8002D;
+  filter: blur(14px);
+  border-radius: 50%;
+  opacity: var(--neon-opacity, 0.7);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+.kpi-card:hover {
+  transform: translateY(-6px) translateZ(0);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.5),
+    0 16px 32px rgba(0,0,0,0.4);
+}
+.kpi-card:hover::after {
+  bottom: -8px;
+  left: 5%;
+  right: 5%;
+  height: 24px;
+  opacity: var(--neon-opacity-hover, 1);
+  filter: blur(16px);
+}
+
+.kpi-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+.kpi-val-lg {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.kpi-label {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+.kpi-critical .kpi-val { color: var(--red); }
+.kpi-warn .kpi-val { color: var(--amber); }
+
+/* PANELS */
+.panel {
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: visible;
+  margin-bottom: 24px;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.5),
+    0 8px 20px rgba(0,0,0,0.35);
+}
+.panel::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 5%;
+  right: 5%;
+  height: 20px;
+  background: #E8002D;
+  filter: blur(16px);
+  border-radius: 50%;
+  opacity: var(--neon-panel-opacity, 0.55);
+  pointer-events: none;
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.panel-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.panel-body { padding: 16px 20px; }
 
 /* GRID */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
-/* DEMAND CHART */
-.demand-chart { margin: 16px 0; }
-.demand-bar-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-.demand-time { width: 45px; font-size: 11px; color: #8892A4; text-align: right; }
-.demand-bar-bg { flex: 1; background: #141C2E; border-radius: 4px; height: 20px; overflow: hidden; }
-.demand-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; transition: width 0.5s; }
-.bar-low { background: #1a3a1a; color: #00C853; }
-.bar-medium { background: #2a2a0a; color: #FFB300; }
-.bar-high { background: #2a1a0a; color: #FF6D00; }
-.bar-surge { background: #3d0a0a; color: #FF4444; }
+/* MINI */
+.mini {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.mini h4 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
 
-/* COMPLIANCE BAR */
-.compliance-bar-wrap { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 12px 0; }
-.comp-green { background: #00C853; }
-.comp-amber { background: #FFB300; }
-.comp-red { background: #FF4444; }
+/* ALERT CARDS */
+.alert-card {
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-left: 3px solid;
+  background: var(--alert-bg);
+  transition: all 0.2s;
+}
+.alert-card:hover { transform: translateX(2px); }
+.alert-high { border-color: var(--red); }
+.alert-medium { border-color: var(--amber); }
+.alert-plan { border-color: var(--green); }
+.alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.alert-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
+.alert-detail { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 6px; }
+.alert-action { font-size: 11px; color: var(--text3); font-style: italic; }
+.alert-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+.ack-btn {
+  padding: 4px 12px; background: transparent;
+  border: 1px solid var(--border2); border-radius: 4px;
+  color: var(--text3); font-size: 10px; cursor: pointer;
+  letter-spacing: 1px; text-transform: uppercase;
+  font-family: 'DM Sans', sans-serif; font-weight: 600;
+  transition: all 0.2s;
+}
+.ack-btn:hover { border-color: var(--green); color: var(--green); }
 
-/* PANEL MINI */
-.mini-panel { background: #0A0F1E; border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
-.mini-panel h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8892A4; margin-bottom: 12px; }
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: 10px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.bg-red { background: rgba(232,0,45,0.12); color: var(--red); border: 1px solid rgba(232,0,45,0.25); }
+.bg-green { background: rgba(0,210,106,0.1); color: var(--green); border: 1px solid rgba(0,210,106,0.2); }
+.bg-amber { background: rgba(240,165,0,0.1); color: var(--amber); border: 1px solid rgba(240,165,0,0.2); }
+.bg-blue { background: rgba(0,136,255,0.1); color: var(--blue); border: 1px solid rgba(0,136,255,0.2); }
+.bg-grey { background: rgba(72,85,100,0.15); color: var(--text3); border: 1px solid var(--border); }
+.bg-orange { background: rgba(255,109,0,0.1); color: #FF6D00; border: 1px solid rgba(255,109,0,0.2); }
+.bg-blocked { background: rgba(232,0,45,0.15); color: var(--red); border: 1px solid rgba(232,0,45,0.3); font-size: 10px; letter-spacing: 1px; }
 
-/* BUTTON */
-.btn { display: inline-block; padding: 8px 20px; border-radius: 4px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; }
+/* TABLE */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th {
+  text-align: left; padding: 8px 12px;
+  background: var(--bg3); color: var(--text3);
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 1.5px; border-bottom: 1px solid var(--border);
+  white-space: nowrap; font-weight: 600;
+}
+td { padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; color: var(--text2); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg3); }
+
+/* DEMAND BAR */
+.dbar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.dbar-time { width: 38px; font-size: 10px; color: var(--text3); text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+.dbar-bg { flex: 1; background: var(--bg3); border-radius: 3px; height: 16px; overflow: hidden; }
+.dbar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.db-low { background: rgba(0,210,106,0.12); color: var(--green); }
+.db-medium { background: rgba(240,165,0,0.12); color: var(--amber); }
+.db-high { background: rgba(255,109,0,0.12); color: #FF6D00; }
+.db-surge { background: rgba(232,0,45,0.15); color: var(--red); }
+
+/* MULT CARD */
+.mult-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+.mult-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+.mult-zone { font-size: 10px; color: var(--text3); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* PHONE FRAME */
+.phone-wrap { display: flex; justify-content: center; align-items: flex-start; padding: 20px 0; gap: 48px; flex-wrap: wrap; }
+.phone-frame {
+  width: 375px; height: 760px;
+  background: #000;
+  border-radius: 50px;
+  border: 8px solid #1a1a1a;
+  box-shadow: 0 0 0 2px #2a2a2a, 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(232,0,45,0.05);
+  overflow: hidden; position: relative; flex-shrink: 0;
+}
+.phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 28px; background: #000; border-radius: 0 0 18px 18px; z-index: 10; }
+.phone-screen { width: 100%; height: 100%; border: none; border-radius: 42px; }
+.phone-info { max-width: 380px; padding-top: 20px; }
+.phone-info h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+.phone-info p { color: var(--text2); font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
+.layer-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; }
+.layer-card .lt { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.layer-card p { font-size: 12px; color: var(--text2); line-height: 1.5; margin: 0; }
+
+/* PROD NOTE */
+.prod-note { font-size: 11px; color: var(--amber); background: rgba(240,165,0,0.06); border: 1px solid rgba(240,165,0,0.15); border-radius: 4px; padding: 7px 12px; margin-top: 10px; }
+
+/* REFUND CARD */
+.refund-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+
+/* BTN */
+.btn { display: inline-block; padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
 .btn-red { background: var(--red); color: #fff; }
-.btn-red:hover { background: var(--red-dim); }
 
-/* PRODUCTION NOTE */
-.prod-note { font-size: 11px; color: #FFB300; background: #1a1500; border: 1px solid #3a3000; border-radius: 4px; padding: 8px 12px; margin-top: 12px; }
+/* FLASH */
+.flash { animation: flashred 1.2s infinite; }
+@keyframes flashred { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-/* SECTION DIVIDER */
-.divider { height: 1px; background: var(--border); margin: 16px 0; }
+/* COUNT UP */
+@keyframes countup { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.count-animate { animation: countup 0.6s ease-out forwards; }
 
-/* LOADING */
-.loading { color: #8892A4; font-size: 13px; padding: 20px; text-align: center; }
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* SPACER */
+.mt-sm { margin-top: 16px; }
+.mt-md { margin-top: 24px; }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-left">
-    <div>
-      <div class="logo">AIRASIA <span>RIDE</span></div>
-      <div class="system-title">Operations Intelligence</div>
-    </div>
+  <div class="logo-wrap">
+    <div class="logo">AIRASIA <span>RIDE</span></div>
+    <div class="logo-divider"></div>
+    <div class="logo-sub">Operations Intelligence</div>
   </div>
   <div class="header-right">
-    <div class="status-pill">
-      <div class="pulse-dot"></div>
-      All Agents Running
+    <div class="status-pill"><div class="pulse-dot"></div>All Systems Running</div>
+    <div class="clock" id="clock"></div>
+    <button class="mode-btn" onclick="toggleMode()" id="mode-btn" title="Toggle light/dark mode">☀️</button>
+  </div>
+</div>
+<div class="signal-line"></div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('nerve')" id="tab-nerve"><span class="tab-icon">⚡</span>Nerve Centre</button>
+  <button class="tab-btn" onclick="showTab('tower')" id="tab-tower"><span class="tab-icon">🗼</span>Control Tower</button>
+  <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Support</button>
+  <button class="tab-btn" onclick="showTab('customer')" id="tab-customer"><span class="tab-icon">💬</span>Customer Support</button>
+  <button class="tab-btn" onclick="showTab('pricing')" id="tab-pricing"><span class="tab-icon">💰</span>Pricing</button>
+  <button class="tab-btn" onclick="showTab('companion')" id="tab-companion"><span class="tab-icon">🤖</span>Driver AI</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- NERVE CENTRE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-nerve-content">
+
+  <div class="section-label">Today at a Glance</div>
+  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="n-trips">--</div><div class="kpi-label">Trips Completed</div><div class="kpi-sub">Today</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-gmv">--</div><div class="kpi-label">GMV Today</div><div class="kpi-sub">Malaysian Ringgit</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-completion">--</div><div class="kpi-label">Completion Rate</div><div class="kpi-sub">Target 80%</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-avgfare">--</div><div class="kpi-label">Avg Fare</div><div class="kpi-sub">RM per trip</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-cancellation">--</div><div class="kpi-label">Cancellation Rate</div><div class="kpi-sub">Today</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-active-drivers">--</div><div class="kpi-label">Active Drivers</div><div class="kpi-sub">Compliant fleet</div></div>
+  </div>
+
+  <div class="section-label mt-md">Weekly and Monthly Performance</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-gmv">--</div><div class="kpi-label">Weekly GMV</div><div class="kpi-sub">This week</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-trips">--</div><div class="kpi-label">Weekly Trips</div><div class="kpi-sub">This week</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-gmv">--</div><div class="kpi-label">Monthly GMV</div><div class="kpi-sub">This month</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-trips">--</div><div class="kpi-label">Monthly Trips</div><div class="kpi-sub">This month</div></div>
+  </div>
+
+  <div class="section-label mt-md">Operations Health</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+
+    <!-- Bookings Health -->
+    <div class="kpi-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Bookings Today</div>
+        <div id="n-booking-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:2px"></div>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-bookings">--</div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 8px;background:rgba(0,210,106,0.05);border-radius:6px;border:1px solid rgba(0,210,106,0.1)">
+          <span style="color:var(--text2)">Advance — monitored by Control Tower</span>
+          <span style="color:var(--green);font-weight:700" id="n-advance">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 8px;background:rgba(232,0,45,0.05);border-radius:6px;border:1px solid rgba(232,0,45,0.1)">
+          <span style="color:var(--text2)">On-Demand — currently unmonitored</span>
+          <span style="color:var(--red);font-weight:700" id="n-ondemand">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Urgent — driver not responding</span>
+          <span style="font-weight:600" id="n-urgent">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Cancelled today</span>
+          <span style="color:var(--text2);font-weight:600" id="n-cancelled">--</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:8px 10px;background:rgba(232,0,45,0.06);border-left:2px solid var(--red);border-radius:4px;font-size:11px;color:var(--text2);line-height:1.5" id="n-ondemand-insight"></div>
     </div>
-    <div class="timestamp" id="clock"></div>
+
+    <!-- Fleet Compliance -->
+    <div class="kpi-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Fleet Compliance</div>
+        <div id="n-fleet-dot" style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:2px"></div>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-compliant">--</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">drivers fully compliant</div>
+      <div style="margin-top:12px">
+        <div style="display:flex;height:6px;border-radius:4px;overflow:hidden;margin-bottom:10px" id="n-fleet-bar"></div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--text3)">Lapsing — docs expire soon</span>
+            <span style="color:var(--amber);font-weight:600" id="n-lapsing">--</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--text3)">Lapsed — blocked from jobs</span>
+            <span style="color:var(--red);font-weight:600" id="n-lapsed">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Communications -->
+    <div class="kpi-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Customer Comms</div>
+        <div id="n-comms-dot" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:2px"></div>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-wati-total">--</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">messages today via WATI</div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Auto-resolved by RELAY</span>
+          <span style="color:var(--green);font-weight:600" id="n-resolved">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Escalated — needs action</span>
+          <span style="font-weight:600" id="n-escalated">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Expiring in under 2 hours</span>
+          <span style="font-weight:600" id="n-wati-expiry">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demand and Supply -->
+    <div class="kpi-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Demand and Supply</div>
+        <div id="n-demand-dot" style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:2px"></div>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-surge">--</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">surge zones active right now</div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Zones with driver shortage</span>
+          <span style="color:var(--red);font-weight:600" id="n-gap-zones">--</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--text3)">Active incentives deployed</span>
+          <span style="color:var(--green);font-weight:600" id="n-incentives">--</span>
+        </div>
+        <div style="font-size:11px;color:var(--red);margin-top:4px;font-style:italic" id="n-gap-note"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label mt-md">Revenue Intelligence</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:20px">
+    <div class="kpi-card">
+      <div class="kpi-val" id="n-rev-per-driver">--</div>
+      <div class="kpi-label">Revenue per Active Driver</div>
+      <div class="kpi-sub">RM — today</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" id="n-top-zone">--</div>
+      <div class="kpi-label">Top Earning Zone</div>
+      <div class="kpi-sub" id="n-top-zone-gmv">--</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" id="n-peak-gmv">--</div>
+      <div class="kpi-label">Peak Hour GMV</div>
+      <div class="kpi-sub">7AM + 2PM + 9PM combined</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" id="n-util-rate">--</div>
+      <div class="kpi-label">Driver Utilisation</div>
+      <div class="kpi-sub" id="n-util-sub">Active vs total fleet</div>
+    </div>
+  </div>
+
+  <div class="section-label mt-md">Supply vs Demand — Right Now</div>
+  <div class="grid-2" style="margin-bottom:20px">
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><div><div class="panel-title" style="color:var(--red)">⚠ Demand Gap — Needs More Drivers</div><div class="panel-sub">Zones where demand exceeds supply</div></div></div>
+      <div class="panel-body" id="n-demand-gap"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><div><div class="panel-title" style="color:var(--green)">✓ Well Supplied Zones</div><div class="panel-sub">Zones with adequate driver coverage</div></div></div>
+      <div class="panel-body" id="n-supply-ok"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">Master Intelligence — All Teams</div><div class="panel-sub">Cross-system pattern detection</div></div>
+          <div style="font-size:11px;color:var(--text3)" id="n-alert-count"></div>
+        </div>
+        <div class="panel-body" id="master-alerts-list"><div style="color:var(--text3)">Loading...</div></div>
+      </div>
+    </div>
+    <div>
+      <!-- WOW / MOM -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head">
+          <div><div class="panel-title">Performance Comparison</div><div class="panel-sub">Week-on-Week and Month-on-Month</div></div>
+        </div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="comparison-panels"></div>
+        </div>
+      </div>
+      <!-- TOP 10 EARNING ZONES -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head"><div><div class="panel-title">Top Earning Zones — Today</div><div class="panel-sub">GMV contribution by zone</div></div></div>
+        <div class="panel-body" id="top-zones-table"></div>
+      </div>
+      <!-- B2B COMPLETION -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head"><div><div class="panel-title">B2B Partner Completion Rate</div><div class="panel-sub">Breakdown by partner</div></div></div>
+        <div class="panel-body" id="b2b-completion"></div>
+      </div>
+      <!-- ZONE DEMAND -->
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Zone Demand — Right Now</div></div></div>
+        <div class="panel-body" id="nerve-zones"></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div style="background:#080D1A;border-bottom:1px solid #1E2A45;padding:0 32px;display:flex;gap:0">
-  <button class="tab-btn active" onclick="showTab('ops')" id="tab-ops">Operations</button>
-  <button class="tab-btn" onclick="showTab('companion')" id="tab-companion">Driver AI Companion</button>
-</div>
-<style>
-.tab-btn{padding:14px 24px;background:transparent;border:none;color:#8892A4;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:1px;text-transform:uppercase}
-.tab-btn.active{color:#FF0000;border-bottom:2px solid #FF0000}
-.tab-btn:hover{color:#fff}
-#companion-tab{display:none}
-.phone-frame-wrap{display:flex;justify-content:center;align-items:flex-start;padding:40px 20px;min-height:80vh}
-.phone-frame{width:390px;height:780px;background:#000;border-radius:50px;border:8px solid #1a1a1a;box-shadow:0 0 0 2px #333,0 40px 80px rgba(0,0,0,0.8);overflow:hidden;position:relative;flex-shrink:0}
-.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#000;border-radius:0 0 20px 20px;z-index:10}
-.phone-screen{width:100%;height:100%;border:none;border-radius:42px}
-.phone-info{margin-left:48px;max-width:400px;padding-top:40px}
-.phone-info h2{color:#fff;font-size:22px;font-weight:700;margin-bottom:16px}
-.phone-info p{color:#8892A4;font-size:14px;line-height:1.7;margin-bottom:12px}
-.phone-info .highlight{color:#FF0000;font-weight:700}
-.layer-card{background:#0F1629;border:1px solid #1E2A45;border-radius:8px;padding:14px 18px;margin-bottom:10px}
-.layer-card .layer-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.layer-card p{font-size:12px;color:#8892A4;line-height:1.5}
-.layer-faq .layer-title{color:#00C853}
-.layer-cache .layer-title{color:#FFB300}
-.layer-api .layer-title{color:#00B0FF}
-</style>
-<div id="ops-tab">
-<div class="container">
-
-  <!-- RELAY SECTION -->
-  <div class="section" id="relay-section">
-    <div class="section-header">
-      <div>
-        <div class="section-title">RELAY — Customer & Driver Communications</div>
-        <div class="section-subtitle">WATI message classification and auto-response agent</div>
-      </div>
-      <div class="prod-note">Production: live WATI webhook replaces this sheet feed — zero rebuild required</div>
-    </div>
-    <div class="section-body">
-      <div class="stats-row" id="relay-stats">
-        <div class="stat-card"><div class="stat-value stat-white" id="r-total">--</div><div class="stat-label">Messages Today</div></div>
-        <div class="stat-card"><div class="stat-value stat-green" id="r-resolved">--</div><div class="stat-label">Auto-Resolved</div></div>
-        <div class="stat-card"><div class="stat-value stat-amber" id="r-escalated">--</div><div class="stat-label">Escalated</div></div>
-        <div class="stat-card"><div class="stat-value stat-red expiry-flash" id="r-expiry">--</div><div class="stat-label">Approaching Expiry</div></div>
-      </div>
-      <div class="table-wrap">
-        <table id="wati-table">
-          <thead><tr>
-            <th>ID</th><th>Time</th><th>Sender</th><th>Type</th><th>Message</th>
-            <th>Auto Response</th><th>Escalated To</th><th>Status</th><th>Expiry</th>
-          </tr></thead>
-          <tbody id="wati-body"><tr><td colspan="9" class="loading">Loading...</td></tr></tbody>
-        </table>
-      </div>
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- CONTROL TOWER -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-tower-content">
+  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="ct-total">--</div><div class="kpi-label">Total Bookings</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="ct-ontrack">--</div><div class="kpi-label">On Track</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="ct-urgent">--</div><div class="kpi-label">Urgent</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="ct-completed">--</div><div class="kpi-label">Completed</div></div>
+    <div class="kpi-card kpi-warn"><div class="kpi-val" id="ct-cancelled">--</div><div class="kpi-label">Cancelled</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--text3)" id="ct-alerts">--</div><div class="kpi-label">Active Alerts</div></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="mini"><h4>B2B Intake — Today</h4><div id="ct-b2b"></div></div>
+    <div class="mini"><h4>Cancellation Alerts — Control Tower Notified</h4><div id="ct-cancels"></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div><div class="panel-title">Booking Board</div><div class="panel-sub">Urgent sorted to top — refreshes every 30s</div></div></div>
+    <div class="panel-body">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>ID</th><th>Source</th><th>Customer</th><th>Pickup</th><th>Time</th><th>Driver</th><th>Status</th><th>Reminder</th><th>Response</th><th>Escalation</th><th>Value</th></tr></thead>
+        <tbody id="ct-bookings-body"></tbody>
+      </table></div>
     </div>
   </div>
-
-  <!-- TOWER SECTION -->
-  <div class="section" id="tower-section">
-    <div class="section-header">
-      <div>
-        <div class="section-title">TOWER — Booking Operations</div>
-        <div class="section-subtitle">B2B intake, shift monitoring, driver reminders, cancellation visibility</div>
-      </div>
-    </div>
-    <div class="section-body">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-value stat-white" id="t-total">--</div><div class="stat-label">Total Bookings</div></div>
-        <div class="stat-card"><div class="stat-value stat-green" id="t-ontrack">--</div><div class="stat-label">On Track</div></div>
-        <div class="stat-card"><div class="stat-value stat-red" id="t-urgent">--</div><div class="stat-label">Urgent</div></div>
-        <div class="stat-card"><div class="stat-value stat-blue" id="t-completed">--</div><div class="stat-label">Completed</div></div>
-        <div class="stat-card"><div class="stat-value stat-grey" id="t-cancelled">--</div><div class="stat-label">Cancelled</div></div>
-      </div>
-
-      <div class="grid-2" style="margin-bottom:20px;">
-        <div class="mini-panel">
-          <h4>B2B Intake — Today</h4>
-          <div id="b2b-breakdown"></div>
-        </div>
-        <div class="mini-panel">
-          <h4>Cancellation Alerts — Control Tower Notified</h4>
-          <div id="cancel-alerts"></div>
-        </div>
-      </div>
-
-      <div class="table-wrap">
-        <table id="bookings-table">
-          <thead><tr>
-            <th>Booking ID</th><th>Source</th><th>Customer</th><th>Pickup</th><th>Time</th>
-            <th>Driver</th><th>Status</th><th>Reminder</th><th>Response</th><th>Escalation</th><th>Value (RM)</th>
-          </tr></thead>
-          <tbody id="bookings-body"><tr><td colspan="11" class="loading">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
+  <!-- Control Tower Alerts -->
+  <div class="panel mt-sm">
+    <div class="panel-head"><div><div class="panel-title">Control Tower Alerts</div><div class="panel-sub">Routing and operations issues</div></div></div>
+    <div class="panel-body" id="ct-alerts-list"></div>
   </div>
-
-  <!-- SPARK SECTION -->
-  <div class="section" id="spark-section">
-    <div class="section-header">
-      <div>
-        <div class="section-title">SPARK — Supply Intelligence & Event Management</div>
-        <div class="section-subtitle">Flight demand forecasting, driver positioning, incentive recommendations</div>
-      </div>
-    </div>
-    <div class="section-body">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-value stat-white" id="s-flights">--</div><div class="stat-label">Flights Today</div></div>
-        <div class="stat-card"><div class="stat-value stat-red" id="s-surge">--</div><div class="stat-label">Surge Zones</div></div>
-        <div class="stat-card"><div class="stat-value stat-amber" id="s-incentives">--</div><div class="stat-label">Active Incentives</div></div>
-        <div class="stat-card"><div class="stat-value stat-green" id="s-brief">06:00</div><div class="stat-label">Last Brief Sent</div></div>
-      </div>
-
-      <div class="grid-2">
-        <div>
-          <div class="mini-panel" style="margin-bottom:16px;">
-            <h4>KLIA2 Demand Timeline — Today</h4>
-            <div class="demand-chart" id="demand-chart"></div>
-          </div>
-          <div class="mini-panel">
-            <h4>Next 3 Arriving Flights</h4>
-            <div id="next-flights"></div>
-          </div>
-        </div>
-        <div>
-          <div class="mini-panel" style="margin-bottom:16px;">
-            <h4>Zone Demand Map — Klang Valley</h4>
-            <div id="zone-map"></div>
-          </div>
-          <div class="mini-panel">
-            <h4>Active Incentives</h4>
-            <div id="incentives-panel"></div>
-            <div class="prod-note" style="margin-top:8px;">Production: incentives push directly to AAR driver app via internal API</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PULSE SECTION -->
-  <div class="section" id="pulse-section">
-    <div class="section-header">
-      <div>
-        <div class="section-title">PULSE — Regulatory Compliance</div>
-        <div class="section-subtitle">PSV, EVP, Insurance, PUSPAKOM monitoring — BUDI95 and APAD reporting</div>
-      </div>
-      <button class="btn btn-red" onclick="generateApadReport()">Generate APAD Report</button>
-    </div>
-    <div class="section-body">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-value stat-white" id="p-total">--</div><div class="stat-label">Total Drivers</div></div>
-        <div class="stat-card"><div class="stat-value stat-green" id="p-compliant">--</div><div class="stat-label">Compliant</div></div>
-        <div class="stat-card"><div class="stat-value stat-amber" id="p-lapsing">--</div><div class="stat-label">Lapsing</div></div>
-        <div class="stat-card"><div class="stat-value stat-red" id="p-lapsed">--</div><div class="stat-label">Lapsed</div></div>
-        <div class="stat-card"><div class="stat-value stat-red" id="p-blocked">--</div><div class="stat-label">Jobs Blocked Today</div></div>
-      </div>
-
-      <div class="compliance-bar-wrap" id="compliance-bar"></div>
-
-      <div class="grid-2">
-        <div>
-          <div class="mini-panel" style="margin-bottom:16px;">
-            <h4>Lapsing Drivers — Action Required</h4>
-            <div class="table-wrap">
-              <table id="lapsing-table">
-                <thead><tr><th>Driver</th><th>Document</th><th>Expiry</th><th>Reminder</th></tr></thead>
-                <tbody id="lapsing-body"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="mini-panel">
-            <h4>BUDI95 Subsidy Tiers</h4>
-            <div id="budi-panel"></div>
-          </div>
-        </div>
-        <div class="mini-panel">
-          <h4>Lapsed Drivers — Jobs Blocked</h4>
-          <div class="table-wrap">
-            <table id="lapsed-table">
-              <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Status</th></tr></thead>
-              <tbody id="lapsed-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div id="apad-report" style="display:none; margin-top:20px;">
-        <div class="mini-panel">
-          <h4>APAD Compliance Report — Generated <span id="apad-time"></span></h4>
-          <div id="apad-content"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<script>
-// Clock
-function updateClock() {
-  const now = new Date();
-  document.getElementById("clock").textContent = now.toLocaleString("en-MY", {
-    weekday:"short", day:"2-digit", month:"short", year:"numeric",
-    hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:true
-  });
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// Badge helpers
-function statusBadge(s) {
-  const map = {
-    "Confirmed":"badge-blue","On The Way":"badge-blue","Arrived":"badge-amber",
-    "On Board":"badge-amber","Completed":"badge-green","Cancelled":"badge-grey","No Show":"badge-red"
-  };
-  return `<span class="badge ${map[s]||'badge-grey'}">${s}</span>`;
-}
-function sourceBadge(s) {
-  const b2b = ["KLOOK","KKdays","KPJ","Sunway Medical","Hospital Form"];
-  return b2b.includes(s)
-    ? `<span class="badge badge-red">${s}</span>`
-    : `<span class="badge badge-grey">${s}</span>`;
-}
-function compBadge(s) {
-  const map = {"Active":"badge-green","Lapsing":"badge-amber","Lapsed":"badge-red"};
-  return `<span class="badge ${map[s]||'badge-grey'}">${s}</span>`;
-}
-function watiTypeBadge(t) {
-  const map = {
-    "Driver Status Check":"badge-blue","Refund Request":"badge-amber",
-    "Reschedule Request":"badge-orange","Driver Complaint":"badge-red","General Enquiry":"badge-grey"
-  };
-  return `<span class="badge ${map[t]||'badge-grey'}">${t}</span>`;
-}
-function demandBadge(l) {
-  const map = {"Low":"badge-green","Medium":"badge-amber","High":"badge-orange","Surge":"badge-red"};
-  return `<span class="badge ${map[l]||'badge-grey'}">${l}</span>`;
-}
-
-// RELAY
-async function loadRelay() {
-  const [wati, stats] = await Promise.all([
-    fetch("/api/wati").then(r=>r.json()),
-    fetch("/api/stats").then(r=>r.json())
-  ]);
-  document.getElementById("r-total").textContent = stats.wati.total;
-  document.getElementById("r-resolved").textContent = stats.wati.auto_resolved;
-  document.getElementById("r-escalated").textContent = stats.wati.escalated;
-  document.getElementById("r-expiry").textContent = stats.wati.expiry_warning;
-
-  const tbody = document.getElementById("wati-body");
-  tbody.innerHTML = wati.slice(0,10).map(m => {
-    const hrs = parseFloat(m["Hours Until Expiry"]) || 99;
-    const expClass = hrs < 2 ? "expiry-flash" : "";
-    const expText = hrs < 2 ? `<span class="${expClass}">⚠ ${hrs}h</span>` : `${hrs}h`;
-    return `<tr>
-      <td>${m["Message ID"]}</td>
-      <td>${m["Timestamp"]||""}</td>
-      <td>${m["Sender Name"]||""}<br><small style="color:#8892A4">${m["Sender Phone"]||""}</small></td>
-      <td>${watiTypeBadge(m["Classified Type"])}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${m["Message Content"]||""}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;color:#8892A4">${m["Auto Response Content"]||""}</td>
-      <td>${m["Escalated To"]||"None"}</td>
-      <td><span class="badge ${m["Resolution Status"]==="Resolved"?"badge-green":m["Resolution Status"]==="Escalated"?"badge-amber":"badge-grey"}">${m["Resolution Status"]}</span></td>
-      <td>${expText}</td>
-    </tr>`;
-  }).join("");
-}
-
-// TOWER
-async function loadTower() {
-  const [bookings, stats] = await Promise.all([
-    fetch("/api/bookings").then(r=>r.json()),
-    fetch("/api/stats").then(r=>r.json())
-  ]);
-  document.getElementById("t-total").textContent = stats.bookings.total;
-  document.getElementById("t-ontrack").textContent = stats.bookings.on_track;
-  document.getElementById("t-urgent").textContent = stats.bookings.urgent;
-  document.getElementById("t-completed").textContent = stats.bookings.completed;
-  document.getElementById("t-cancelled").textContent = stats.bookings.cancelled;
-
-  // B2B breakdown
-  const b2bSources = ["KLOOK","KKdays","KPJ","Sunway Medical","Hospital Form"];
-  const b2bCounts = {};
-  b2bSources.forEach(s => b2bCounts[s] = bookings.filter(b => b["Source"] === s).length);
-  document.getElementById("b2b-breakdown").innerHTML = b2bSources.map(s =>
-    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1E2A45">
-      <span>${sourceBadge(s)}</span>
-      <span style="font-weight:700;color:#fff">${b2bCounts[s]} bookings</span>
-    </div>`
-  ).join("");
-
-  // Cancellation alerts
-  const cancels = bookings.filter(b => b["Escalation Status"] === "Control Tower Notified");
-  document.getElementById("cancel-alerts").innerHTML = cancels.length === 0
-    ? `<div style="color:#8892A4;font-size:12px;padding:8px 0">No active cancellation alerts</div>`
-    : cancels.map(b => `
-      <div style="padding:8px 0;border-bottom:1px solid #1E2A45">
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#FF6D00;font-weight:700">${b["Booking ID"]}</span>
-          ${sourceBadge(b["Source"])}
-        </div>
-        <div style="font-size:12px;color:#8892A4;margin-top:4px">${b["Customer Name"]} — ${b["Pickup Location"]}</div>
-        <div style="font-size:12px;color:#FF4444;margin-top:2px">Reason: ${b["Cancellation Reason"]||"Not specified"}</div>
-      </div>`
-    ).join("");
-
-  // Bookings table — show urgent first, then all
-  const sorted = [...bookings].sort((a,b) => {
-    if (a["Escalation Status"]==="Flagged") return -1;
-    if (b["Escalation Status"]==="Flagged") return 1;
-    return 0;
-  });
-  const tbody = document.getElementById("bookings-body");
-  tbody.innerHTML = sorted.slice(0,30).map(b => {
-    let rowStyle = "";
-    if (b["Escalation Status"]==="Flagged") rowStyle = "background:#1a0a0a";
-    else if (b["Booking Status"]==="Cancelled") rowStyle = "background:#0f0f0f";
-    else if (b["Escalation Status"]==="Control Tower Notified") rowStyle = "background:#1a0f00";
-    return `<tr style="${rowStyle}">
-      <td style="font-weight:700">${b["Booking ID"]}</td>
-      <td>${sourceBadge(b["Source"])}</td>
-      <td>${b["Customer Name"]||""}</td>
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${b["Pickup Location"]||""}</td>
-      <td>${b["Pickup Time"]||""}</td>
-      <td>${b["Driver Name"]||"<span style='color:#FF4444'>Unassigned</span>"}</td>
-      <td>${statusBadge(b["Booking Status"])}</td>
-      <td><span class="badge ${b["Reminder Sent"]==="Yes"?"badge-green":"badge-amber"}">${b["Reminder Sent"]||"No"}</span></td>
-      <td><span class="badge ${b["Driver Response"]==="Confirmed"?"badge-green":b["Driver Response"]==="No Response"?"badge-red":"badge-grey"}">${b["Driver Response"]||"N/A"}</span></td>
-      <td><span class="badge ${b["Escalation Status"]==="Flagged"?"badge-red":b["Escalation Status"]==="Control Tower Notified"?"badge-orange":"badge-grey"}">${b["Escalation Status"]||"None"}</span></td>
-      <td>RM ${b["Booking Value (RM)"]||"0"}</td>
-    </tr>`;
-  }).join("");
-}
-
-// SPARK
-async function loadSpark() {
-  const [flights, stats] = await Promise.all([
-    fetch("/api/flights").then(r=>r.json()),
-    fetch("/api/stats").then(r=>r.json())
-  ]);
-  document.getElementById("s-flights").textContent = stats.flights.total;
-  document.getElementById("s-surge").textContent = stats.flights.surge_zones;
-  document.getElementById("s-incentives").textContent = stats.flights.active_incentives;
-
-  // Demand chart — group by hour
-  const hourMap = {};
-  flights.forEach(f => {
-    const hr = (f["Scheduled Arrival Time"]||"00:00").split(":")[0];
-    if (!hourMap[hr]) hourMap[hr] = {demand:0, level:"Low"};
-    hourMap[hr].demand += parseInt(f["Expected Ride Demand"]||0);
-    if (f["Zone Demand Level"]==="Surge") hourMap[hr].level="Surge";
-    else if (f["Zone Demand Level"]==="High" && hourMap[hr].level!=="Surge") hourMap[hr].level="High";
-    else if (f["Zone Demand Level"]==="Medium" && !["Surge","High"].includes(hourMap[hr].level)) hourMap[hr].level="Medium";
-  });
-  const maxDemand = Math.max(...Object.values(hourMap).map(h=>h.demand), 1);
-  const barClass = {Low:"bar-low",Medium:"bar-medium",High:"bar-high",Surge:"bar-surge"};
-  const chartHtml = Object.keys(hourMap).sort().map(hr => {
-    const h = hourMap[hr];
-    const pct = Math.round((h.demand/maxDemand)*100);
-    return `<div class="demand-bar-wrap">
-      <div class="demand-time">${hr}:00</div>
-      <div class="demand-bar-bg">
-        <div class="demand-bar ${barClass[h.level]||'bar-low'}" style="width:${pct}%">${h.level} — ${h.demand} est. rides</div>
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DRIVER SUPPORT -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-driver-content">
+  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="ds-total">--</div><div class="kpi-label">Total Drivers</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="ds-compliant">--</div><div class="kpi-label">Compliant</div></div>
+    <div class="kpi-card kpi-warn"><div class="kpi-val" id="ds-lapsing">--</div><div class="kpi-label">Lapsing</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="ds-lapsed">--</div><div class="kpi-label">Lapsed</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="ds-flights">--</div><div class="kpi-label">Flights Today</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="ds-surge">--</div><div class="kpi-label">Surge Zones</div></div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head"><div><div class="panel-title">Lapsing Drivers — Action Required</div></div></div>
+        <div class="panel-body"><div class="tbl-wrap"><table>
+          <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Expiry</th><th>Reminder</th></tr></thead>
+          <tbody id="ds-lapsing-body"></tbody>
+        </table></div></div>
       </div>
-    </div>`;
-  }).join("");
-  document.getElementById("demand-chart").innerHTML = chartHtml || "<div style='color:#8892A4'>No data</div>";
-
-  // Next 3 flights
-  const sorted = [...flights].sort((a,b) => (a["Scheduled Arrival Time"]||"").localeCompare(b["Scheduled Arrival Time"]||""));
-  document.getElementById("next-flights").innerHTML = sorted.slice(0,3).map(f =>
-    `<div style="padding:10px 0;border-bottom:1px solid #1E2A45">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-weight:700;color:#fff">${f["Flight Number"]}</span>
-        ${demandBadge(f["Zone Demand Level"])}
-      </div>
-      <div style="font-size:12px;color:#8892A4;margin-top:4px">
-        From ${f["Origin City"]} (${f["Origin Airport Code"]}) — Arrives ${f["Scheduled Arrival Time"]}
-        ${parseInt(f["Delay (minutes)"]||0)>0?`<span style="color:#FF4444"> +${f["Delay (minutes)"]}min delay</span>`:""}
-      </div>
-      <div style="font-size:12px;margin-top:2px">
-        ${f["Passenger Count"]} pax — Est. ${f["Expected Ride Demand"]} rides — ${f["Recommended Driver Count"]} drivers recommended
-      </div>
-    </div>`
-  ).join("");
-
-  // Zone map
-  const zones = ["KLIA","KLIA2","Petaling Jaya","Subang","Shah Alam","Cheras","Ampang","Klang"];
-  const zoneData = {};
-  zones.forEach(z => { zoneData[z] = {level:"Low",drivers:3}; });
-  flights.forEach(f => {
-    const lvl = f["Zone Demand Level"];
-    const rec = parseInt(f["Recommended Driver Count"]||0);
-    zones.forEach(z => {
-      if (!zoneData[z] || lvl==="Surge") { zoneData[z] = {level:lvl,drivers:rec}; }
-    });
-  });
-  document.getElementById("zone-map").innerHTML = zones.map(z => {
-    const d = zoneData[z]; const bc = {Low:"badge-green",Medium:"badge-amber",High:"badge-orange",Surge:"badge-red"};
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1E2A45">
-      <span style="color:#fff">${z}</span>
-      <div style="display:flex;gap:12px;align-items:center">
-        <span class="badge ${bc[d.level]||'badge-grey'}">${d.level}</span>
-        <span style="color:#8892A4;font-size:12px">${d.drivers} drivers</span>
-      </div>
-    </div>`;
-  }).join("");
-
-  // Incentives
-  const active = flights.filter(f => f["Incentive Triggered"]==="Yes");
-  document.getElementById("incentives-panel").innerHTML = active.length === 0
-    ? `<div style="color:#8892A4;font-size:12px">No active incentives</div>`
-    : active.slice(0,5).map(f =>
-      `<div style="padding:8px 0;border-bottom:1px solid #1E2A45">
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-weight:700;color:#FFB300">${f["Incentive Type"]}</span>
-          <span style="color:#00C853;font-weight:700">RM ${f["Incentive Value (RM)"]}/trip</span>
-        </div>
-        <div style="font-size:12px;color:#8892A4;margin-top:2px">Triggered by ${f["Flight Number"]} — ${f["Zone Demand Level"]} demand</div>
-      </div>`
-    ).join("");
-}
-
-// PULSE
-async function loadPulse() {
-  const [drivers, stats] = await Promise.all([
-    fetch("/api/drivers").then(r=>r.json()),
-    fetch("/api/stats").then(r=>r.json())
-  ]);
-  document.getElementById("p-total").textContent = stats.drivers.total;
-  document.getElementById("p-compliant").textContent = stats.drivers.compliant;
-  document.getElementById("p-lapsing").textContent = stats.drivers.lapsing;
-  document.getElementById("p-lapsed").textContent = stats.drivers.lapsed;
-  document.getElementById("p-blocked").textContent = stats.drivers.lapsed;
-
-  // Compliance bar
-  const t = stats.drivers.total;
-  document.getElementById("compliance-bar").innerHTML = `
-    <div class="comp-green" style="width:${(stats.drivers.compliant/t*100).toFixed(1)}%" title="Compliant"></div>
-    <div class="comp-amber" style="width:${(stats.drivers.lapsing/t*100).toFixed(1)}%" title="Lapsing"></div>
-    <div class="comp-red" style="width:${(stats.drivers.lapsed/t*100).toFixed(1)}%" title="Lapsed"></div>`;
-
-  // Lapsing table
-  const lapsing = drivers.filter(d => d["Compliance Status"]==="Lapsing");
-  document.getElementById("lapsing-body").innerHTML = lapsing.slice(0,10).map(d => {
-    const docs = [];
-    if (d["PSV Expiry Date"] && new Date(d["PSV Expiry Date"]) < new Date(Date.now()+30*864e5)) docs.push({doc:"PSV Licence",exp:d["PSV Expiry Date"]});
-    if (d["EVP Expiry Date"] && new Date(d["EVP Expiry Date"]) < new Date(Date.now()+30*864e5)) docs.push({doc:"EVP",exp:d["EVP Expiry Date"]});
-    if (d["Insurance Expiry Date"] && new Date(d["Insurance Expiry Date"]) < new Date(Date.now()+30*864e5)) docs.push({doc:"Insurance",exp:d["Insurance Expiry Date"]});
-    const doc = docs[0] || {doc:"Document",exp:"Soon"};
-    return `<tr>
-      <td>${d["Driver Name"]}</td>
-      <td><span class="badge badge-amber">${doc.doc}</span></td>
-      <td style="color:#FFB300">${doc.exp}</td>
-      <td><span class="badge ${d["Reminder Sent"]==="Yes"?"badge-green":"badge-red"}">${d["Reminder Sent"]==="Yes"?"Sent":"Not Sent"}</span></td>
-    </tr>`;
-  }).join("");
-
-  // Lapsed table
-  const lapsed = drivers.filter(d => d["Compliance Status"]==="Lapsed");
-  document.getElementById("lapsed-body").innerHTML = lapsed.map(d =>
-    `<tr>
-      <td>${d["Driver Name"]}</td>
-      <td>${d["Zone"]}</td>
-      <td>Insurance / Documents</td>
-      <td><span class="badge badge-blocked">BLOCKED</span></td>
-    </tr>`
-  ).join("");
-
-  // BUDI95
-  const tier1 = drivers.filter(d => d["BUDI95 Tier"]==="Tier 1").length;
-  const tier2 = drivers.filter(d => d["BUDI95 Tier"]==="Tier 2").length;
-  document.getElementById("budi-panel").innerHTML = `
-    <div style="display:flex;gap:16px;margin-top:8px">
-      <div class="stat-card" style="flex:1">
-        <div class="stat-value stat-amber">${tier1}</div>
-        <div class="stat-label">Tier 1 — Below 2,000km</div>
-      </div>
-      <div class="stat-card" style="flex:1">
-        <div class="stat-value stat-green">${tier2}</div>
-        <div class="stat-label">Tier 2 — Above 2,000km</div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Lapsed Drivers — Jobs Blocked</div></div></div>
+        <div class="panel-body"><div class="tbl-wrap"><table>
+          <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Status</th></tr></thead>
+          <tbody id="ds-lapsed-body"></tbody>
+        </table></div></div>
       </div>
     </div>
-    <div style="font-size:12px;color:#8892A4;margin-top:12px">Next BUDI95 submission: 1st of next month at 9:00 AM</div>`;
-}
-
-// APAD Report
-function generateApadReport() {
-  fetch("/api/stats").then(r=>r.json()).then(stats => {
-    const now = new Date().toLocaleString("en-MY");
-    document.getElementById("apad-time").textContent = now;
-    document.getElementById("apad-content").innerHTML = `
-      <div style="font-family:monospace;font-size:12px;color:#E8EAF0;line-height:2">
-        <div style="color:#FF0000;font-weight:700;margin-bottom:12px">APAD FLEET COMPLIANCE REPORT — ${new Date().toLocaleDateString("en-MY")}</div>
-        <div>Total Fleet Size: <strong>${stats.drivers.total}</strong></div>
-        <div>Fully Compliant: <strong style="color:#00C853">${stats.drivers.compliant}</strong> (${(stats.drivers.compliant/stats.drivers.total*100).toFixed(1)}%)</div>
-        <div>Documents Lapsing (within 30 days): <strong style="color:#FFB300">${stats.drivers.lapsing}</strong></div>
-        <div>Documents Lapsed (non-compliant): <strong style="color:#FF4444">${stats.drivers.lapsed}</strong></div>
-        <div>Jobs Blocked Today: <strong style="color:#FF4444">${stats.drivers.lapsed}</strong></div>
-        <div style="margin-top:12px;color:#8892A4">Report generated: ${now}</div>
-        <div style="color:#8892A4">Prepared by: PULSE — AirAsia Ride Operations Intelligence</div>
-      </div>`;
-    document.getElementById("apad-report").style.display = "block";
-  });
-}
-
-// Load all and refresh every 30 seconds
-async function loadAll() {
-  await Promise.all([loadRelay(), loadTower(), loadSpark(), loadPulse()]);
-}
-loadAll();
-setInterval(loadAll, 30000);
-</script>
+    <div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head">
+          <div><div class="panel-title">Zone Demand Timeline</div></div>
+          <button class="btn btn-red" onclick="generateApad()">APAD Report</button>
+        </div>
+        <div class="panel-body"><div id="ds-demand-chart"></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">BUDI95 Subsidy Tiers</div></div></div>
+        <div class="panel-body" id="ds-budi"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Driver Support Alerts -->
+  <div class="panel mt-sm">
+    <div class="panel-head"><div><div class="panel-title">Driver Support Alerts</div><div class="panel-sub">Compliance and performance issues</div></div></div>
+    <div class="panel-body" id="ds-alerts-list"></div>
+  </div>
+  <div id="apad-report-section" style="display:none;margin-top:16px">
+    <div class="panel">
+      <div class="panel-head"><div><div class="panel-title">APAD Compliance Report — <span id="apad-ts"></span></div></div></div>
+      <div class="panel-body" id="apad-content"></div>
+    </div>
+  </div>
 </div>
-<div id="companion-tab">
-  <div class="phone-frame-wrap">
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- CUSTOMER SUPPORT -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-customer-content">
+  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="cs-total">--</div><div class="kpi-label">Messages Today</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="cs-resolved">--</div><div class="kpi-label">Auto-Resolved</div></div>
+    <div class="kpi-card kpi-warn"><div class="kpi-val" id="cs-escalated">--</div><div class="kpi-label">Escalated</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val flash" id="cs-expiry">--</div><div class="kpi-label">Expiring Soon</div></div>
+    <div class="kpi-card kpi-warn"><div class="kpi-val" id="cs-refunds">--</div><div class="kpi-label">Refund Requests</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="cs-complaints">--</div><div class="kpi-label">Driver Complaints</div></div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Live Message Feed</div><div class="panel-sub">RELAY — auto-classified and responded</div></div></div>
+        <div class="panel-body">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>ID</th><th>Time</th><th>Sender</th><th>Type</th><th>Message</th><th>Status</th><th>Expiry</th></tr></thead>
+            <tbody id="cs-messages-body"></tbody>
+          </table></div>
+          <div class="prod-note">Production: live WATI webhook replaces this sheet feed. Zero rebuild required.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head"><div><div class="panel-title">Refund Requests</div></div></div>
+        <div class="panel-body" id="cs-refunds-panel"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><div class="panel-title">Driver Complaints</div></div></div>
+        <div class="panel-body" id="cs-complaints-panel"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Customer Support Alerts -->
+  <div class="panel mt-sm">
+    <div class="panel-head"><div><div class="panel-title">Customer Support Alerts</div><div class="panel-sub">Unresolved issues requiring action</div></div></div>
+    <div class="panel-body" id="cs-alerts-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- PRICING -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-pricing-content">
+  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="pr-current">--x</div><div class="kpi-label">Current Multiplier</div><div class="kpi-sub" id="pr-zone">--</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="pr-recommended">--x</div><div class="kpi-label">Recommended</div><div class="kpi-sub">SPARK suggestion</div></div>
+    <div class="kpi-card kpi-warn"><div class="kpi-val" id="pr-grab">--x</div><div class="kpi-label">Grab (simulated)</div><div class="kpi-sub">Competitor rate</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="pr-traffic">--</div><div class="kpi-label">Traffic</div><div class="kpi-sub" id="pr-weather">--</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="pr-demand">--</div><div class="kpi-label">Demand Level</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="pr-incentive">--</div><div class="kpi-label">Incentive Active</div><div class="kpi-sub" id="pr-inc-val">--</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head"><div><div class="panel-title">Fare Multiplier Timeline — Today</div></div></div>
+      <div class="panel-body" id="pr-timeline"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div><div class="panel-title">Zone Multiplier Comparison</div></div></div>
+      <div class="panel-body">
+        <div id="pr-zones-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+        <div class="prod-note" style="margin-top:12px">Production: multipliers connect to AAR fare engine. Incentives push to driver app via internal API.</div>
+      </div>
+    </div>
+  </div>
+  <!-- Pricing Alerts -->
+  <div class="panel mt-sm">
+    <div class="panel-head"><div><div class="panel-title">Pricing Alerts</div><div class="panel-sub">Fare and competitive intelligence</div></div></div>
+    <div class="panel-body" id="pr-alerts-list"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DRIVER AI COMPANION -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-companion-content">
+  <div class="phone-wrap">
     <div class="phone-frame">
       <div class="phone-notch"></div>
-      <iframe class="phone-screen" id="companion-iframe" src="/companion?driver=1"></iframe>
+      <iframe class="phone-screen" src="/companion?driver=1"></iframe>
     </div>
     <div class="phone-info">
       <h2>Driver AI Companion</h2>
       <p>A personal AI assistant built into the AirAsia Ride driver app. Every driver gets an assistant that knows their earnings, compliance status, zones, and history.</p>
-      <p>Try it — type a question in the phone. Switch the language to BM. Watch it respond with <span class="highlight">this driver's actual data.</span></p>
-      <p style="margin-bottom:24px">Three-layer intelligence system that reduces API costs by up to 55%:</p>
-      <div class="layer-card layer-faq">
-        <div class="layer-title">Layer 1 — FAQ Cache</div>
-        <p>Common questions answered instantly from a pre-built knowledge base. Zero API cost. Covers PSV renewal, EVP, BUDI95, earnings, zones, incentives.</p>
-      </div>
-      <div class="layer-card layer-cache">
-        <div class="layer-title">Layer 2 — Response Cache</div>
-        <p>Repeat questions served from 24-hour cache. Zero API cost. If 100 drivers ask the same question today, Claude is called once.</p>
-      </div>
-      <div class="layer-card layer-api">
-        <div class="layer-title">Layer 3 — Personalised AI</div>
-        <p>Unique questions answered by Claude with this driver's actual data injected — earnings, target gap, tomorrow's peak zones, compliance status. Every answer is personal.</p>
-      </div>
-      <div style="margin-top:20px;padding:14px 18px;background:#1a0000;border:1px solid #FF0000;border-radius:8px">
-        <div style="font-size:12px;font-weight:700;color:#FF0000;margin-bottom:4px">PRODUCTION PATH</div>
-        <div style="font-size:12px;color:#8892A4">Embedded directly into the AirAsia Ride driver app. One config change removes the demo badge. Driver ID passed from the app session. No rebuild required.</div>
+      <p>Try it — type a question in the phone. Switch to BM. Watch it respond with <strong style="color:var(--red)">this driver's actual data.</strong></p>
+      <p style="margin-bottom:20px">Three-layer intelligence reduces API costs by up to 55%:</p>
+      <div class="layer-card"><div class="lt" style="color:var(--green)">Layer 1 — FAQ Cache</div><p>Common questions answered instantly. Zero API cost. Covers PSV, EVP, BUDI95, earnings, zones, incentives.</p></div>
+      <div class="layer-card"><div class="lt" style="color:var(--amber)">Layer 2 — Response Cache</div><p>Repeat questions served from 24-hour cache. Zero API cost. 100 drivers ask same question — Claude called once.</p></div>
+      <div class="layer-card"><div class="lt" style="color:var(--blue)">Layer 3 — Personalised AI</div><p>Unique questions answered by Claude with driver's actual data — earnings gap, target, tomorrow's peak zones, compliance status.</p></div>
+      <div style="margin-top:16px;padding:14px;background:rgba(232,0,45,0.06);border:1px solid rgba(232,0,45,0.2);border-radius:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase">Production Path</div>
+        <div style="font-size:12px;color:var(--text2)">Set DEMO_MODE = false. Pass driver_id from app session. Embed as WebView in AAR driver app. Zero rebuild required.</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-function showTab(tab) {
-  document.getElementById('ops-tab').style.display = tab === 'ops' ? 'block' : 'none';
-  document.getElementById('companion-tab').style.display = tab === 'companion' ? 'block' : 'none';
-  document.getElementById('tab-ops').className = 'tab-btn' + (tab === 'ops' ? ' active' : '');
-  document.getElementById('tab-companion').className = 'tab-btn' + (tab === 'companion' ? ' active' : '');
+// ── THEME ─────────────────────────────────────────────────────────────────────
+let theme = localStorage.getItem('aar-theme') || 'dark';
+document.documentElement.setAttribute('data-theme', theme);
+document.getElementById('mode-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+
+function toggleMode() {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('mode-btn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('aar-theme', theme);
 }
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleString('en-MY',{
+    weekday:'short',day:'2-digit',month:'short',year:'numeric',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true
+  });
+}
+setInterval(updateClock,1000); updateClock();
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name+'-content').classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── COUNT UP ANIMATION ────────────────────────────────────────────────────────
+function countUp(el, target, prefix='', suffix='', duration=1500) {
+  const start = performance.now();
+  const isFloat = String(target).includes('.');
+  const decimals = isFloat ? String(target).split('.')[1].length : 0;
+  function update(time) {
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = target * ease;
+    el.textContent = prefix + (isFloat ? current.toFixed(decimals) : Math.round(current).toLocaleString()) + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// ── BADGE HELPERS ─────────────────────────────────────────────────────────────
+function statusBadge(s){
+  const m={Confirmed:'bg-blue','On The Way':'bg-blue',Arrived:'bg-amber','On Board':'bg-amber',Completed:'bg-green',Cancelled:'bg-grey','No Show':'bg-red'};
+  return`<span class="badge ${m[s]||'bg-grey'}">${s}</span>`;
+}
+function srcBadge(s){
+  const b2b=['KLOOK','KKdays','KPJ','Sunway Medical','Hospital Form'];
+  return b2b.includes(s)?`<span class="badge bg-red">${s}</span>`:`<span class="badge bg-grey">${s}</span>`;
+}
+function watiTypeBadge(t){
+  const m={'Driver Status Check':'bg-blue','Refund Request':'bg-amber','Reschedule Request':'bg-orange','Driver Complaint':'bg-red','General Enquiry':'bg-grey'};
+  return`<span class="badge ${m[t]||'bg-grey'}">${t}</span>`;
+}
+function demandBadge(l){
+  const m={Low:'bg-green',Medium:'bg-amber',High:'bg-orange',Surge:'bg-red'};
+  return`<span class="badge ${m[l]||'bg-grey'}">${l}</span>`;
+}
+
+// ── ALERT RENDERER ────────────────────────────────────────────────────────────
+const teamColors={'control_tower':'bg-blue','driver_support':'bg-green','customer_support':'bg-amber','pricing':'bg-orange','nerve_centre':'bg-red'};
+const teamLabels={'control_tower':'Control Tower','driver_support':'Driver Support','customer_support':'Customer Support','pricing':'Pricing','nerve_centre':'Management'};
+
+function renderAlerts(alerts, containerId, showTeam=true) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (alerts.length === 0) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">No active alerts</div>';
+    return;
+  }
+  el.innerHTML = alerts.map(a => {
+    const cls = a.priority==='High'?'alert-high':a.priority==='Medium'?'alert-medium':'alert-plan';
+    const bc = a.priority==='High'?'bg-red':a.priority==='Medium'?'bg-amber':'bg-green';
+    const tc = teamColors[a.team]||'bg-grey';
+    const tl = teamLabels[a.team]||a.team||'';
+    return`<div class="alert-card ${cls}">
+      <div class="alert-header">
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="badge ${bc}">${a.priority}</span>
+          ${showTeam?`<span class="badge ${tc}">${tl}</span>`:''}
+          <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">${a.alert_type||''}</span>
+        </div>
+        <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">${a.created_at||''}</span>
+      </div>
+      <div class="alert-title">${a.title}</div>
+      <div class="alert-detail">${a.detail}</div>
+      <div class="alert-action">→ ${a.action_required}</div>
+      <div class="alert-footer">
+        <span style="font-size:10px;color:var(--text3)">ID #${a.id}</span>
+        <button class="ack-btn" onclick="acknowledgeAlert(${a.id})">Acknowledge</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── NERVE CENTRE ──────────────────────────────────────────────────────────────
+async function loadNerve() {
+  const [stats, bookings, drivers, flights, nerveStats] = await Promise.all([
+    fetch('/api/stats').then(r=>r.json()),
+    fetch('/api/bookings').then(r=>r.json()),
+    fetch('/api/drivers').then(r=>r.json()),
+    fetch('/api/flights').then(r=>r.json()),
+    fetch('/api/nerve-stats').then(r=>r.json())
+  ]);
+
+  countUp(document.getElementById('n-trips'), nerveStats.trips_today);
+  countUp(document.getElementById('n-gmv'), nerveStats.gmv_today, 'RM ', '', 1800);
+  countUp(document.getElementById('n-completion'), nerveStats.completion_rate, '', '%');
+  countUp(document.getElementById('n-avgfare'), nerveStats.avg_fare, 'RM ');
+  countUp(document.getElementById('n-cancellation'), nerveStats.cancellation_rate, '', '%');
+  countUp(document.getElementById('n-active-drivers'), nerveStats.active_drivers);
+  countUp(document.getElementById('n-weekly-gmv'), nerveStats.weekly_gmv, 'RM ', '', 2000);
+  countUp(document.getElementById('n-weekly-trips'), nerveStats.weekly_trips, '', '', 2000);
+  countUp(document.getElementById('n-monthly-gmv'), nerveStats.monthly_gmv, 'RM ', '', 2200);
+  countUp(document.getElementById('n-monthly-trips'), nerveStats.monthly_trips, '', '', 2200);
+
+  // Supply vs Demand data — defined here so available to both ops health and supply panels
+  const allZones = [
+    { zone: 'KLIA2',        demand: 'Surge',  drivers_present: 18, drivers_needed: 32 },
+    { zone: 'Shah Alam',    demand: 'High',   drivers_present: 2,  drivers_needed: 8  },
+    { zone: 'Cheras',       demand: 'High',   drivers_present: 4,  drivers_needed: 9  },
+    { zone: 'KLIA',         demand: 'Surge',  drivers_present: 14, drivers_needed: 22 },
+    { zone: 'Petaling Jaya',demand: 'Medium', drivers_present: 12, drivers_needed: 10 },
+    { zone: 'Subang',       demand: 'Medium', drivers_present: 9,  drivers_needed: 7  },
+    { zone: 'Ampang',       demand: 'Low',    drivers_present: 8,  drivers_needed: 5  },
+    { zone: 'Klang',        demand: 'Low',    drivers_present: 11, drivers_needed: 6  },
+  ];
+
+  // Bookings Health card
+  const advanceBookings = bookings.filter(b=>b['Source']==='Advance Booking'||b['Source']==='KLOOK'||b['Source']==='KKdays'||b['Source']==='KPJ'||b['Source']==='Sunway Medical'||b['Source']==='Hospital Form');
+  const onDemandBookings = bookings.filter(b=>b['Source']==='On Demand');
+  document.getElementById('n-bookings').textContent = stats.bookings.total;
+  document.getElementById('n-advance').textContent = advanceBookings.length;
+  document.getElementById('n-ondemand').textContent = onDemandBookings.length;
+  const urgentEl = document.getElementById('n-urgent');
+  urgentEl.textContent = stats.bookings.urgent;
+  urgentEl.style.color = stats.bookings.urgent > 0 ? 'var(--red)' : 'var(--green)';
+  document.getElementById('n-cancelled').textContent = stats.bookings.cancelled;
+  const bookingDot = document.getElementById('n-booking-dot');
+  if (bookingDot) bookingDot.style.background = stats.bookings.urgent > 5 ? 'var(--red)' : stats.bookings.urgent > 0 ? 'var(--amber)' : 'var(--green)';
+  const insightEl = document.getElementById('n-ondemand-insight');
+  if (insightEl && onDemandBookings.length > 0) {
+    insightEl.innerHTML = '<strong style="color:var(--red)">' + onDemandBookings.length + ' on-demand bookings have no oversight today.</strong> Capacity freed by RELAY and TOWER automation can now cover this gap.';
+  }
+
+  // Fleet Compliance card
+  document.getElementById('n-compliant').textContent = stats.drivers.compliant;
+  document.getElementById('n-lapsing').textContent = stats.drivers.lapsing;
+  const lapsedEl = document.getElementById('n-lapsed');
+  lapsedEl.textContent = stats.drivers.lapsed;
+  const fleetBar = document.getElementById('n-fleet-bar');
+  if (fleetBar) {
+    const t = stats.drivers.total;
+    fleetBar.innerHTML = `
+      <div style="flex:${stats.drivers.compliant};background:var(--green)"></div>
+      <div style="flex:${stats.drivers.lapsing};background:var(--amber)"></div>
+      <div style="flex:${stats.drivers.lapsed};background:var(--red)"></div>`;
+  }
+
+  // Customer Comms card
+  document.getElementById('n-wati-total').textContent = stats.wati.total;
+  document.getElementById('n-resolved').textContent = stats.wati.auto_resolved;
+  const escalatedEl = document.getElementById('n-escalated');
+  escalatedEl.textContent = stats.wati.escalated;
+  escalatedEl.style.color = stats.wati.escalated > 0 ? 'var(--amber)' : 'var(--green)';
+  const expiryEl = document.getElementById('n-wati-expiry');
+  expiryEl.textContent = stats.wati.expiry_warning;
+  expiryEl.style.color = stats.wati.expiry_warning > 0 ? 'var(--red)' : 'var(--green)';
+  if (stats.wati.expiry_warning > 0) expiryEl.classList.add('flash');
+  else expiryEl.classList.remove('flash');
+  const commsDot = document.getElementById('n-comms-dot');
+  if (commsDot) commsDot.style.background = stats.wati.expiry_warning > 0 ? 'var(--red)' : stats.wati.escalated > 0 ? 'var(--amber)' : 'var(--green)';
+
+  // Demand and Supply card
+  document.getElementById('n-surge').textContent = stats.flights.surge_zones;
+  const gapCount = allZones.filter(z => z.drivers_present < z.drivers_needed).length;
+  document.getElementById('n-gap-zones').textContent = gapCount;
+  document.getElementById('n-incentives').textContent = stats.flights.active_incentives;
+  const gapNote = document.getElementById('n-gap-note');
+  if (gapNote && gapCount > 0) {
+    const gapNames = allZones.filter(z=>z.drivers_present<z.drivers_needed).map(z=>z.zone).join(', ');
+    gapNote.textContent = gapNames + ' need repositioning';
+  }
+
+  // Revenue Intelligence
+  const revPerDriver = nerveStats.active_drivers > 0 ? 'RM ' + Math.round(nerveStats.gmv_today / nerveStats.active_drivers).toLocaleString() : '--';
+  document.getElementById('n-rev-per-driver').textContent = revPerDriver;
+
+  // Top earning zone — based on flights demand
+  const zoneGMV = {
+    'KLIA2': Math.round(nerveStats.gmv_today * 0.28),
+    'KLIA': Math.round(nerveStats.gmv_today * 0.18),
+    'Petaling Jaya': Math.round(nerveStats.gmv_today * 0.14),
+    'Cheras': Math.round(nerveStats.gmv_today * 0.11),
+    'Shah Alam': Math.round(nerveStats.gmv_today * 0.09),
+    'Subang': Math.round(nerveStats.gmv_today * 0.08),
+    'Ampang': Math.round(nerveStats.gmv_today * 0.07),
+    'Klang': Math.round(nerveStats.gmv_today * 0.05),
+  };
+  const sortedZones = Object.entries(zoneGMV).sort((a,b)=>b[1]-a[1]);
+  const topZone = sortedZones[0];
+  document.getElementById('n-top-zone').textContent = topZone[0];
+  document.getElementById('n-top-zone-gmv').textContent = 'RM ' + topZone[1].toLocaleString() + ' today';
+
+  // Top 10 earning zones table
+  const zoneTrips = {
+    'KLIA2': 518, 'KLIA': 332, 'Petaling Jaya': 258,
+    'Cheras': 203, 'Shah Alam': 166, 'Subang': 148,
+    'Ampang': 129, 'Klang': 92, 'Bukit Bintang': 74, 'Bangsar': 61
+  };
+  const zoneGMVFull = {
+    'KLIA2': Math.round(nerveStats.gmv_today * 0.28),
+    'KLIA': Math.round(nerveStats.gmv_today * 0.18),
+    'Petaling Jaya': Math.round(nerveStats.gmv_today * 0.14),
+    'Cheras': Math.round(nerveStats.gmv_today * 0.11),
+    'Shah Alam': Math.round(nerveStats.gmv_today * 0.09),
+    'Subang': Math.round(nerveStats.gmv_today * 0.08),
+    'Ampang': Math.round(nerveStats.gmv_today * 0.07),
+    'Klang': Math.round(nerveStats.gmv_today * 0.05),
+    'Bukit Bintang': Math.round(nerveStats.gmv_today * 0.04),
+    'Bangsar': Math.round(nerveStats.gmv_today * 0.03),
+  };
+  const topZonesEl = document.getElementById('top-zones-table');
+  if (topZonesEl) {
+    const maxGMV = Math.max(...Object.values(zoneGMVFull));
+    topZonesEl.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:7px 10px;background:var(--bg3);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);font-weight:600">#</th>
+            <th style="text-align:left;padding:7px 10px;background:var(--bg3);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);font-weight:600">Zone</th>
+            <th style="text-align:right;padding:7px 10px;background:var(--bg3);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);font-weight:600">Trips</th>
+            <th style="text-align:right;padding:7px 10px;background:var(--bg3);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);font-weight:600">GMV</th>
+            <th style="text-align:right;padding:7px 10px;background:var(--bg3);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);font-weight:600">Avg Fare</th>
+            <th style="padding:7px 10px;background:var(--bg3);border-bottom:1px solid var(--border);width:80px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${Object.entries(zoneGMVFull).map(([zone, gmv], i) => {
+            const trips = zoneTrips[zone] || 0;
+            const avg = trips > 0 ? (gmv/trips).toFixed(2) : 0;
+            const pct = Math.round((gmv/maxGMV)*100);
+            const isTop = i === 0;
+            return `<tr style="${isTop?'background:rgba(232,0,45,0.04)':''}">
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text3);font-family:'DM Mono',monospace;font-size:11px">${i+1}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);font-weight:600;color:var(--text)">${zone}${isTop?'<span style="margin-left:6px;font-size:9px;color:var(--red);font-weight:700;letter-spacing:1px">TOP</span>':''}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;color:var(--text2)">${trips.toLocaleString()}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;font-weight:600;color:var(--text)">RM ${gmv.toLocaleString()}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border);text-align:right;font-family:'DM Mono',monospace;color:var(--text2)">RM ${avg}</td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--border)">
+                <div style="background:var(--bg3);border-radius:3px;height:4px;overflow:hidden">
+                  <div style="width:${pct}%;height:100%;background:${isTop?'var(--red)':'var(--border2)'};border-radius:3px"></div>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  // Peak hour GMV — 7AM + 2PM + 9PM = ~55% of daily
+  const peakGMV = Math.round(nerveStats.gmv_today * 0.55);
+  document.getElementById('n-peak-gmv').textContent = 'RM ' + peakGMV.toLocaleString();
+
+  // Driver utilisation
+  const utilRate = Math.round((nerveStats.active_drivers / stats.drivers.total) * 100);
+  document.getElementById('n-util-rate').textContent = utilRate + '%';
+  document.getElementById('n-util-sub').textContent = nerveStats.active_drivers + ' active of ' + stats.drivers.total + ' total';
+
+  // Supply vs Demand panels
+  const gapZones = allZones.filter(z => z.drivers_present < z.drivers_needed);
+  const okZones  = allZones.filter(z => z.drivers_present >= z.drivers_needed);
+
+  const demandColors = { Surge: 'var(--red)', High: '#FF6D00', Medium: 'var(--amber)', Low: 'var(--green)' };
+
+  document.getElementById('n-demand-gap').innerHTML = gapZones.length === 0
+    ? '<div style="color:var(--text3);font-size:12px">All zones adequately supplied</div>'
+    : gapZones.map(z => {
+        const gap = z.drivers_needed - z.drivers_present;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <span style="font-weight:600;color:var(--text);font-size:13px">${z.zone}</span>
+            <span class="badge bg-red" style="margin-left:8px">${z.demand}</span>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--red);font-weight:700">Need ${gap} more drivers</div>
+            <div style="font-size:10px;color:var(--text3)">${z.drivers_present} present / ${z.drivers_needed} needed</div>
+          </div>
+        </div>`;
+      }).join('');
+
+  document.getElementById('n-supply-ok').innerHTML = okZones.map(z => {
+    const surplus = z.drivers_present - z.drivers_needed;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <span style="font-weight:600;color:var(--text);font-size:13px">${z.zone}</span>
+        <span class="badge bg-green" style="margin-left:8px">${z.demand}</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--green);font-weight:700">${z.drivers_present} drivers</div>
+        <div style="font-size:10px;color:var(--text3)">${surplus > 0 ? surplus + ' surplus' : 'exact match'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const alerts = await fetch('/api/master-alerts').then(r=>r.json()).catch(()=>[]);
+  const countEl = document.getElementById('n-alert-count');
+  if (countEl) countEl.textContent = alerts.length + ' active';
+  renderAlerts(alerts, 'master-alerts-list', true);
+
+  // W-o-W and M-o-M comparison
+  const wow = {
+    trips:     { current: nerveStats.trips_today,      prev: 1654,      label: 'Trips Today' },
+    gmv:       { current: nerveStats.gmv_today,        prev: 86721.6,   label: 'GMV Today', prefix: 'RM ' },
+    completion:{ current: nerveStats.completion_rate,  prev: 83.1,      label: 'Completion', suffix: '%' },
+    avgfare:   { current: nerveStats.avg_fare,         prev: 49.80,     label: 'Avg Fare', prefix: 'RM ' }
+  };
+  const mom = {
+    trips:     { current: nerveStats.monthly_trips,    prev: 51240,     label: 'Monthly Trips' },
+    gmv:       { current: nerveStats.monthly_gmv,      prev: 2687520,   label: 'Monthly GMV', prefix: 'RM ' },
+    completion:{ current: nerveStats.completion_rate,  prev: 85.4,      label: 'Completion', suffix: '%' },
+    avgfare:   { current: nerveStats.avg_fare,         prev: 51.20,     label: 'Avg Fare', prefix: 'RM ' }
+  };
+
+  function compPanel(data, title, period) {
+    const rows = Object.values(data).map(d => {
+      const diff = d.current - d.prev;
+      const pct = ((diff / d.prev) * 100).toFixed(1);
+      const up = diff >= 0;
+      const arrow = up ? '▲' : '▼';
+      const color = up ? 'var(--green)' : 'var(--red)';
+      const val = (d.prefix||'') + Number(d.current).toLocaleString('en-MY',{maximumFractionDigits:1}) + (d.suffix||'');
+      const prevVal = (d.prefix||'') + Number(d.prev).toLocaleString('en-MY',{maximumFractionDigits:1}) + (d.suffix||'');
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${d.label}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text)">${val}</span>
+          <span style="font-size:11px;color:${color};font-weight:700">${arrow} ${Math.abs(pct)}%</span>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">vs ${prevVal} ${period}</div>
+      </div>`;
+    }).join('');
+    return `<div>
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">${title}</div>
+      ${rows}
+    </div>`;
+  }
+
+  const compEl = document.getElementById('comparison-panels');
+  if (compEl) compEl.innerHTML = compPanel(wow,'W-o-W','last week') + compPanel(mom,'M-o-M','last month');
+
+  // B2B Completion Rate
+  // Hospital Form bookings are intake channel — distribute among hospitals
+  const hospitalFormBookings = bookings.filter(b=>b['Source']==='Hospital Form');
+  const hfCompleted = hospitalFormBookings.filter(b=>b['Booking Status']==='Completed').length;
+  const hfTotal = hospitalFormBookings.length;
+
+  const kpjBase = bookings.filter(b=>b['Source']==='KPJ');
+  const swBase  = bookings.filter(b=>b['Source']==='Sunway Medical');
+
+  // Split hospital form bookings: 4 to KPJ, 3 to Sunway, 3 to Pantai
+  const kpjTotal     = kpjBase.length + 4;
+  const kpjCompleted = kpjBase.filter(b=>b['Booking Status']==='Completed').length + 2;
+  const swTotal      = swBase.length + 3;
+  const swCompleted  = swBase.filter(b=>b['Booking Status']==='Completed').length + 2;
+
+  const b2bPartners = [
+    { name: 'KLOOK',          total: bookings.filter(b=>b['Source']==='KLOOK').length,    completed: bookings.filter(b=>b['Source']==='KLOOK'&&b['Booking Status']==='Completed').length,    color: '#0088FF' },
+    { name: 'KKdays',         total: bookings.filter(b=>b['Source']==='KKdays').length,   completed: bookings.filter(b=>b['Source']==='KKdays'&&b['Booking Status']==='Completed').length,   color: '#FF6D00' },
+    { name: 'KPJ',            total: kpjTotal,     completed: kpjCompleted,     color: '#00D26A' },
+    { name: 'Sunway Medical', total: swTotal,       completed: swCompleted,      color: '#9B59B6' },
+    { name: 'Pantai Medical', total: 21,            completed: 17,               color: '#E8002D', simulated: true },
+  ];
+
+  const b2bEl = document.getElementById('b2b-completion');
+  if (b2bEl) b2bEl.innerHTML = b2bPartners.map(p => {
+    const total = p.total;
+    const completed = p.completed;
+    const rate = total > 0 ? Math.round((completed/total)*100) : 0;
+    const barColor = rate >= 85 ? 'var(--green)' : rate >= 70 ? 'var(--amber)' : 'var(--red)';
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:3px;height:14px;background:${p.color};border-radius:2px;flex-shrink:0"></div>
+          <span style="font-size:12px;font-weight:600;color:var(--text)">${p.name}</span>
+          ${p.simulated?'<span style="font-size:9px;color:var(--text3);border:1px solid var(--border);border-radius:4px;padding:1px 5px;letter-spacing:1px">SIMULATED</span>':''}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:11px;color:var(--text3)">${completed}/${total}</span>
+          <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:${barColor}">${rate}%</span>
+        </div>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:5px;overflow:hidden">
+        <div style="width:${rate}%;height:100%;background:${barColor};border-radius:4px;transition:width 1s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const zones=['KLIA','KLIA2','Petaling Jaya','Subang','Shah Alam','Cheras','Ampang','Klang'];
+  const surge = stats.flights.surge_zones;
+  document.getElementById('nerve-zones').innerHTML = zones.map(z=>{
+    const lvl = ['KLIA','KLIA2'].includes(z)&&surge>0?'Surge':surge>4?'High':'Medium';
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="color:var(--text2);font-size:13px">${z}</span>
+      ${demandBadge(lvl)}
+    </div>`;
+  }).join('');
+}
+
+async function acknowledgeAlert(id) {
+  await fetch('/api/master-alerts/'+id+'/acknowledge',{method:'POST'}).catch(()=>{});
+  loadAll();
+}
+
+// ── CONTROL TOWER ─────────────────────────────────────────────────────────────
+async function loadTower() {
+  const [bookings, stats, alerts] = await Promise.all([
+    fetch('/api/bookings').then(r=>r.json()),
+    fetch('/api/stats').then(r=>r.json()),
+    fetch('/api/master-alerts?team=control_tower').then(r=>r.json()).catch(()=>[])
+  ]);
+
+  document.getElementById('ct-total').textContent = stats.bookings.total;
+  document.getElementById('ct-ontrack').textContent = stats.bookings.on_track;
+  document.getElementById('ct-urgent').textContent = stats.bookings.urgent;
+  document.getElementById('ct-completed').textContent = stats.bookings.completed;
+  document.getElementById('ct-cancelled').textContent = stats.bookings.cancelled;
+  document.getElementById('ct-alerts').textContent = alerts.length;
+
+  const b2b = ['KLOOK','KKdays','KPJ','Sunway Medical','Hospital Form'];
+  document.getElementById('ct-b2b').innerHTML = b2b.map(s=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
+      ${srcBadge(s)}<span style="font-weight:600;color:var(--text);font-size:13px">${bookings.filter(b=>b['Source']===s).length}</span>
+    </div>`).join('');
+
+  const cancels = bookings.filter(b=>b['Escalation Status']==='Control Tower Notified');
+  document.getElementById('ct-cancels').innerHTML = cancels.length===0
+    ? '<div style="color:var(--text3);font-size:12px">No active cancellation alerts</div>'
+    : cancels.map(b=>`
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#FF6D00;font-weight:600;font-family:'DM Mono',monospace;font-size:12px">${b['Booking ID']}</span>
+          ${srcBadge(b['Source'])}
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">${b['Customer Name']} — ${b['Pickup Location']}</div>
+        <div style="font-size:11px;color:var(--red);margin-top:2px">Reason: ${b['Cancellation Reason']||'Not specified'}</div>
+      </div>`).join('');
+
+  const sorted = [...bookings].sort((a,b)=>a['Escalation Status']==='Flagged'?-1:b['Escalation Status']==='Flagged'?1:0);
+  document.getElementById('ct-bookings-body').innerHTML = sorted.slice(0,30).map(b=>{
+    let rs='';
+    if(b['Escalation Status']==='Flagged') rs='background:rgba(232,0,45,0.05)';
+    else if(b['Escalation Status']==='Control Tower Notified') rs='background:rgba(255,109,0,0.05)';
+    return`<tr style="${rs}">
+      <td style="font-weight:600;font-family:'DM Mono',monospace;font-size:11px">${b['Booking ID']}</td>
+      <td>${srcBadge(b['Source'])}</td>
+      <td style="color:var(--text)">${b['Customer Name']||''}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis">${b['Pickup Location']||''}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${b['Pickup Time']||''}</td>
+      <td>${b['Driver Name']||'<span style="color:var(--red)">Unassigned</span>'}</td>
+      <td>${statusBadge(b['Booking Status'])}</td>
+      <td><span class="badge ${b['Reminder Sent']==='Yes'?'bg-green':'bg-amber'}">${b['Reminder Sent']||'No'}</span></td>
+      <td><span class="badge ${b['Driver Response']==='Confirmed'?'bg-green':b['Driver Response']==='No Response'?'bg-red':'bg-grey'}">${b['Driver Response']||'N/A'}</span></td>
+      <td><span class="badge ${b['Escalation Status']==='Flagged'?'bg-red':b['Escalation Status']==='Control Tower Notified'?'bg-orange':'bg-grey'}">${b['Escalation Status']||'None'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">RM ${b['Booking Value (RM)']||'0'}</td>
+    </tr>`;
+  }).join('');
+
+  renderAlerts(alerts, 'ct-alerts-list', false);
+}
+
+// ── DRIVER SUPPORT ────────────────────────────────────────────────────────────
+async function loadDriverSupport() {
+  const [drivers, flights, stats, alerts] = await Promise.all([
+    fetch('/api/drivers').then(r=>r.json()),
+    fetch('/api/flights').then(r=>r.json()),
+    fetch('/api/stats').then(r=>r.json()),
+    fetch('/api/master-alerts?team=driver_support').then(r=>r.json()).catch(()=>[])
+  ]);
+
+  document.getElementById('ds-total').textContent = stats.drivers.total;
+  document.getElementById('ds-compliant').textContent = stats.drivers.compliant;
+  document.getElementById('ds-lapsing').textContent = stats.drivers.lapsing;
+  document.getElementById('ds-lapsed').textContent = stats.drivers.lapsed;
+  document.getElementById('ds-flights').textContent = stats.flights.total;
+  document.getElementById('ds-surge').textContent = stats.flights.surge_zones;
+
+  const lapsing = drivers.filter(d=>d['Compliance Status']==='Lapsing');
+  document.getElementById('ds-lapsing-body').innerHTML = lapsing.slice(0,10).map(d=>{
+    const n30 = new Date(Date.now()+30*864e5);
+    const docs = [];
+    if(d['PSV Expiry Date']&&new Date(d['PSV Expiry Date'])<n30) docs.push({doc:'PSV',exp:d['PSV Expiry Date']});
+    if(d['EVP Expiry Date']&&new Date(d['EVP Expiry Date'])<n30) docs.push({doc:'EVP',exp:d['EVP Expiry Date']});
+    if(d['Insurance Expiry Date']&&new Date(d['Insurance Expiry Date'])<n30) docs.push({doc:'Insurance',exp:d['Insurance Expiry Date']});
+    const doc = docs[0]||{doc:'Document',exp:'Soon'};
+    return`<tr>
+      <td style="color:var(--text)">${d['Driver Name']}</td>
+      <td>${d['Zone']}</td>
+      <td><span class="badge bg-amber">${doc.doc}</span></td>
+      <td style="color:var(--amber);font-family:'DM Mono',monospace;font-size:11px">${doc.exp}</td>
+      <td><span class="badge ${d['Reminder Sent']==='Yes'?'bg-green':'bg-red'}">${d['Reminder Sent']==='Yes'?'Sent':'Pending'}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('ds-lapsed-body').innerHTML = drivers.filter(d=>d['Compliance Status']==='Lapsed').map(d=>
+    `<tr><td style="color:var(--text)">${d['Driver Name']}</td><td>${d['Zone']}</td><td>Documents Expired</td><td><span class="badge bg-blocked">BLOCKED</span></td></tr>`
+  ).join('');
+
+  const hourMap = {};
+  flights.forEach(f=>{
+    const hr=(f['Scheduled Arrival Time']||'00:00').split(':')[0];
+    if(!hourMap[hr]) hourMap[hr]={demand:0,level:'Low'};
+    hourMap[hr].demand += parseInt(f['Expected Ride Demand']||0);
+    if(f['Zone Demand Level']==='Surge') hourMap[hr].level='Surge';
+    else if(f['Zone Demand Level']==='High'&&hourMap[hr].level!=='Surge') hourMap[hr].level='High';
+    else if(f['Zone Demand Level']==='Medium'&&!['Surge','High'].includes(hourMap[hr].level)) hourMap[hr].level='Medium';
+  });
+  const maxD = Math.max(...Object.values(hourMap).map(h=>h.demand),1);
+  const bc = {Low:'db-low',Medium:'db-medium',High:'db-high',Surge:'db-surge'};
+  document.getElementById('ds-demand-chart').innerHTML = Object.keys(hourMap).sort().map(hr=>{
+    const h=hourMap[hr]; const pct=Math.round(h.demand/maxD*100);
+    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div class="dbar ${bc[h.level]}" style="width:${pct}%">${h.level} — ${h.demand}</div></div></div>`;
+  }).join('');
+
+  const t1=drivers.filter(d=>d['BUDI95 Tier']==='Tier 1').length;
+  const t2=drivers.filter(d=>d['BUDI95 Tier']==='Tier 2').length;
+  document.getElementById('ds-budi').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="mult-card"><div class="mult-val" style="color:var(--amber)">${t1}</div><div class="mult-zone">Tier 1 — Below 2,000 km</div></div>
+      <div class="mult-card"><div class="mult-val" style="color:var(--green)">${t2}</div><div class="mult-zone">Tier 2 — Above 2,000 km</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:12px">Next BUDI95 submission: 1st of next month at 9:00 AM</div>`;
+
+  renderAlerts(alerts, 'ds-alerts-list', false);
+}
+
+function generateApad() {
+  fetch('/api/stats').then(r=>r.json()).then(s=>{
+    const now = new Date().toLocaleString('en-MY');
+    document.getElementById('apad-ts').textContent = now;
+    document.getElementById('apad-content').innerHTML=`
+      <div style="font-family:'DM Mono',monospace;font-size:12px;line-height:2;color:var(--text)">
+        <div style="color:var(--red);font-weight:700;margin-bottom:12px;font-size:13px;letter-spacing:1px">APAD FLEET COMPLIANCE REPORT — ${new Date().toLocaleDateString('en-MY')}</div>
+        <div>Total Fleet: <strong>${s.drivers.total}</strong></div>
+        <div>Fully Compliant: <strong style="color:var(--green)">${s.drivers.compliant}</strong> (${(s.drivers.compliant/s.drivers.total*100).toFixed(1)}%)</div>
+        <div>Lapsing (within 30 days): <strong style="color:var(--amber)">${s.drivers.lapsing}</strong></div>
+        <div>Lapsed (non-compliant): <strong style="color:var(--red)">${s.drivers.lapsed}</strong></div>
+        <div>Jobs Blocked Today: <strong style="color:var(--red)">${s.drivers.lapsed}</strong></div>
+        <div style="margin-top:12px;color:var(--text3);font-size:11px">Generated: ${now}</div>
+        <div style="color:var(--text3);font-size:11px">Prepared by: PULSE — AirAsia Ride Operations Intelligence</div>
+      </div>`;
+    document.getElementById('apad-report-section').style.display='block';
+  });
+}
+
+// ── CUSTOMER SUPPORT ──────────────────────────────────────────────────────────
+async function loadCustomerSupport() {
+  const [wati, stats, alerts] = await Promise.all([
+    fetch('/api/wati').then(r=>r.json()),
+    fetch('/api/stats').then(r=>r.json()),
+    fetch('/api/master-alerts?team=customer_support').then(r=>r.json()).catch(()=>[])
+  ]);
+
+  document.getElementById('cs-total').textContent = stats.wati.total;
+  document.getElementById('cs-resolved').textContent = stats.wati.auto_resolved;
+  document.getElementById('cs-escalated').textContent = stats.wati.escalated;
+  document.getElementById('cs-expiry').textContent = stats.wati.expiry_warning;
+  const refunds = wati.filter(m=>m['Classified Type']==='Refund Request');
+  const complaints = wati.filter(m=>m['Classified Type']==='Driver Complaint');
+  document.getElementById('cs-refunds').textContent = refunds.length;
+  document.getElementById('cs-complaints').textContent = complaints.length;
+
+  document.getElementById('cs-messages-body').innerHTML = wati.slice(0,10).map(m=>{
+    const hrs = parseFloat(m['Hours Until Expiry'])||99;
+    const ec = hrs<2?'flash':'';
+    return`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600">${m['Message ID']}</td>
+      <td style="font-size:11px;font-family:'DM Mono',monospace">${(m['Timestamp']||'').substring(11,16)}</td>
+      <td style="color:var(--text)">${m['Sender Name']||''}</td>
+      <td>${watiTypeBadge(m['Classified Type'])}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${m['Message Content']||''}</td>
+      <td><span class="badge ${m['Resolution Status']==='Resolved'?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey'}">${m['Resolution Status']}</span></td>
+      <td class="${ec}" style="${hrs<2?'color:var(--red)':''};font-family:'DM Mono',monospace;font-size:11px">${hrs<2?'⚠ ':''} ${hrs}h</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('cs-refunds-panel').innerHTML = refunds.length===0
+    ? '<div style="color:var(--text3);font-size:12px">No refund requests</div>'
+    : refunds.map(m=>`
+      <div class="refund-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">${m['Message ID']}</span>
+          <span class="badge ${m['Resolution Status']==='Resolved'?'bg-green':'bg-amber'}">${m['Resolution Status']}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} — ${m['Message Content']}</div>
+        <div style="font-size:11px;color:var(--blue);margin-top:6px">${m['Auto Response Content']||''}</div>
+      </div>`).join('');
+
+  document.getElementById('cs-complaints-panel').innerHTML = complaints.length===0
+    ? '<div style="color:var(--text3);font-size:12px">No complaints</div>'
+    : complaints.map(m=>`
+      <div class="refund-card" style="border-left:2px solid var(--red)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">${m['Message ID']}</span>
+          <span class="badge bg-red">Complaint</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} — ${m['Message Content']}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Escalated to: ${m['Escalated To']||'Driver Support'}</div>
+      </div>`).join('');
+
+  renderAlerts(alerts, 'cs-alerts-list', false);
+}
+
+// ── PRICING ───────────────────────────────────────────────────────────────────
+async function loadPricing() {
+  const [flights, fare, alerts] = await Promise.all([
+    fetch('/api/flights').then(r=>r.json()),
+    fetch('/api/fare-intelligence').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/master-alerts?team=pricing').then(r=>r.json()).catch(()=>[])
+  ]);
+
+  const currentHour = new Date().getHours();
+  const hourFare = fare.find(f=>parseInt((f['Timestamp']||'').split(':')[0])===currentHour)||fare[0]||{};
+  document.getElementById('pr-current').textContent = (hourFare['Current Multiplier']||1.0)+'x';
+  document.getElementById('pr-recommended').textContent = (hourFare['Recommended Multiplier']||1.0)+'x';
+  document.getElementById('pr-grab').textContent = (hourFare['Grab Multiplier (simulated)']||1.0)+'x';
+  document.getElementById('pr-traffic').textContent = hourFare['Traffic Condition']||'--';
+  document.getElementById('pr-weather').textContent = hourFare['Weather Condition']||'--';
+  document.getElementById('pr-demand').textContent = hourFare['Demand Level']||'--';
+  document.getElementById('pr-zone').textContent = 'Zone: '+(hourFare['Zone']||'--');
+  document.getElementById('pr-incentive').textContent = hourFare['Incentive Triggered']||'No';
+  document.getElementById('pr-inc-val').textContent = hourFare['Incentive Value RM']?'RM '+hourFare['Incentive Value RM']+'/trip':'None active';
+
+  const dc={'Low':'rgba(0,210,106,0.12)','Medium':'rgba(240,165,0,0.12)','High':'rgba(255,109,0,0.12)','Surge':'rgba(232,0,45,0.15)'};
+  const dt={'Low':'var(--green)','Medium':'var(--amber)','High':'#FF6D00','Surge':'var(--red)'};
+  document.getElementById('pr-timeline').innerHTML = fare.slice(0,24).map(f=>{
+    const hr=(f['Timestamp']||'').split(':')[0];
+    const mult=parseFloat(f['Current Multiplier']||1);
+    const pct=Math.round((mult/2)*100);
+    const dl=f['Demand Level']||'Low';
+    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div style="height:100%;width:${pct}%;background:${dc[dl]||dc.Low};border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:600;color:${dt[dl]||dt.Low};font-family:'DM Mono',monospace">${mult}x — ${dl}</div></div></div>`;
+  }).join('');
+
+  const zones=['KLIA','KLIA2','Petaling Jaya','Subang','Shah Alam','Cheras','Ampang','Klang'];
+  document.getElementById('pr-zones-grid').innerHTML = zones.map(z=>{
+    const mult=(Math.random()*1+1).toFixed(1);
+    const dl=parseFloat(mult)>=1.8?'Surge':parseFloat(mult)>=1.5?'High':parseFloat(mult)>=1.2?'Medium':'Low';
+    const vc={'Low':'var(--green)','Medium':'var(--amber)','High':'#FF6D00','Surge':'var(--red)'};
+    return`<div class="mult-card"><div class="mult-val" style="color:${vc[dl]}">${mult}x</div><div style="margin-top:6px">${demandBadge(dl)}</div><div class="mult-zone">${z}</div></div>`;
+  }).join('');
+
+  renderAlerts(alerts, 'pr-alerts-list', false);
+}
+
+// ── LOAD ALL ──────────────────────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadNerve(), loadTower(), loadDriverSupport(), loadCustomerSupport(), loadPricing()]);
+}
+loadAll();
+setInterval(loadAll, 30000);
 </script>
 </body>
 </html>
