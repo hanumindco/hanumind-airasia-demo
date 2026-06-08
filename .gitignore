@@ -2,3 +2,4 @@
 __pycache__
 *.pyc
 populate_sheets.py
+google_creds.json
