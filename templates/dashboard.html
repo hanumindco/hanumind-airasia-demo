@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AirAsia Ride — Operations Intelligence</title>
+<title>AirAsia Ride Operations Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
@@ -201,6 +201,19 @@ tr:hover td{background:var(--bg3)}
 .flash{animation:flashred 1.2s infinite}
 @keyframes flashred{0%,100%{opacity:1}50%{opacity:0.3}}
 
+/* SPARK MAP */
+@keyframes incentive-pulse{
+  0%{opacity:0.5;transform:translate(-50%,-50%) scale(0.9)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}
+}
+.spark-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,212,255,0.2);transform:translate(-50%,-50%);left:50%;top:50%;animation:sparkring 5s ease-out infinite;opacity:0}
+@keyframes sparkring{0%{width:0;height:0;opacity:0.3}100%{width:700px;height:700px;opacity:0}}
+.spark-zone{position:absolute;transform:translate(-50%,-50%);cursor:pointer}
+.spark-zone-ring{border-radius:50%;border:1.5px solid;position:relative;display:flex;align-items:center;justify-content:center}
+.spark-zone-core{border-radius:50%;position:absolute}
+.spark-zone-label{position:absolute;white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:"DM Mono",monospace;top:-18px;left:50%;transform:translateX(-50%)}
+.spark-zone-traffic{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;opacity:0.8;font-weight:600}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -242,6 +255,7 @@ tr:hover td{background:var(--bg3)}
   <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Support</button>
   <button class="tab-btn" onclick="showTab('customer')" id="tab-customer"><span class="tab-icon">💬</span>Customer Support</button>
   <button class="tab-btn" onclick="showTab('pricing')" id="tab-pricing"><span class="tab-icon">💰</span>Pricing</button>
+  <button class="tab-btn" onclick="showTab('spark')" id="tab-spark"><span class="tab-icon">📡</span>Demand Map</button>
   <button class="tab-btn" onclick="showTab('companion')" id="tab-companion"><span class="tab-icon">🤖</span>Driver AI</button>
 </div>
 
@@ -288,15 +302,15 @@ tr:hover td{background:var(--bg3)}
       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-bookings">--</div>
       <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 8px;background:rgba(0,210,106,0.05);border-radius:6px;border:1px solid rgba(0,210,106,0.1)">
-          <span style="color:var(--text2)">Advance — monitored by Control Tower</span>
+          <span style="color:var(--text2)">Advance monitored by Control Tower</span>
           <span style="color:var(--green);font-weight:700" id="n-advance">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 8px;background:rgba(232,0,45,0.05);border-radius:6px;border:1px solid rgba(232,0,45,0.1)">
-          <span style="color:var(--text2)">On-Demand — currently unmonitored</span>
+          <span style="color:var(--text2)">On-Demand currently unmonitored</span>
           <span style="color:var(--red);font-weight:700" id="n-ondemand">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text2);font-size:13px">Urgent — driver not responding</span>
+          <span style="color:var(--text2);font-size:13px">Urgent driver not responding</span>
           <span style="font-weight:600" id="n-urgent">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
@@ -319,11 +333,11 @@ tr:hover td{background:var(--bg3)}
         <div style="display:flex;height:6px;border-radius:4px;overflow:hidden;margin-bottom:10px" id="n-fleet-bar"></div>
         <div style="display:flex;flex-direction:column;gap:6px">
           <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:var(--text2);font-size:13px">Lapsing — docs expire soon</span>
+            <span style="color:var(--text2);font-size:13px">Lapsing docs expire soon</span>
             <span style="color:var(--amber);font-weight:600" id="n-lapsing">--</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:var(--text2);font-size:13px">Lapsed — blocked from jobs</span>
+            <span style="color:var(--text2);font-size:13px">Lapsed blocked from jobs</span>
             <span style="color:var(--red);font-weight:600" id="n-lapsed">--</span>
           </div>
         </div>
@@ -344,7 +358,7 @@ tr:hover td{background:var(--bg3)}
           <span style="color:var(--green);font-weight:600" id="n-resolved">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text2);font-size:13px">Escalated — needs action</span>
+          <span style="color:var(--text2);font-size:13px">Escalated needs action</span>
           <span style="font-weight:600" id="n-escalated">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
@@ -397,10 +411,10 @@ tr:hover td{background:var(--bg3)}
     </div>
   </div>
 
-  <div class="section-label mt-md">Supply vs Demand — Right Now</div>
+  <div class="section-label mt-md">Supply vs Demand Right Now</div>
   <div class="grid-2" style="margin-bottom:20px">
     <div class="panel" style="margin-bottom:0">
-      <div class="panel-head"><div><div class="panel-title" style="color:var(--red)">⚠ Demand Gap — Needs More Drivers</div><div class="panel-sub">Zones where demand exceeds supply</div></div></div>
+      <div class="panel-head"><div><div class="panel-title" style="color:var(--red)">⚠ Demand Gap Needs More Drivers</div><div class="panel-sub">Zones where demand exceeds supply</div></div></div>
       <div class="panel-body" id="n-demand-gap"></div>
     </div>
     <div class="panel" style="margin-bottom:0">
@@ -413,7 +427,7 @@ tr:hover td{background:var(--bg3)}
     <div>
       <div class="panel">
         <div class="panel-head">
-          <div><div class="panel-title">Master Intelligence — All Teams</div><div class="panel-sub">Cross-system pattern detection</div></div>
+          <div><div class="panel-title">Master Intelligence All Teams</div><div class="panel-sub">Cross-system pattern detection</div></div>
           <div style="font-size:11px;color:var(--text3)" id="n-alert-count"></div>
         </div>
         <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">
@@ -436,7 +450,7 @@ tr:hover td{background:var(--bg3)}
       </div>
       <!-- TOP 10 EARNING ZONES -->
       <div class="panel" style="margin-bottom:16px">
-        <div class="panel-head"><div><div class="panel-title">Top Earning Zones — Today</div><div class="panel-sub">GMV contribution by zone</div></div></div>
+        <div class="panel-head"><div><div class="panel-title">Top Earning Zones Today</div><div class="panel-sub">GMV contribution by zone</div></div></div>
         <div class="panel-body" id="top-zones-table"></div>
       </div>
       <!-- B2B COMPLETION -->
@@ -446,7 +460,7 @@ tr:hover td{background:var(--bg3)}
       </div>
       <!-- ZONE DEMAND -->
       <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Zone Demand — Right Now</div></div></div>
+        <div class="panel-head"><div><div class="panel-title">Zone Demand Right Now</div></div></div>
         <div class="panel-body" id="nerve-zones"></div>
       </div>
     </div>
@@ -466,11 +480,11 @@ tr:hover td{background:var(--bg3)}
     <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--text3)" id="ct-alerts">--</div><div class="kpi-label">Active Alerts</div></div>
   </div>
   <div class="grid-2" style="margin-bottom:16px">
-    <div class="mini"><h4>B2B Intake — Today</h4><div id="ct-b2b"></div></div>
-    <div class="mini"><h4>Cancellation Alerts — Control Tower Notified</h4><div id="ct-cancels"></div></div>
+    <div class="mini"><h4>B2B Intake Today</h4><div id="ct-b2b"></div></div>
+    <div class="mini"><h4>Cancellation Alerts Control Tower Notified</h4><div id="ct-cancels"></div></div>
   </div>
   <div class="panel">
-    <div class="panel-head"><div><div class="panel-title">Booking Board</div><div class="panel-sub">Urgent sorted to top — refreshes every 30s</div></div></div>
+    <div class="panel-head"><div><div class="panel-title">Booking Board</div><div class="panel-sub">Urgent sorted to top refreshes every 30s</div></div></div>
     <div class="panel-body">
       <div class="tbl-wrap"><table>
         <thead><tr><th>ID</th><th>Source</th><th>Customer</th><th>Pickup</th><th>Time</th><th>Driver</th><th>Status</th><th>Reminder</th><th>Response</th><th>Escalation</th><th>Value</th></tr></thead>
@@ -500,14 +514,14 @@ tr:hover td{background:var(--bg3)}
   <div class="grid-2">
     <div>
       <div class="panel" style="margin-bottom:16px">
-        <div class="panel-head"><div><div class="panel-title">Lapsing Drivers — Action Required</div></div></div>
+        <div class="panel-head"><div><div class="panel-title">Lapsing Drivers Action Required</div></div></div>
         <div class="panel-body"><div class="tbl-wrap"><table>
           <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Expiry</th><th>Reminder</th></tr></thead>
           <tbody id="ds-lapsing-body"></tbody>
         </table></div></div>
       </div>
       <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Lapsed Drivers — Jobs Blocked</div></div></div>
+        <div class="panel-head"><div><div class="panel-title">Lapsed Drivers Jobs Blocked</div></div></div>
         <div class="panel-body"><div class="tbl-wrap"><table>
           <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Status</th></tr></thead>
           <tbody id="ds-lapsed-body"></tbody>
@@ -535,7 +549,7 @@ tr:hover td{background:var(--bg3)}
   </div>
   <div id="apad-report-section" style="display:none;margin-top:16px">
     <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">APAD Compliance Report — <span id="apad-ts"></span></div></div></div>
+      <div class="panel-head"><div><div class="panel-title">APAD Compliance Report <span id="apad-ts"></span></div></div></div>
       <div class="panel-body" id="apad-content"></div>
     </div>
   </div>
@@ -556,7 +570,7 @@ tr:hover td{background:var(--bg3)}
   <div class="grid-2">
     <div>
       <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Live Message Feed</div><div class="panel-sub">RELAY — auto-classified and responded</div></div></div>
+        <div class="panel-head"><div><div class="panel-title">Live Message Feed</div><div class="panel-sub">RELAY auto-classified and responded</div></div></div>
         <div class="panel-body">
           <div class="tbl-wrap"><table>
             <thead><tr><th>ID</th><th>Time</th><th>Sender</th><th>Type</th><th>Message</th><th>Status</th><th>Expiry</th></tr></thead>
@@ -598,7 +612,7 @@ tr:hover td{background:var(--bg3)}
   </div>
   <div class="grid-2">
     <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">Fare Multiplier Timeline — Today</div></div></div>
+      <div class="panel-head"><div><div class="panel-title">Fare Multiplier Timeline Today</div></div></div>
       <div class="panel-body" id="pr-timeline"></div>
     </div>
     <div class="panel">
@@ -617,6 +631,113 @@ tr:hover td{background:var(--bg3)}
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
+<!-- DEMAND MAP SPARK -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-spark-content">
+  <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;height:calc(100vh - 200px);min-height:600px">
+
+    <!-- HUD MAP -->
+    <div style="position:relative;background:linear-gradient(145deg,#060912,#0A0F1C);border:1px solid rgba(0,212,255,0.1);border-radius:10px;overflow:hidden">
+
+      <!-- Grid background -->
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:40px 40px"></div>
+
+      <!-- Radar rings -->
+      <div style="position:absolute;left:45%;top:50%;transform:translate(-50%,-50%);pointer-events:none" id="spark-radar">
+        <div class="spark-ring" style="animation-delay:0s"></div>
+        <div class="spark-ring" style="animation-delay:1.7s"></div>
+        <div class="spark-ring" style="animation-delay:3.4s"></div>
+      </div>
+
+      <!-- Canvas for connector lines -->
+      <canvas id="spark-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+
+      <!-- Zone nodes -->
+      <div id="spark-zones"></div>
+
+      <!-- Map title -->
+      <div style="position:absolute;top:14px;left:16px;font-size:13px;font-weight:700;color:rgba(0,212,255,0.7);letter-spacing:2px;text-transform:uppercase">Klang Valley Live Demand Map</div>
+
+      <!-- Legend -->
+      <div style="position:absolute;top:14px;right:16px;background:rgba(6,9,18,0.85);border:1px solid rgba(0,212,255,0.12);border-radius:8px;padding:10px 14px;backdrop-filter:blur(10px)">
+        <div style="font-size:10px;font-weight:700;color:rgba(0,212,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Driver Demand Level</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:12px;height:12px;border-radius:50%;background:#E8002D;box-shadow:0 0 6px #E8002D;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#E8002D">Surge</div>
+              <div style="font-size:10px;color:rgba(168,180,200,0.5)">Critical shortage immediate action</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:12px;height:12px;border-radius:50%;background:#FF6D00;box-shadow:0 0 6px #FF6D00;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#FF6D00">High</div>
+              <div style="font-size:10px;color:rgba(168,180,200,0.5)">Demand exceeds supply</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:12px;height:12px;border-radius:50%;background:#F0A500;box-shadow:0 0 6px #F0A500;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#F0A500">Medium</div>
+              <div style="font-size:10px;color:rgba(168,180,200,0.5)">Watch approaching shortage</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:12px;height:12px;border-radius:50%;background:#00D26A;box-shadow:0 0 6px #00D26A;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#00D26A">OK</div>
+              <div style="font-size:10px;color:rgba(168,180,200,0.5)">Supply meets demand</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weather bar -->
+      <div style="position:absolute;bottom:14px;left:14px;right:14px;background:rgba(6,9,18,0.9);border:1px solid rgba(0,212,255,0.12);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:20px;backdrop-filter:blur(10px)">
+        <div style="font-size:12px;color:rgba(168,180,200,0.7);display:flex;align-items:center;gap:6px">⛅ <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:#F0F4FF">31°C</span> Partly Cloudy</div>
+        <div style="width:1px;height:20px;background:rgba(0,212,255,0.1)"></div>
+        <div style="font-size:12px;color:rgba(168,180,200,0.7);display:flex;align-items:center;gap:6px">💧 Humidity <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:#F0F4FF">68%</span></div>
+        <div style="width:1px;height:20px;background:rgba(0,212,255,0.1)"></div>
+        <div style="font-size:12px;color:rgba(168,180,200,0.7);display:flex;align-items:center;gap:6px">🌧 Rain forecast <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:#F0F4FF">6PM</span> Cheras, PJ</div>
+        <div style="width:1px;height:20px;background:rgba(0,212,255,0.1)"></div>
+        <div style="font-size:12px;color:rgba(168,180,200,0.7);display:flex;align-items:center;gap:6px">🚗 Traffic <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:#F0F4FF">Heavy</span> MRR, LDP</div>
+        <div style="margin-left:auto;font-size:11px;color:#E8002D;font-weight:700;letter-spacing:1px;animation:flashred 2s infinite">⚠ RAIN DEMAND SPIKE PREDICTED 6PM</div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto">
+
+      <!-- Zone status -->
+      <div class="panel" style="margin-bottom:0">
+        <div class="panel-head"><div><div class="panel-title">Zone Status Now</div><div class="panel-sub">Driver supply vs demand</div></div></div>
+        <div class="panel-body" id="spark-zone-list" style="padding:10px 16px"></div>
+      </div>
+
+      <!-- SPARK Recommendations -->
+      <div class="panel" style="margin-bottom:0;border:1px solid rgba(232,0,45,0.2)">
+        <div class="panel-head" style="background:rgba(232,0,45,0.04)">
+          <div><div class="panel-title" style="color:var(--red);font-size:13px">⚡ SPARK Recommendations</div><div class="panel-sub" style="font-size:12px">Incentives to activate now</div></div>
+        </div>
+        <div class="panel-body" id="spark-recommendations" style="padding:10px 16px"></div>
+      </div>
+
+      <!-- Activation Log -->
+      <div class="panel" style="margin-bottom:0;border:1px solid rgba(0,210,106,0.15)">
+        <div class="panel-head" style="background:rgba(0,210,106,0.04)">
+          <div><div class="panel-title" style="font-size:13px;color:var(--green)">📋 Activation Log</div><div class="panel-sub" style="font-size:12px">Incentives activated this session</div></div>
+        </div>
+        <div class="panel-body" style="padding:10px 16px" id="spark-activation-log">
+          <div style="font-size:12px;color:var(--text3);font-style:italic">No incentives activated yet</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
 <!-- DRIVER AI COMPANION -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-companion-content">
@@ -628,11 +749,11 @@ tr:hover td{background:var(--bg3)}
     <div class="phone-info">
       <h2>Driver AI Companion</h2>
       <p>A personal AI assistant built into the AirAsia Ride driver app. Every driver gets an assistant that knows their earnings, compliance status, zones, and history.</p>
-      <p>Try it — type a question in the phone. Switch to BM. Watch it respond with <strong style="color:var(--red)">this driver's actual data.</strong></p>
+      <p>Try it type a question in the phone. Switch to BM. Watch it respond with <strong style="color:var(--red)">this driver's actual data.</strong></p>
       <p style="margin-bottom:20px">Three-layer intelligence reduces API costs by up to 55%:</p>
-      <div class="layer-card"><div class="lt" style="color:var(--green)">Layer 1 — FAQ Cache</div><p>Common questions answered instantly. Zero API cost. Covers PSV, EVP, BUDI95, earnings, zones, incentives.</p></div>
-      <div class="layer-card"><div class="lt" style="color:var(--amber)">Layer 2 — Response Cache</div><p>Repeat questions served from 24-hour cache. Zero API cost. 100 drivers ask same question — Claude called once.</p></div>
-      <div class="layer-card"><div class="lt" style="color:var(--blue)">Layer 3 — Personalised AI</div><p>Unique questions answered by Claude with driver's actual data — earnings gap, target, tomorrow's peak zones, compliance status.</p></div>
+      <div class="layer-card"><div class="lt" style="color:var(--green)">Layer 1 FAQ Cache</div><p>Common questions answered instantly. Zero API cost. Covers PSV, EVP, BUDI95, earnings, zones, incentives.</p></div>
+      <div class="layer-card"><div class="lt" style="color:var(--amber)">Layer 2 Response Cache</div><p>Repeat questions served from 24-hour cache. Zero API cost. 100 drivers ask same question Claude called once.</p></div>
+      <div class="layer-card"><div class="lt" style="color:var(--blue)">Layer 3 Personalised AI</div><p>Unique questions answered by Claude with driver's actual data earnings gap, target, tomorrow's peak zones, compliance status.</p></div>
       <div style="margin-top:16px;padding:14px;background:rgba(232,0,45,0.06);border:1px solid rgba(232,0,45,0.2);border-radius:8px">
         <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:4px;letter-spacing:1.5px;text-transform:uppercase">Production Path</div>
         <div style="font-size:12px;color:var(--text2)">Set DEMO_MODE = false. Pass driver_id from app session. Embed as WebView in AAR driver app. Zero rebuild required.</div>
@@ -811,7 +932,7 @@ async function loadNerve() {
   countUp(document.getElementById('n-monthly-gmv'), nerveStats.monthly_gmv, 'RM ', '', 2200);
   countUp(document.getElementById('n-monthly-trips'), nerveStats.monthly_trips, '', '', 2200);
 
-  // Supply vs Demand data — defined here so available to both ops health and supply panels
+  // Supply vs Demand data defined here so available to both ops health and supply panels
   const allZones = [
     { zone: 'KLIA2',        demand: 'Surge',  drivers_present: 18, drivers_needed: 32 },
     { zone: 'Shah Alam',    demand: 'High',   drivers_present: 2,  drivers_needed: 8  },
@@ -898,7 +1019,7 @@ async function loadNerve() {
   const revPerDriver = nerveStats.active_drivers > 0 ? 'RM ' + Math.round(adjGMV / nerveStats.active_drivers).toLocaleString() : '--';
   document.getElementById('n-rev-per-driver').textContent = revPerDriver;
 
-  // Top earning zone — based on flights demand
+  // Top earning zone based on flights demand
   const zoneGMV = {
     'KLIA2': Math.round(nerveStats.gmv_today * 0.28),
     'KLIA': Math.round(nerveStats.gmv_today * 0.18),
@@ -971,7 +1092,7 @@ async function loadNerve() {
       </table>`;
   }
 
-  // Peak hour GMV — 7AM + 2PM + 9PM = ~55% of daily
+  // Peak hour GMV 7AM + 2PM + 9PM = ~55% of daily
   const peakGMV = Math.round(nerveStats.gmv_today * 0.55);
   document.getElementById('n-peak-gmv').textContent = 'RM ' + peakGMV.toLocaleString();
 
@@ -1067,7 +1188,7 @@ async function loadNerve() {
   if (compEl) compEl.innerHTML = compPanel(wow,'W-o-W','last week') + compPanel(mom,'M-o-M','last month');
 
   // B2B Completion Rate
-  // Hospital Form bookings are intake channel — distribute among hospitals
+  // Hospital Form bookings are intake channel distribute among hospitals
   const hospitalFormBookings = bookings.filter(b=>b['Source']==='Hospital Form');
   const hfCompleted = hospitalFormBookings.filter(b=>b['Booking Status']==='Completed').length;
   const hfTotal = hospitalFormBookings.length;
@@ -1164,7 +1285,7 @@ async function loadTower() {
           <span style="color:#FF6D00;font-weight:600;font-family:'DM Mono',monospace;font-size:12px">${b['Booking ID']}</span>
           ${srcBadge(b['Source'])}
         </div>
-        <div style="font-size:12px;color:var(--text2);margin-top:3px">${b['Customer Name']} — ${b['Pickup Location']}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">${b['Customer Name']} ${b['Pickup Location']}</div>
         <div style="font-size:11px;color:var(--red);margin-top:2px">Reason: ${b['Cancellation Reason']||'Not specified'}</div>
       </div>`).join('');
 
@@ -1241,15 +1362,15 @@ async function loadDriverSupport() {
   const bc = {Low:'db-low',Medium:'db-medium',High:'db-high',Surge:'db-surge'};
   document.getElementById('ds-demand-chart').innerHTML = Object.keys(hourMap).sort().map(hr=>{
     const h=hourMap[hr]; const pct=Math.round(h.demand/maxD*100);
-    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div class="dbar ${bc[h.level]}" style="width:${pct}%">${h.level} — ${h.demand}</div></div></div>`;
+    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div class="dbar ${bc[h.level]}" style="width:${pct}%">${h.level} ${h.demand}</div></div></div>`;
   }).join('');
 
   const t1=drivers.filter(d=>d['BUDI95 Tier']==='Tier 1').length;
   const t2=drivers.filter(d=>d['BUDI95 Tier']==='Tier 2').length;
   document.getElementById('ds-budi').innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="mult-card"><div class="mult-val" style="color:var(--amber)">${t1}</div><div class="mult-zone">Tier 1 — Below 2,000 km</div></div>
-      <div class="mult-card"><div class="mult-val" style="color:var(--green)">${t2}</div><div class="mult-zone">Tier 2 — Above 2,000 km</div></div>
+      <div class="mult-card"><div class="mult-val" style="color:var(--amber)">${t1}</div><div class="mult-zone">Tier 1 Below 2,000 km</div></div>
+      <div class="mult-card"><div class="mult-val" style="color:var(--green)">${t2}</div><div class="mult-zone">Tier 2 Above 2,000 km</div></div>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:12px">Next BUDI95 submission: 1st of next month at 9:00 AM</div>`;
 
@@ -1262,14 +1383,14 @@ function generateApad() {
     document.getElementById('apad-ts').textContent = now;
     document.getElementById('apad-content').innerHTML=`
       <div style="font-family:'DM Mono',monospace;font-size:12px;line-height:2;color:var(--text)">
-        <div style="color:var(--red);font-weight:700;margin-bottom:12px;font-size:13px;letter-spacing:1px">APAD FLEET COMPLIANCE REPORT — ${new Date().toLocaleDateString('en-MY')}</div>
+        <div style="color:var(--red);font-weight:700;margin-bottom:12px;font-size:13px;letter-spacing:1px">APAD FLEET COMPLIANCE REPORT ${new Date().toLocaleDateString('en-MY')}</div>
         <div>Total Fleet: <strong>${s.drivers.total}</strong></div>
         <div>Fully Compliant: <strong style="color:var(--green)">${s.drivers.compliant}</strong> (${(s.drivers.compliant/s.drivers.total*100).toFixed(1)}%)</div>
         <div>Lapsing (within 30 days): <strong style="color:var(--amber)">${s.drivers.lapsing}</strong></div>
         <div>Lapsed (non-compliant): <strong style="color:var(--red)">${s.drivers.lapsed}</strong></div>
         <div>Jobs Blocked Today: <strong style="color:var(--red)">${s.drivers.lapsed}</strong></div>
         <div style="margin-top:12px;color:var(--text3);font-size:11px">Generated: ${now}</div>
-        <div style="color:var(--text3);font-size:11px">Prepared by: PULSE — AirAsia Ride Operations Intelligence</div>
+        <div style="color:var(--text3);font-size:11px">Prepared by: PULSE AirAsia Ride Operations Intelligence</div>
       </div>`;
     document.getElementById('apad-report-section').style.display='block';
   });
@@ -1314,7 +1435,7 @@ async function loadCustomerSupport() {
           <span style="font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">${m['Message ID']}</span>
           <span class="badge ${m['Resolution Status']==='Resolved'?'bg-green':'bg-amber'}">${m['Resolution Status']}</span>
         </div>
-        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} — ${m['Message Content']}</div>
+        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} ${m['Message Content']}</div>
         <div style="font-size:11px;color:var(--blue);margin-top:6px">${m['Auto Response Content']||''}</div>
       </div>`).join('');
 
@@ -1326,7 +1447,7 @@ async function loadCustomerSupport() {
           <span style="font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">${m['Message ID']}</span>
           <span class="badge bg-red">Complaint</span>
         </div>
-        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} — ${m['Message Content']}</div>
+        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} ${m['Message Content']}</div>
         <div style="font-size:13px;color:var(--text2);margin-top:4px">Escalated to: ${m['Escalated To']||'Driver Support'}</div>
       </div>`).join('');
 
@@ -1360,7 +1481,7 @@ async function loadPricing() {
     const mult=parseFloat(f['Current Multiplier']||1);
     const pct=Math.round((mult/2)*100);
     const dl=f['Demand Level']||'Low';
-    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div style="height:100%;width:${pct}%;background:${dc[dl]||dc.Low};border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:600;color:${dt[dl]||dt.Low};font-family:'DM Mono',monospace">${mult}x — ${dl}</div></div></div>`;
+    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div style="height:100%;width:${pct}%;background:${dc[dl]||dc.Low};border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:600;color:${dt[dl]||dt.Low};font-family:'DM Mono',monospace">${mult}x ${dl}</div></div></div>`;
   }).join('');
 
   const zones=['KLIA','KLIA2','Petaling Jaya','Subang','Shah Alam','Cheras','Ampang','Klang'];
@@ -1386,6 +1507,187 @@ function switchAlertView(view) {
   loadNerve();
 }
 
+// ── SPARK / DEMAND MAP ───────────────────────────────────────────────────────
+const sparkZones = [
+  { id:'klia2',   name:'KLIA2',         left:'52%', top:'82%', demand:'Surge',  drivers:18, needed:32, traffic:'Heavy',   color:'#E8002D', rec:'RM 5/trip, ongoing' },
+  { id:'klia',    name:'KLIA',          left:'44%', top:'76%', demand:'Surge',  drivers:14, needed:22, traffic:'Moderate',color:'#E8002D', rec:'RM 5/trip, ongoing' },
+  { id:'putrajaya',name:'Putrajaya',    left:'56%', top:'76%', demand:'Medium', drivers:6,  needed:5,  traffic:'Light',   color:'#F0A500', rec:null },
+  { id:'cyberjaya',name:'Cyberjaya',    left:'50%', top:'70%', demand:'Medium', drivers:5,  needed:6,  traffic:'Light',   color:'#F0A500', rec:'RM 2/trip, tech workers peak 6PM' },
+  { id:'serkem',  name:'Seri Kembangan',left:'55%', top:'58%', demand:'Medium', drivers:4,  needed:6,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, activate now' },
+  { id:'kajang',  name:'Kajang',        left:'68%', top:'62%', demand:'High',   drivers:3,  needed:7,  traffic:'Moderate',color:'#FF6D00', rec:'RM 3/trip, activate now' },
+  { id:'cheras',  name:'Cheras',        left:'60%', top:'46%', demand:'High',   drivers:4,  needed:9,  traffic:'Heavy',   color:'#FF6D00', rec:'RM 3/trip, activate now' },
+  { id:'ampang',  name:'Ampang',        left:'68%', top:'36%', demand:'Low',    drivers:8,  needed:5,  traffic:'Light',   color:'#00D26A', rec:null },
+  { id:'bb',      name:'Bukit Bintang', left:'52%', top:'30%', demand:'Medium', drivers:7,  needed:8,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, evening peak' },
+  { id:'pj',      name:'Petaling Jaya', left:'38%', top:'40%', demand:'High',   drivers:12, needed:10, traffic:'Heavy',   color:'#FF6D00', rec:'RM 4/trip, rain 6PM' },
+  { id:'damansara',name:'Damansara',    left:'42%', top:'28%', demand:'Medium', drivers:9,  needed:8,  traffic:'Moderate',color:'#F0A500', rec:null },
+  { id:'montkiara',name:'Mont Kiara',   left:'46%', top:'20%', demand:'Low',    drivers:10, needed:7,  traffic:'Light',   color:'#00D26A', rec:null },
+  { id:'sunway',  name:'Sunway',        left:'34%', top:'48%', demand:'Medium', drivers:8,  needed:9,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, mall crowd 7PM' },
+  { id:'subang',  name:'Subang',        left:'28%', top:'52%', demand:'Medium', drivers:9,  needed:7,  traffic:'Light',   color:'#F0A500', rec:null },
+  { id:'puchong', name:'Puchong',       left:'36%', top:'60%', demand:'High',   drivers:5,  needed:9,  traffic:'Heavy',   color:'#FF6D00', rec:'RM 3/trip, LDP congestion' },
+  { id:'shah',    name:'Shah Alam',     left:'22%', top:'42%', demand:'Medium', drivers:2,  needed:8,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, activate 5PM' },
+  { id:'klang',   name:'Klang',         left:'14%', top:'54%', demand:'Low',    drivers:11, needed:6,  traffic:'Light',   color:'#00D26A', rec:null },
+  { id:'batucaves',name:'Batu Caves',   left:'50%', top:'14%', demand:'Low',    drivers:6,  needed:4,  traffic:'Light',   color:'#00D26A', rec:null },
+];
+
+const sparkConnections = [
+  ['klia2','klia'],['klia2','cyberjaya'],['cyberjaya','putrajaya'],
+  ['cyberjaya','serkem'],['serkem','kajang'],['kajang','cheras'],
+  ['cheras','ampang'],['cheras','bb'],['bb','damansara'],
+  ['damansara','montkiara'],['damansara','pj'],['pj','sunway'],
+  ['sunway','subang'],['subang','shah'],['shah','klang'],
+  ['pj','puchong'],['puchong','cyberjaya'],['bb','ampang'],
+  ['montkiara','batucaves'],['klia','puchong']
+];
+
+const trafficColors = { Heavy:'#E8002D', Moderate:'#F0A500', Light:'#00D26A' };
+const ringSize = { Surge:44, High:36, Medium:30, Low:26 };
+const coreSize = { Surge:18, High:14, Medium:11, Low:10 };
+
+const activatedZones = {};
+
+function activateIncentive(zoneId, zoneName, rec) {
+  const btn = document.getElementById('rec-btn-'+zoneId);
+  if(!btn || activatedZones[zoneId]) return;
+
+  // Extract RM amount from rec string
+  const rmMatch = rec.match(/RM (\d+)/);
+  const amount = rmMatch ? rmMatch[1] : '2';
+
+  // Mark as activated
+  activatedZones[zoneId] = { name: zoneName, amount: amount, time: new Date(), duration: 120 };
+
+  // Update button to active with timer
+  btn.style.background = 'rgba(0,210,106,0.15)';
+  btn.style.borderColor = 'rgba(0,210,106,0.4)';
+  btn.style.color = 'var(--green)';
+  btn.style.cursor = 'default';
+  btn.innerHTML = 'Active <span id="timer-'+zoneId+'">2:00:00</span>';
+
+  // Start countdown
+  const interval = setInterval(()=>{
+    const elapsed = Math.floor((new Date() - activatedZones[zoneId].time) / 1000);
+    const remaining = 7200 - elapsed;
+    if(remaining <= 0) {
+      clearInterval(interval);
+      btn.innerHTML = 'Expired';
+      btn.style.color = 'var(--text3)';
+      btn.style.background = 'transparent';
+      delete activatedZones[zoneId];
+      updateActivationLog();
+      return;
+    }
+    const h = Math.floor(remaining/3600);
+    const m = Math.floor((remaining%3600)/60);
+    const s = remaining%60;
+    const timerEl = document.getElementById('timer-'+zoneId);
+    if(timerEl) timerEl.textContent = h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }, 1000);
+
+  // Add green pulsing halo BEHIND the zone node — zone colour stays unchanged
+  const zoneNode = document.querySelector('.spark-zone[title="'+zoneName+'"]');
+  if(zoneNode) {
+    const halo = document.createElement('div');
+    halo.id = 'halo-'+zoneId;
+    halo.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;width:60px;height:60px;background:radial-gradient(circle,rgba(0,210,106,0.35) 0%,rgba(0,210,106,0.1) 50%,transparent 70%);animation:incentive-pulse 1.2s ease-in-out infinite alternate;pointer-events:none;z-index:-1';
+    zoneNode.appendChild(halo);
+  }
+
+  updateActivationLog();
+}
+
+function updateActivationLog() {
+  const logEl = document.getElementById('spark-activation-log');
+  if(!logEl) return;
+  const keys = Object.keys(activatedZones);
+  if(keys.length === 0) {
+    logEl.innerHTML = '<div style="font-size:12px;color:var(--text3);font-style:italic">No incentives activated yet</div>';
+    return;
+  }
+  logEl.innerHTML = keys.map(id => {
+    const a = activatedZones[id];
+    const timeStr = a.time.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true});
+    return `<div style="padding:7px 0;border-bottom:1px solid rgba(0,210,106,0.08)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${a.name}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace">RM ${a.amount}/trip</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px">Activated by Gowrish at ${timeStr} for 2 hours</div>
+    </div>`;
+  }).join('');
+}
+
+function loadSpark() {
+  const zonesEl = document.getElementById('spark-zones');
+  const zoneListEl = document.getElementById('spark-zone-list');
+  const recEl = document.getElementById('spark-recommendations');
+  if(!zonesEl) return;
+
+  // Render zone nodes on HUD map
+  zonesEl.innerHTML = sparkZones.map(z => {
+    const rs = ringSize[z.demand]; const cs = coreSize[z.demand];
+    const tc = trafficColors[z.traffic];
+    return `<div class="spark-zone" style="left:${z.left};top:${z.top}" title="${z.name}">
+      <div class="spark-zone-ring" style="width:${rs}px;height:${rs}px;border-color:${z.color};box-shadow:0 0 12px ${z.color}44;animation:zringpulse${z.demand} 2s ease-in-out infinite alternate">
+        <div class="spark-zone-core" style="width:${cs}px;height:${cs}px;background:${z.color};box-shadow:0 0 8px ${z.color}"></div>
+      </div>
+      <div class="spark-zone-label" style="color:${z.color}">${z.name}</div>
+      <div class="spark-zone-traffic" style="color:${tc}">● ${z.traffic}</div>
+    </div>`;
+  }).join('');
+
+  // Draw connector lines
+  setTimeout(()=>{
+    const canvas = document.getElementById('spark-canvas');
+    if(!canvas) return;
+    const parent = canvas.parentElement;
+    canvas.width = parent.offsetWidth;
+    canvas.height = parent.offsetHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    sparkConnections.forEach(([a,b])=>{
+      const ea = zonesEl.querySelector(`[title="${sparkZones.find(z=>z.id===a)?.name}"]`);
+      const eb = zonesEl.querySelector(`[title="${sparkZones.find(z=>z.id===b)?.name}"]`);
+      if(!ea||!eb) return;
+      const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
+      const pr = canvas.getBoundingClientRect();
+      const x1=ra.left+ra.width/2-pr.left, y1=ra.top+ra.height/2-pr.top;
+      const x2=rb.left+rb.width/2-pr.left, y2=rb.top+rb.height/2-pr.top;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle='rgba(0,212,255,0.07)'; ctx.lineWidth=1;
+      ctx.setLineDash([4,10]); ctx.stroke(); ctx.setLineDash([]);
+    });
+  }, 100);
+
+  // Zone list
+  if(zoneListEl) zoneListEl.innerHTML = sparkZones.map(z => {
+    const gap = z.needed - z.drivers;
+    const surplus = z.drivers - z.needed;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <span style="font-size:12px;font-weight:600;color:var(--text)">${z.name}</span>
+        <span class="badge ${z.demand==='Surge'||z.demand==='High'?'bg-red':z.demand==='Medium'?'bg-amber':'bg-green'}" style="margin-left:6px;font-size:9px">${z.demand}</span>
+        <span style="font-size:10px;color:${trafficColors[z.traffic]};margin-left:6px">● ${z.traffic} traffic</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:${gap>0?'var(--red)':'var(--green)'}">${z.drivers}/${z.needed}</div>
+        <div style="font-size:10px;color:var(--text3)">${gap>0?gap+' needed':surplus+' surplus'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Recommendations
+  const recs = sparkZones.filter(z=>z.rec);
+  if(recEl) recEl.innerHTML = recs.map(z =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(232,0,45,0.08)" id="rec-row-${z.id}">
+      <div>
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${z.name}</span>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">${z.rec}</div>
+      </div>
+      <div id="rec-btn-${z.id}" onclick="activateIncentive('${z.id}','${z.name}','${z.rec}')" style="padding:6px 14px;background:rgba(232,0,45,0.1);border:1px solid rgba(232,0,45,0.2);border-radius:4px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer;white-space:nowrap;letter-spacing:0.5px;transition:all 0.3s">Activate</div>
+    </div>`
+  ).join('');
+}
+
 async function loadAll() {
   const active = document.querySelector('.tab-content.active');
   if (!active) return;
@@ -1395,6 +1697,7 @@ async function loadAll() {
   else if (id === 'tab-driver-content') await loadDriverSupport();
   else if (id === 'tab-customer-content') await loadCustomerSupport();
   else if (id === 'tab-pricing-content') await loadPricing();
+  else if (id === 'tab-spark-content') loadSpark();
 }
 
 function showTab(name) {
