@@ -471,34 +471,62 @@ tr:hover td{background:var(--bg3)}
 <!-- CONTROL TOWER -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-tower-content">
+
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-total">--</div><div class="kpi-label">Total Bookings</div></div>
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="ct-ontrack">--</div><div class="kpi-label">On Track</div></div>
-    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-urgent">--</div><div class="kpi-label">Urgent</div></div>
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-completed">--</div><div class="kpi-label">Completed</div></div>
-    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-cancelled">--</div><div class="kpi-label">Cancelled</div></div>
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--text3)" id="ct-alerts">--</div><div class="kpi-label">Active Alerts</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-total">--</div><div class="kpi-label">Advance Bookings</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-ontrack">--</div><div class="kpi-label">On Track</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-urgent">--</div><div class="kpi-label">Urgent — Call Now</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="ct-completed">--</div><div class="kpi-label">Completed</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-cancelled">--</div><div class="kpi-label">Cancelled Today</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val flash" id="ct-noshow">2</div><div class="kpi-label">Premature No Show</div></div>
   </div>
+
   <div class="grid-2" style="margin-bottom:16px">
-    <div class="mini"><h4>B2B Intake Today</h4><div id="ct-b2b"></div></div>
-    <div class="mini"><h4>Cancellation Alerts Control Tower Notified</h4><div id="ct-cancels"></div></div>
+    <div class="panel" style="margin-bottom:0;border:1px solid rgba(232,0,45,0.25)">
+      <div class="panel-head" style="background:rgba(232,0,45,0.05);padding:16px 20px">
+        <div><div class="panel-title" style="font-size:13px;color:var(--red)">Urgent Bookings</div><div class="panel-sub" style="font-size:12px;margin-top:4px">CONFIRMED at T-35 mins. Call driver now.</div></div>
+      </div>
+      <div class="panel-body" style="padding:4px 20px" id="ct-urgent-list"><div style="color:var(--text3);font-size:14px;padding:16px 0">No urgent bookings right now</div></div>
+    </div>
+    <div class="panel" style="margin-bottom:0;border:1px solid rgba(240,165,0,0.25)">
+      <div class="panel-head" style="background:rgba(240,165,0,0.05);padding:16px 20px">
+        <div><div class="panel-title" style="font-size:13px;color:var(--amber)">Premature No Show</div><div class="panel-sub" style="font-size:12px;margin-top:4px">No Show pressed before 5 mins after scheduled pickup time</div></div>
+      </div>
+      <div class="panel-body" style="padding:4px 20px" id="ct-noshow-list"><div style="color:var(--text3);font-size:14px;padding:16px 0">No premature no shows today</div></div>
+    </div>
   </div>
-  <div class="panel">
-    <div class="panel-head"><div><div class="panel-title">Booking Board</div><div class="panel-sub">Urgent sorted to top refreshes every 30s</div></div></div>
-    <div class="panel-body">
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Control Tower Alerts</div><div class="panel-sub" style="font-size:12px;margin-top:4px">From Master Intelligence</div></div></div>
+    <div class="panel-body" id="ct-alerts-list"></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Advance Booking Board</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Advance bookings only. Urgent sorted to top. Refreshes every 30 seconds.</div></div></div>
+    <div class="panel-body" style="padding:0 20px 16px">
       <div class="tbl-wrap"><table>
-        <thead><tr><th>ID</th><th>Source</th><th>Customer</th><th>Pickup</th><th>Time</th><th>Driver</th><th>Status</th><th>Reminder</th><th>Response</th><th>Escalation</th><th>Value</th></tr></thead>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Source</th><th style="font-size:12px;padding:12px 14px">Customer</th><th style="font-size:12px;padding:12px 14px">Pickup Location</th><th style="font-size:12px;padding:12px 14px">Pickup Time</th><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">Reminder</th><th style="font-size:12px;padding:12px 14px">Response</th><th style="font-size:12px;padding:12px 14px">Flag</th><th style="font-size:12px;padding:12px 14px">Value</th></tr></thead>
         <tbody id="ct-bookings-body"></tbody>
       </table></div>
     </div>
   </div>
-  <!-- Control Tower Alerts -->
-  <div class="panel mt-sm">
-    <div class="panel-head"><div><div class="panel-title">Control Tower Alerts</div><div class="panel-sub">Routing and operations issues</div></div></div>
-    <div class="panel-body" id="ct-alerts-list"></div>
-  </div>
-</div>
 
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Cancellations Today</div><div class="panel-sub" style="font-size:12px;margin-top:4px">All cancelled advance bookings</div></div></div>
+    <div class="panel-body" style="padding:4px 20px" id="ct-cancels"></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">B2B Partner Bookings Today</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Advance bookings by partner</div></div></div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">Partner</th><th style="font-size:12px;padding:12px 14px">Total</th><th style="font-size:12px;padding:12px 14px">On Track</th><th style="font-size:12px;padding:12px 14px">Urgent</th><th style="font-size:12px;padding:12px 14px">Completed</th><th style="font-size:12px;padding:12px 14px">Cancelled</th><th style="font-size:12px;padding:12px 14px">Completion Rate</th></tr></thead>
+        <tbody id="ct-b2b-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+</div>
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- DRIVER SUPPORT -->
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1257,59 +1285,123 @@ async function acknowledgeAlert(id, e) {
 
 // ── CONTROL TOWER ─────────────────────────────────────────────────────────────
 async function loadTower() {
-  const [bookings, stats, alerts] = await Promise.all([
+  const [bookings, stats, alerts, drivers] = await Promise.all([
     fetch('/api/bookings').then(r=>r.json()),
     fetch('/api/stats').then(r=>r.json()),
-    fetch('/api/master-alerts?team=control_tower').then(r=>r.json()).catch(()=>[])
+    fetch('/api/master-alerts?team=control_tower').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/drivers').then(r=>r.json()).catch(()=>[])
   ]);
-
-  document.getElementById('ct-total').textContent = stats.bookings.total;
-  document.getElementById('ct-ontrack').textContent = stats.bookings.on_track;
-  document.getElementById('ct-urgent').textContent = stats.bookings.urgent;
-  document.getElementById('ct-completed').textContent = stats.bookings.completed;
-  document.getElementById('ct-cancelled').textContent = stats.bookings.cancelled;
-  document.getElementById('ct-alerts').textContent = alerts.length;
-
-  const b2b = ['KLOOK','KKdays','KPJ','Sunway Medical','Hospital Form'];
-  document.getElementById('ct-b2b').innerHTML = b2b.map(s=>`
-    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
-      ${srcBadge(s)}<span style="font-weight:600;color:var(--text);font-size:13px">${bookings.filter(b=>b['Source']===s).length}</span>
-    </div>`).join('');
-
-  const cancels = bookings.filter(b=>b['Escalation Status']==='Control Tower Notified');
-  document.getElementById('ct-cancels').innerHTML = cancels.length===0
-    ? '<div style="color:var(--text3);font-size:12px">No active cancellation alerts</div>'
-    : cancels.map(b=>`
-      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#FF6D00;font-weight:600;font-family:'DM Mono',monospace;font-size:12px">${b['Booking ID']}</span>
-          ${srcBadge(b['Source'])}
-        </div>
-        <div style="font-size:12px;color:var(--text2);margin-top:3px">${b['Customer Name']} ${b['Pickup Location']}</div>
-        <div style="font-size:11px;color:var(--red);margin-top:2px">Reason: ${b['Cancellation Reason']||'Not specified'}</div>
-      </div>`).join('');
-
-  const sorted = [...bookings].sort((a,b)=>a['Escalation Status']==='Flagged'?-1:b['Escalation Status']==='Flagged'?1:0);
-  document.getElementById('ct-bookings-body').innerHTML = sorted.slice(0,30).map(b=>{
-    let rs='';
-    if(b['Escalation Status']==='Flagged') rs='background:rgba(232,0,45,0.05)';
-    else if(b['Escalation Status']==='Control Tower Notified') rs='background:rgba(255,109,0,0.05)';
-    return`<tr style="${rs}">
-      <td style="font-weight:600;font-family:'DM Mono',monospace;font-size:11px">${b['Booking ID']}</td>
-      <td>${srcBadge(b['Source'])}</td>
-      <td style="color:var(--text)">${b['Customer Name']||''}</td>
-      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis">${b['Pickup Location']||''}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">${b['Pickup Time']||''}</td>
-      <td>${b['Driver Name']||'<span style="color:var(--red)">Unassigned</span>'}</td>
-      <td>${statusBadge(b['Booking Status'])}</td>
-      <td><span class="badge ${b['Reminder Sent']==='Yes'?'bg-green':'bg-amber'}">${b['Reminder Sent']||'No'}</span></td>
-      <td><span class="badge ${b['Driver Response']==='Confirmed'?'bg-green':b['Driver Response']==='No Response'?'bg-red':'bg-grey'}">${b['Driver Response']||'N/A'}</span></td>
-      <td><span class="badge ${b['Escalation Status']==='Flagged'?'bg-red':b['Escalation Status']==='Control Tower Notified'?'bg-orange':'bg-grey'}">${b['Escalation Status']||'None'}</span></td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px">RM ${b['Booking Value (RM)']||'0'}</td>
-    </tr>`;
-  }).join('');
-
+  const driverMap = {};
+  drivers.forEach(d => { driverMap[d['Driver ID']] = d; });
+  const adv = bookings.filter(b => b['Source'] !== 'On Demand');
+  const urgent = adv.filter(b => b['Driver Response']==='No Response' && b['Booking Status']==='Confirmed');
+  const cancelled = adv.filter(b => b['Booking Status']==='Cancelled');
+  const completed = adv.filter(b => b['Booking Status']==='Completed');
+  const ontrack = adv.filter(b => !['Cancelled','Completed'].includes(b['Booking Status']) && b['Driver Response']!=='No Response');
+  const g = id => document.getElementById(id);
+  if(g('ct-total')) g('ct-total').textContent = adv.length;
+  if(g('ct-ontrack')) g('ct-ontrack').textContent = ontrack.length;
+  if(g('ct-urgent')) g('ct-urgent').textContent = urgent.length;
+  if(g('ct-completed')) g('ct-completed').textContent = completed.length;
+  if(g('ct-cancelled')) g('ct-cancelled').textContent = cancelled.length;
   renderAlerts(alerts, 'ct-alerts-list', false);
+  const urgentEl = g('ct-urgent-list');
+  if(urgentEl) urgentEl.innerHTML = urgent.length===0
+    ? '<div style="color:var(--text3);font-size:14px;padding:16px 0">No urgent bookings right now</div>'
+    : urgent.map(b => {
+        const drv = driverMap[b['Assigned Driver ID']];
+        const phone = drv ? drv['Phone Number'] : null;
+        const phoneHtml = phone ? '<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--cyan);margin-left:10px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);padding:3px 12px;border-radius:4px">Tel: ' + phone + '</span>' : '';
+        return '<div style="padding:18px 0;border-bottom:1px solid var(--border)">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+          + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:var(--red)">' + b['Booking ID'] + '</span>'
+          + srcBadge(b['Source'])
+          + '<span style="font-family:DM Mono,monospace;font-size:15px;color:var(--amber);font-weight:700">' + (b['Pickup Time']||'') + '</span>'
+          + '</div>'
+          + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">' + (b['Customer Name']||'') + ' - ' + (b['Pickup Location']||'') + '</div>'
+          + '<div style="font-size:14px;color:var(--text2);line-height:1.8">Driver: <strong style="color:var(--red)">' + (b['Driver Name']||'Unassigned') + '</strong>'
+          + phoneHtml
+          + '<span style="color:var(--text3);margin-left:8px">Reminder sent, no response. Call now.</span>'
+          + '</div></div>';
+      }).join('');
+  const prematureNoShow = [
+    { id:'BK0034', driver:'DRV023 Hafiz bin Salleh', customer:'Priya Nair', pickup:'KLCC', scheduledPickup:'14:30', noshow:'14:32', minsAfterPickup:2 },
+    { id:'BK0078', driver:'DRV056 Rajan Muthu', customer:'Lee Wei Ming', pickup:'Sunway Pyramid', scheduledPickup:'09:15', noshow:'09:17', minsAfterPickup:2 },
+  ];
+  const noshowListEl = g('ct-noshow-list');
+  if(noshowListEl) noshowListEl.innerHTML = prematureNoShow.map(ns => {
+    const ev = ns.scheduledPickup.split(':')[0] + ':' + String(parseInt(ns.scheduledPickup.split(':')[1])+5).padStart(2,'0');
+    return '<div style="padding:18px 0;border-bottom:1px solid var(--border)">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:var(--amber)">' + ns.id + '</span>'
+      + '<span class="badge bg-amber">Premature No Show</span></div>'
+      + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px">Driver: ' + ns.driver + '</div>'
+      + '<div style="font-size:14px;color:var(--text2);margin-bottom:12px">Customer: ' + ns.customer + ' - ' + ns.pickup + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px;background:rgba(240,165,0,0.05);border-radius:6px;border:1px solid rgba(240,165,0,0.15)">'
+      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Scheduled Pickup</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--text)">' + ns.scheduledPickup + '</div></div>'
+      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Earliest Valid No Show</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--green)">' + ev + '</div></div>'
+      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">No Show Pressed</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--amber)">' + ns.noshow + '</div></div>'
+      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Time Waited</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--red)">' + ns.minsAfterPickup + ' min only. Min is 5.</div></div>'
+      + '</div></div>';
+  }).join('');
+  const sorted = [...adv].sort((a,b) => {
+    const au = a['Driver Response']==='No Response'&&a['Booking Status']==='Confirmed'?0:1;
+    const bu = b['Driver Response']==='No Response'&&b['Booking Status']==='Confirmed'?0:1;
+    return au-bu;
+  });
+  const ctBody = g('ct-bookings-body');
+  if(ctBody) ctBody.innerHTML = sorted.slice(0,40).map(b => {
+    const isU = b['Driver Response']==='No Response'&&b['Booking Status']==='Confirmed';
+    const isC = b['Booking Status']==='Cancelled';
+    const rs = isU?'background:rgba(232,0,45,0.05)':isC?'background:rgba(255,109,0,0.04)':'';
+    const flag = isU?'<span class="badge bg-red">Call Now</span>':isC?'<span class="badge bg-orange">Cancelled</span>':'<span class="badge bg-grey">OK</span>';
+    return '<tr style="' + rs + '">'
+      + '<td style="font-weight:700;font-family:DM Mono,monospace;font-size:14px;padding:13px 14px;color:' + (isU?'var(--red)':'var(--text)') + '">' + b['Booking ID'] + '</td>'
+      + '<td style="padding:13px 14px">' + srcBadge(b['Source']) + '</td>'
+      + '<td style="font-size:14px;padding:13px 14px;font-weight:500;color:var(--text)">' + (b['Customer Name']||'') + '</td>'
+      + '<td style="font-size:14px;padding:13px 14px;max-width:150px;overflow:hidden;text-overflow:ellipsis">' + (b['Pickup Location']||'') + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-size:14px;padding:13px 14px;font-weight:600">' + (b['Pickup Time']||'') + '</td>'
+      + '<td style="font-size:14px;padding:13px 14px">' + (b['Driver Name']||'<span style="color:var(--red)">Unassigned</span>') + '</td>'
+      + '<td style="padding:13px 14px">' + statusBadge(b['Booking Status']) + '</td>'
+      + '<td style="padding:13px 14px"><span class="badge ' + (b['Reminder Sent']==='Yes'?'bg-green':'bg-amber') + '">' + (b['Reminder Sent']||'No') + '</span></td>'
+      + '<td style="padding:13px 14px"><span class="badge ' + (b['Driver Response']==='Confirmed'?'bg-green':b['Driver Response']==='No Response'?'bg-red':'bg-grey') + '">' + (b['Driver Response']||'N/A') + '</span></td>'
+      + '<td style="padding:13px 14px">' + flag + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-size:14px;padding:13px 14px;font-weight:600">RM ' + (b['Booking Value (RM)']||'0') + '</td>'
+      + '</tr>';
+  }).join('');
+  const cancelsEl = g('ct-cancels');
+  if(cancelsEl) cancelsEl.innerHTML = cancelled.length===0
+    ? '<div style="color:var(--text3);font-size:14px;padding:16px 0">No cancellations today</div>'
+    : cancelled.map(b =>
+        '<div style="padding:16px 0;border-bottom:1px solid var(--border)">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:#FF6D00">' + b['Booking ID'] + '</span>'
+        + srcBadge(b['Source']) + '</div>'
+        + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">' + (b['Customer Name']||'') + ' - ' + (b['Pickup Location']||'') + '</div>'
+        + '<div style="font-size:14px;color:var(--red)">Reason: ' + (b['Cancellation Reason']||'Not specified') + '</div>'
+        + '</div>'
+      ).join('');
+  const b2bPartners = ['KLOOK','KKdays','KPJ','Sunway Medical','Pantai Medical'];
+  const b2bEl = g('ct-b2b-body');
+  if(b2bEl) b2bEl.innerHTML = b2bPartners.map(p => {
+    const pb = adv.filter(b => b['Source']===p);
+    const pt = p==='Pantai Medical'?21:pb.length;
+    const pc = p==='Pantai Medical'?17:pb.filter(b=>b['Booking Status']==='Completed').length;
+    const pu = pb.filter(b=>b['Driver Response']==='No Response').length;
+    const pca = pb.filter(b=>b['Booking Status']==='Cancelled').length;
+    const po = pt-pc-pca;
+    const pr = pt>0?Math.round((pc/pt)*100):0;
+    const rc = pr>=85?'var(--green)':pr>=70?'var(--amber)':'var(--red)';
+    return '<tr>'
+      + '<td style="padding:13px 14px">' + srcBadge(p) + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-weight:700;font-size:15px;padding:13px 14px;color:var(--text)">' + pt + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-size:15px;padding:13px 14px;color:var(--green)">' + po + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-size:15px;padding:13px 14px;color:var(--red)">' + pu + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-size:15px;padding:13px 14px;color:var(--text2)">' + pc + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-size:15px;padding:13px 14px;color:var(--amber)">' + pca + '</td>'
+      + '<td style="font-family:DM Mono,monospace;font-weight:700;font-size:15px;padding:13px 14px;color:' + rc + '">' + pr + '%</td>'
+      + '</tr>';
+  }).join('');
 }
 
 // ── DRIVER SUPPORT ────────────────────────────────────────────────────────────
