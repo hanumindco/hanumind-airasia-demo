@@ -72,25 +72,20 @@ def api_stats():
 @app.route("/api/master-alerts")
 def api_master_alerts():
     team = request.args.get("team", None)
+    show_resolved = request.args.get("show_resolved", "false") == "true"
     try:
         conn = psycopg2.connect(os.getenv("HANUMIND_MEMORY_DB_URL"))
         cur = conn.cursor()
-        if team and team != "nerve_centre":
-            cur.execute("""
-                SELECT id, alert_type, priority, title, detail,
-                       action_required, acknowledged, created_at, team
-                FROM aar_master_alerts
-                WHERE acknowledged = false AND team = %s
-                ORDER BY CASE priority WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END
-            """, (team,))
+        cols = "id, alert_type, priority, title, detail, action_required, acknowledged, created_at, team, acknowledged_by, acknowledged_at, resolved, resolved_by, resolved_at, resolution_note"
+        order = "ORDER BY CASE priority WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END"
+        if show_resolved:
+            where = "WHERE 1=1"
         else:
-            cur.execute("""
-                SELECT id, alert_type, priority, title, detail,
-                       action_required, acknowledged, created_at, team
-                FROM aar_master_alerts
-                WHERE acknowledged = false
-                ORDER BY CASE priority WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END
-            """)
+            where = "WHERE (resolved = false OR resolved IS NULL)"
+        if team and team != "nerve_centre":
+            cur.execute(f"SELECT {cols} FROM aar_master_alerts {where} AND team = %s {order}", (team,))
+        else:
+            cur.execute(f"SELECT {cols} FROM aar_master_alerts {where} {order}")
         rows = cur.fetchall()
         cur.close()
         conn.close()
@@ -98,10 +93,16 @@ def api_master_alerts():
             "id": r[0], "alert_type": r[1], "priority": r[2],
             "title": r[3], "detail": r[4], "action_required": r[5],
             "acknowledged": r[6], "created_at": str(r[7])[:16],
-            "team": r[8]
+            "team": r[8], "acknowledged_by": r[9],
+            "acknowledged_at": str(r[10])[:16] if r[10] else None,
+            "resolved": r[11], "resolved_by": r[12],
+            "resolved_at": str(r[13])[:16] if r[13] else None,
+            "resolution_note": r[14]
         } for r in rows])
     except Exception as e:
+        print(f"master-alerts error: {e}")
         return jsonify([])
+
 
 @app.route("/api/master-alerts/<int:alert_id>/acknowledge", methods=["POST"])
 def api_acknowledge_alert(alert_id):

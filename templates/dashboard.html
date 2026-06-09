@@ -17,9 +17,9 @@
   --bg4: #141D35;
   --border: #1A2440;
   --border2: #243055;
-  --text: #E8ECF4;
-  --text2: #8894A8;
-  --text3: #4A5568;
+  --text: #F0F4FF;
+  --text2: #A8B4C8;
+  --text3: #6A7890;
   --red: #E8002D;
   --red-glow: rgba(232,0,45,0.15);
   --red-dim: #B8002A;
@@ -177,11 +177,11 @@ body {
 
 /* SECTION LABEL */
 .section-label {
-  font-size: 10px;
-  color: var(--text3);
+  font-size: 11px;
+  color: var(--text2);
   text-transform: uppercase;
   letter-spacing: 3px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
@@ -270,14 +270,14 @@ body {
   letter-spacing: -1px;
 }
 .kpi-label {
-  font-size: 10px;
-  color: var(--text3);
-  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 10px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   font-weight: 600;
 }
-.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
 
 .kpi-critical .kpi-val { color: var(--red); }
 .kpi-warn .kpi-val { color: var(--amber); }
@@ -319,9 +319,9 @@ body {
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--text2);
+  color: var(--text);
 }
-.panel-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.panel-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
 .panel-body { padding: 16px 20px; }
 
 /* GRID */
@@ -450,6 +450,23 @@ tr:hover td { background: var(--bg3); }
 .flash { animation: flashred 1.2s infinite; }
 @keyframes flashred { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+/* DATE TOGGLE */
+.date-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+.date-btn:hover { border-color: var(--red); color: var(--text2); }
+.date-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+
 /* COUNT UP */
 @keyframes countup { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .count-animate { animation: countup 0.6s ease-out forwards; }
@@ -496,22 +513,30 @@ tr:hover td { background: var(--bg3); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content active" id="tab-nerve-content">
 
-  <div class="section-label">Today at a Glance</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+    <div class="section-label" style="margin-bottom:0;padding-bottom:0;border-bottom:none">Today at a Glance</div>
+    <div style="display:flex;gap:6px" id="date-toggle">
+      <button class="date-btn active" onclick="setDate('today')">Today</button>
+      <button class="date-btn" onclick="setDate('yesterday')">Yesterday</button>
+      <button class="date-btn" onclick="setDate('7days')">Last 7 Days</button>
+      <button class="date-btn" onclick="setDate('30days')">Last 30 Days</button>
+    </div>
+  </div>
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="n-trips">--</div><div class="kpi-label">Trips Completed</div><div class="kpi-sub">Today</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-gmv">--</div><div class="kpi-label">GMV Today</div><div class="kpi-sub">Malaysian Ringgit</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-completion">--</div><div class="kpi-label">Completion Rate</div><div class="kpi-sub">Target 80%</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-avgfare">--</div><div class="kpi-label">Avg Fare</div><div class="kpi-sub">RM per trip</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-cancellation">--</div><div class="kpi-label">Cancellation Rate</div><div class="kpi-sub">Today</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-active-drivers">--</div><div class="kpi-label">Active Drivers</div><div class="kpi-sub">Compliant fleet</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-trips">--</div><div class="kpi-label">Trips Completed</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-gmv">--</div><div class="kpi-label">GMV Today</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-completion">--</div><div class="kpi-label">Completion Rate</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-avgfare">--</div><div class="kpi-label">Avg Fare</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-cancellation">--</div><div class="kpi-label">Cancellation Rate</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="n-active-drivers">--</div><div class="kpi-label">Active Drivers</div></div>
   </div>
 
   <div class="section-label mt-md">Weekly and Monthly Performance</div>
   <div class="kpi-grid kpi-4" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-gmv">--</div><div class="kpi-label">Weekly GMV</div><div class="kpi-sub">This week</div></div>
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-trips">--</div><div class="kpi-label">Weekly Trips</div><div class="kpi-sub">This week</div></div>
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-gmv">--</div><div class="kpi-label">Monthly GMV</div><div class="kpi-sub">This month</div></div>
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-trips">--</div><div class="kpi-label">Monthly Trips</div><div class="kpi-sub">This month</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-gmv">--</div><div class="kpi-label">Weekly GMV</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-trips">--</div><div class="kpi-label">Weekly Trips</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-gmv">--</div><div class="kpi-label">Monthly GMV</div></div>
+    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-trips">--</div><div class="kpi-label">Monthly Trips</div></div>
   </div>
 
   <div class="section-label mt-md">Operations Health</div>
@@ -520,7 +545,7 @@ tr:hover td { background: var(--bg3); }
     <!-- Bookings Health -->
     <div class="kpi-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Bookings Today</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">Bookings Today</div>
         <div id="n-booking-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:2px"></div>
       </div>
       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-bookings">--</div>
@@ -534,11 +559,11 @@ tr:hover td { background: var(--bg3); }
           <span style="color:var(--red);font-weight:700" id="n-ondemand">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Urgent — driver not responding</span>
+          <span style="color:var(--text2);font-size:13px">Urgent — driver not responding</span>
           <span style="font-weight:600" id="n-urgent">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Cancelled today</span>
+          <span style="color:var(--text2);font-size:13px">Cancelled today</span>
           <span style="color:var(--text2);font-weight:600" id="n-cancelled">--</span>
         </div>
       </div>
@@ -548,20 +573,20 @@ tr:hover td { background: var(--bg3); }
     <!-- Fleet Compliance -->
     <div class="kpi-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Fleet Compliance</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">Fleet Compliance</div>
         <div id="n-fleet-dot" style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:2px"></div>
       </div>
       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-compliant">--</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px">drivers fully compliant</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">drivers fully compliant</div>
       <div style="margin-top:12px">
         <div style="display:flex;height:6px;border-radius:4px;overflow:hidden;margin-bottom:10px" id="n-fleet-bar"></div>
         <div style="display:flex;flex-direction:column;gap:6px">
           <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:var(--text3)">Lapsing — docs expire soon</span>
+            <span style="color:var(--text2);font-size:13px">Lapsing — docs expire soon</span>
             <span style="color:var(--amber);font-weight:600" id="n-lapsing">--</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:var(--text3)">Lapsed — blocked from jobs</span>
+            <span style="color:var(--text2);font-size:13px">Lapsed — blocked from jobs</span>
             <span style="color:var(--red);font-weight:600" id="n-lapsed">--</span>
           </div>
         </div>
@@ -571,22 +596,22 @@ tr:hover td { background: var(--bg3); }
     <!-- Customer Communications -->
     <div class="kpi-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Customer Comms</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">Customer Comms</div>
         <div id="n-comms-dot" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:2px"></div>
       </div>
       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-wati-total">--</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px">messages today via WATI</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">messages today via WATI</div>
       <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Auto-resolved by RELAY</span>
+          <span style="color:var(--text2);font-size:13px">Auto-resolved by RELAY</span>
           <span style="color:var(--green);font-weight:600" id="n-resolved">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Escalated — needs action</span>
+          <span style="color:var(--text2);font-size:13px">Escalated — needs action</span>
           <span style="font-weight:600" id="n-escalated">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Expiring in under 2 hours</span>
+          <span style="color:var(--text2);font-size:13px">Expiring in under 2 hours</span>
           <span style="font-weight:600" id="n-wati-expiry">--</span>
         </div>
       </div>
@@ -595,18 +620,18 @@ tr:hover td { background: var(--bg3); }
     <!-- Demand and Supply -->
     <div class="kpi-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px">Demand and Supply</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">Demand and Supply</div>
         <div id="n-demand-dot" style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:2px"></div>
       </div>
       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-surge">--</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px">surge zones active right now</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">surge zones active right now</div>
       <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Zones with driver shortage</span>
+          <span style="color:var(--text2);font-size:13px">Zones with driver shortage</span>
           <span style="color:var(--red);font-weight:600" id="n-gap-zones">--</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:12px">
-          <span style="color:var(--text3)">Active incentives deployed</span>
+          <span style="color:var(--text2);font-size:13px">Active incentives deployed</span>
           <span style="color:var(--green);font-weight:600" id="n-incentives">--</span>
         </div>
         <div style="font-size:11px;color:var(--red);margin-top:4px;font-style:italic" id="n-gap-note"></div>
@@ -620,22 +645,22 @@ tr:hover td { background: var(--bg3); }
     <div class="kpi-card">
       <div class="kpi-val" id="n-rev-per-driver">--</div>
       <div class="kpi-label">Revenue per Active Driver</div>
-      <div class="kpi-sub">RM — today</div>
+      
     </div>
     <div class="kpi-card">
       <div class="kpi-val" id="n-top-zone">--</div>
       <div class="kpi-label">Top Earning Zone</div>
-      <div class="kpi-sub" id="n-top-zone-gmv">--</div>
+      
     </div>
     <div class="kpi-card">
       <div class="kpi-val" id="n-peak-gmv">--</div>
       <div class="kpi-label">Peak Hour GMV</div>
-      <div class="kpi-sub">7AM + 2PM + 9PM combined</div>
+      
     </div>
     <div class="kpi-card">
       <div class="kpi-val" id="n-util-rate">--</div>
       <div class="kpi-label">Driver Utilisation</div>
-      <div class="kpi-sub" id="n-util-sub">Active vs total fleet</div>
+      
     </div>
   </div>
 
@@ -879,6 +904,22 @@ tr:hover td { background: var(--bg3); }
 </div>
 
 <script>
+// ── DATE SELECTION ───────────────────────────────────────────────────────────
+const dateMultipliers = {
+  today:     { trips: 1,    gmv: 1,    completion: 1,    avgfare: 1,    cancel: 1,    label: 'Today' },
+  yesterday: { trips: 0.94, gmv: 0.91, completion: 0.98, avgfare: 0.97, cancel: 1.05, label: 'Yesterday' },
+  '7days':   { trips: 0.88, gmv: 0.85, completion: 0.95, avgfare: 0.96, cancel: 1.08, label: 'Last 7 Days avg' },
+  '30days':  { trips: 0.82, gmv: 0.79, completion: 0.93, avgfare: 0.94, cancel: 1.12, label: 'Last 30 Days avg' },
+};
+let currentDate = 'today';
+
+function setDate(period) {
+  currentDate = period;
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  loadNerve();
+}
+
 // ── THEME ─────────────────────────────────────────────────────────────────────
 let theme = localStorage.getItem('aar-theme') || 'dark';
 document.documentElement.setAttribute('data-theme', theme);
@@ -901,12 +942,6 @@ function updateClock() {
 setInterval(updateClock,1000); updateClock();
 
 // ── TABS ──────────────────────────────────────────────────────────────────────
-function showTab(name) {
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+name+'-content').classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-}
 
 // ── COUNT UP ANIMATION ────────────────────────────────────────────────────────
 function countUp(el, target, prefix='', suffix='', duration=1500) {
@@ -949,33 +984,77 @@ const teamLabels={'control_tower':'Control Tower','driver_support':'Driver Suppo
 function renderAlerts(alerts, containerId, showTeam=true) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  if (alerts.length === 0) {
+  if (!alerts || alerts.length === 0) {
     el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">No active alerts</div>';
     return;
   }
-  el.innerHTML = alerts.map(a => {
-    const cls = a.priority==='High'?'alert-high':a.priority==='Medium'?'alert-medium':'alert-plan';
-    const bc = a.priority==='High'?'bg-red':a.priority==='Medium'?'bg-amber':'bg-green';
-    const tc = teamColors[a.team]||'bg-grey';
-    const tl = teamLabels[a.team]||a.team||'';
-    return`<div class="alert-card ${cls}">
-      <div class="alert-header">
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="badge ${bc}">${a.priority}</span>
-          ${showTeam?`<span class="badge ${tc}">${tl}</span>`:''}
-          <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">${a.alert_type||''}</span>
-        </div>
-        <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace">${a.created_at||''}</span>
-      </div>
-      <div class="alert-title">${a.title}</div>
-      <div class="alert-detail">${a.detail}</div>
-      <div class="alert-action">→ ${a.action_required}</div>
-      <div class="alert-footer">
-        <span style="font-size:10px;color:var(--text3)">ID #${a.id}</span>
-        <button class="ack-btn" onclick="acknowledgeAlert(${a.id})">Acknowledge</button>
-      </div>
-    </div>`;
-  }).join('');
+  let html = '';
+  for (const a of alerts) {
+    const cls = a.priority==='High' ? 'alert-high' : a.priority==='Medium' ? 'alert-medium' : 'alert-plan';
+    const bc  = a.priority==='High' ? 'bg-red' : a.priority==='Medium' ? 'bg-amber' : 'bg-green';
+    const tc  = teamColors[a.team] || 'bg-grey';
+    const tl  = teamLabels[a.team] || a.team || '';
+    const teamBadge = showTeam ? '<span class="badge ' + tc + '">' + tl + '</span>' : '';
+    const noteHtml = a.resolution_note ? '<div style="margin-top:8px;padding:8px 10px;background:rgba(0,210,106,0.05);border-left:2px solid var(--green);border-radius:4px;font-size:12px;color:var(--text2)"><strong style="color:var(--green)">Resolution:</strong> ' + a.resolution_note + '</div>' : '';
+
+    html += '<div class="alert-card ' + cls + '">';
+    html += '<div class="alert-header">';
+    html += '<div style="display:flex;gap:6px;align-items:center">' + '<span class="badge ' + bc + '">' + a.priority + '</span>' + teamBadge + '<span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">' + (a.alert_type||'') + '</span></div>';
+    html += '<span style="font-size:10px;color:var(--text3);font-family:monospace">' + (a.created_at||'') + '</span>';
+    html += '</div>';
+    html += '<div class="alert-title">' + a.title + '</div>';
+    html += '<div class="alert-detail">' + a.detail + '</div>';
+    html += '<div class="alert-action">&rarr; ' + a.action_required + '</div>';
+    html += noteHtml;
+    html += '<div class="alert-footer"><div style="display:flex;align-items:center;gap:8px">';
+    html += '<span style="font-size:10px;color:var(--text3)">ID #' + a.id + '</span>';
+    if (a.resolved) {
+      html += '<span style="font-size:11px;color:var(--green)">&#10003; Resolved by ' + (a.resolved_by||'') + '</span>';
+    } else if (a.acknowledged) {
+      html += '<span style="font-size:11px;color:var(--green);font-weight:600">&#10003; Acknowledged by ' + (a.acknowledged_by||'') + '</span>';
+      html += '<button class="ack-btn" style="border-color:var(--green);color:var(--green)" onclick="showResolveModal(' + a.id + ', event)">Resolve</button>';
+    } else {
+      html += '<button class="ack-btn" onclick="acknowledgeAlert(' + a.id + ', event)">Acknowledge</button>';
+      html += '<button class="ack-btn" style="border-color:var(--green);color:var(--green)" onclick="showResolveModal(' + a.id + ', event)">Resolve</button>';
+    }
+    html += '</div></div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function showResolveModal(alertId, e) {
+  if (e) e.stopPropagation();
+  const existing = document.getElementById('resolve-modal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'resolve-modal';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.5)">'+
+    '<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Resolve Alert #'+alertId+'</div>'+
+    '<div style="font-size:13px;color:var(--text2);margin-bottom:20px">Describe the action taken to resolve this issue. This will be logged permanently.</div>'+
+    '<textarea id="resolve-note" placeholder="e.g. Contacted DRV047 directly. EVP renewal confirmed for 11 Jun. BK0089 reassigned to DRV012." style="width:100%;height:100px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px;color:var(--text);font-size:13px;font-family:DM Sans,sans-serif;resize:none;outline:none;line-height:1.6"></textarea>'+
+    '<div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">'+
+      '<button onclick="document.getElementById(\'resolve-modal\').remove()" style="padding:8px 20px;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-size:13px;cursor:pointer">Cancel</button>'+
+      '<button onclick="submitResolve('+alertId+')" style="padding:8px 24px;background:var(--green);border:none;border-radius:6px;color:#000;font-size:13px;font-weight:700;cursor:pointer">Confirm Resolved</button>'+
+    '</div>'+
+  '</div>';
+  document.body.appendChild(modal);
+  document.getElementById('resolve-note').focus();
+}
+
+async function submitResolve(alertId) {
+  const note = document.getElementById('resolve-note').value.trim();
+  if (!note) {
+    document.getElementById('resolve-note').style.borderColor = 'var(--red)';
+    return;
+  }
+  await fetch('/api/master-alerts/'+alertId+'/resolve', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({user: 'Gowrish', note: note})
+  });
+  document.getElementById('resolve-modal').remove();
+  loadAll();
 }
 
 // ── NERVE CENTRE ──────────────────────────────────────────────────────────────
@@ -988,11 +1067,6 @@ async function loadNerve() {
     fetch('/api/nerve-stats').then(r=>r.json())
   ]);
 
-  countUp(document.getElementById('n-trips'), nerveStats.trips_today);
-  countUp(document.getElementById('n-gmv'), nerveStats.gmv_today, 'RM ', '', 1800);
-  countUp(document.getElementById('n-completion'), nerveStats.completion_rate, '', '%');
-  countUp(document.getElementById('n-avgfare'), nerveStats.avg_fare, 'RM ');
-  countUp(document.getElementById('n-cancellation'), nerveStats.cancellation_rate, '', '%');
   countUp(document.getElementById('n-active-drivers'), nerveStats.active_drivers);
   countUp(document.getElementById('n-weekly-gmv'), nerveStats.weekly_gmv, 'RM ', '', 2000);
   countUp(document.getElementById('n-weekly-trips'), nerveStats.weekly_trips, '', '', 2000);
@@ -1067,8 +1141,23 @@ async function loadNerve() {
     gapNote.textContent = gapNames + ' need repositioning';
   }
 
+  // Apply date multiplier
+  const mult = dateMultipliers[currentDate];
+  const adjTrips    = Math.round(nerveStats.trips_today * mult.trips);
+  const adjGMV      = Math.round(nerveStats.gmv_today * mult.gmv);
+  const adjCompletion = (nerveStats.completion_rate * mult.completion).toFixed(1);
+  const adjAvgFare  = (nerveStats.avg_fare * mult.avgfare).toFixed(2);
+  const adjCancel   = (nerveStats.cancellation_rate * mult.cancel).toFixed(1);
+
+  // Override count-up targets with adjusted values
+  countUp(document.getElementById('n-trips'), adjTrips);
+  countUp(document.getElementById('n-gmv'), adjGMV, 'RM ', '', 1800);
+  countUp(document.getElementById('n-completion'), parseFloat(adjCompletion), '', '%');
+  countUp(document.getElementById('n-avgfare'), parseFloat(adjAvgFare), 'RM ');
+  countUp(document.getElementById('n-cancellation'), parseFloat(adjCancel), '', '%');
+
   // Revenue Intelligence
-  const revPerDriver = nerveStats.active_drivers > 0 ? 'RM ' + Math.round(nerveStats.gmv_today / nerveStats.active_drivers).toLocaleString() : '--';
+  const revPerDriver = nerveStats.active_drivers > 0 ? 'RM ' + Math.round(adjGMV / nerveStats.active_drivers).toLocaleString() : '--';
   document.getElementById('n-rev-per-driver').textContent = revPerDriver;
 
   // Top earning zone — based on flights demand
@@ -1085,7 +1174,8 @@ async function loadNerve() {
   const sortedZones = Object.entries(zoneGMV).sort((a,b)=>b[1]-a[1]);
   const topZone = sortedZones[0];
   document.getElementById('n-top-zone').textContent = topZone[0];
-  document.getElementById('n-top-zone-gmv').textContent = 'RM ' + topZone[1].toLocaleString() + ' today';
+  const topZoneGMVEl = document.getElementById('n-top-zone-gmv');
+  if (topZoneGMVEl) topZoneGMVEl.textContent = 'RM ' + topZone[1].toLocaleString() + ' today';
 
   // Top 10 earning zones table
   const zoneTrips = {
@@ -1150,7 +1240,8 @@ async function loadNerve() {
   // Driver utilisation
   const utilRate = Math.round((nerveStats.active_drivers / stats.drivers.total) * 100);
   document.getElementById('n-util-rate').textContent = utilRate + '%';
-  document.getElementById('n-util-sub').textContent = nerveStats.active_drivers + ' active of ' + stats.drivers.total + ' total';
+  const utilSubEl = document.getElementById('n-util-sub');
+  if (utilSubEl) utilSubEl.textContent = nerveStats.active_drivers + ' active of ' + stats.drivers.total + ' total';
 
   // Supply vs Demand panels
   const gapZones = allZones.filter(z => z.drivers_present < z.drivers_needed);
@@ -1226,7 +1317,7 @@ async function loadNerve() {
       </div>`;
     }).join('');
     return `<div>
-      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">${title}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">${title}</div>
       ${rows}
     </div>`;
   }
@@ -1292,8 +1383,13 @@ async function loadNerve() {
   }).join('');
 }
 
-async function acknowledgeAlert(id) {
-  await fetch('/api/master-alerts/'+id+'/acknowledge',{method:'POST'}).catch(()=>{});
+async function acknowledgeAlert(id, e) {
+  if (e) e.stopPropagation();
+  await fetch('/api/master-alerts/'+id+'/acknowledge', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({user: 'Gowrish'})
+  }).catch(()=>{});
   loadAll();
 }
 
@@ -1490,7 +1586,7 @@ async function loadCustomerSupport() {
           <span class="badge bg-red">Complaint</span>
         </div>
         <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} — ${m['Message Content']}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px">Escalated to: ${m['Escalated To']||'Driver Support'}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px">Escalated to: ${m['Escalated To']||'Driver Support'}</div>
       </div>`).join('');
 
   renderAlerts(alerts, 'cs-alerts-list', false);
@@ -1539,8 +1635,24 @@ async function loadPricing() {
 
 // ── LOAD ALL ──────────────────────────────────────────────────────────────────
 async function loadAll() {
-  await Promise.all([loadNerve(), loadTower(), loadDriverSupport(), loadCustomerSupport(), loadPricing()]);
+  const active = document.querySelector('.tab-content.active');
+  if (!active) return;
+  const id = active.id;
+  if (id === 'tab-nerve-content') await loadNerve();
+  else if (id === 'tab-tower-content') await loadTower();
+  else if (id === 'tab-driver-content') await loadDriverSupport();
+  else if (id === 'tab-customer-content') await loadCustomerSupport();
+  else if (id === 'tab-pricing-content') await loadPricing();
 }
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name+'-content').classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  loadAll();
+}
+
 loadAll();
 setInterval(loadAll, 30000);
 </script>
