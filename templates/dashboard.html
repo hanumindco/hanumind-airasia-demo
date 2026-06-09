@@ -253,6 +253,7 @@ tr:hover td{background:var(--bg3)}
   <button class="tab-btn active" onclick="showTab('nerve')" id="tab-nerve"><span class="tab-icon">⚡</span>Nerve Centre</button>
   <button class="tab-btn" onclick="showTab('tower')" id="tab-tower"><span class="tab-icon">🗼</span>Control Tower</button>
   <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Backend</button>
+  <button class="tab-btn" onclick="showTab('driverteam')" id="tab-driverteam"><span class="tab-icon">👥</span>Driver Team</button>
   <button class="tab-btn" onclick="showTab('customer')" id="tab-customer"><span class="tab-icon">💬</span>Customer Support</button>
   <button class="tab-btn" onclick="showTab('pricing')" id="tab-pricing"><span class="tab-icon">💰</span>Pricing</button>
   <button class="tab-btn" onclick="showTab('spark')" id="tab-spark"><span class="tab-icon">📡</span>Demand Map</button>
@@ -592,6 +593,72 @@ tr:hover td{background:var(--bg3)}
   </div>
 
 </div>
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DRIVER TEAM -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-driverteam-content">
+
+  <div class="kpi-grid kpi-4" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-active">--</div><div class="kpi-label">Active Drivers</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-gap-zones">--</div><div class="kpi-label">Zones with Shortage</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-incentives">--</div><div class="kpi-label">Active Incentives</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-wati">--</div><div class="kpi-label">Driver WATI Messages</div></div>
+  </div>
+
+  <!-- Driver Team Alerts -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Team Alerts</div><div class="panel-sub" style="font-size:12px;margin-top:4px">From Master Intelligence</div></div></div>
+    <div class="panel-body" id="dt-alerts-list"></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px">
+
+    <!-- Supply and Demand Gaps -->
+    <div class="panel" style="margin-bottom:0;border:1px solid rgba(232,0,45,0.2)">
+      <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:16px 20px">
+        <div><div class="panel-title" style="font-size:13px;color:var(--red)">Supply and Demand Gaps</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Zones needing more drivers right now</div></div>
+      </div>
+      <div class="panel-body" id="dt-gaps"></div>
+    </div>
+
+    <!-- Zone Demand by Hour -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Zone Demand by Hour</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Based on flight arrivals and historical patterns</div></div></div>
+      <div class="panel-body" id="dt-demand-chart"></div>
+    </div>
+
+  </div>
+
+  <!-- Active Incentives -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Active Incentives</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Incentives currently live across zones</div></div></div>
+    <div class="panel-body" id="dt-incentives-panel"></div>
+  </div>
+
+  <!-- WATI Messages — Driver Team -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">WATI Messages — Driver Team</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Driver queries escalated to team. Auto-resolved messages excluded.</div></div></div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Time</th><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Message</th><th style="font-size:12px;padding:12px 14px">Status</th></tr></thead>
+        <tbody id="dt-wati-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Driver Performance -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Performance</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Weekly trips, earnings, rating, completion rate by driver</div></div></div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Zone</th><th style="font-size:12px;padding:12px 14px">Weekly Trips</th><th style="font-size:12px;padding:12px 14px">Weekly Earnings</th><th style="font-size:12px;padding:12px 14px">Rating</th><th style="font-size:12px;padding:12px 14px">Completion Rate</th></tr></thead>
+        <tbody id="dt-performance-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+</div>
+
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- CUSTOMER SUPPORT -->
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1536,6 +1603,117 @@ function generateApad() {
   });
 }
 
+// ── DRIVER TEAM ───────────────────────────────────────────────────────────────
+async function loadDriverTeam() {
+  const [drivers, wati, flights, stats, alerts] = await Promise.all([
+    fetch('/api/drivers').then(r=>r.json()),
+    fetch('/api/wati').then(r=>r.json()),
+    fetch('/api/flights').then(r=>r.json()),
+    fetch('/api/stats').then(r=>r.json()),
+    fetch('/api/master-alerts?team=driver_support').then(r=>r.json()).catch(()=>[])
+  ]);
+  const g = id => document.getElementById(id);
+
+  // KPIs
+  if(g('dt-active')) g('dt-active').textContent = 60;
+  if(g('dt-gap-zones')) g('dt-gap-zones').textContent = 4;
+  if(g('dt-incentives')) g('dt-incentives').textContent = stats.flights.active_incentives||18;
+  const driverWati = wati.filter(m=>m['Classified Type']==='Driver Status Check'||m['Escalated To']==='Driver Team');
+  if(g('dt-wati')) g('dt-wati').textContent = driverWati.length;
+
+  // Alerts
+  renderAlerts(alerts, 'dt-alerts-list', false);
+
+  // Supply and Demand Gaps
+  const gaps = [
+    {zone:'KLIA2',demand:'Surge',present:18,needed:32},
+    {zone:'Shah Alam',demand:'High',present:2,needed:8},
+    {zone:'Cheras',demand:'High',present:4,needed:9},
+    {zone:'KLIA',demand:'Surge',present:14,needed:22},
+  ];
+  const gapsEl = g('dt-gaps');
+  if(gapsEl) gapsEl.innerHTML = gaps.map(z =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">'
+    +'<div><span style="font-size:14px;font-weight:600;color:var(--text)">'+z.zone+'</span>'
+    +'<span class="badge bg-red" style="margin-left:8px">'+z.demand+'</span></div>'
+    +'<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--red)">'+(z.needed-z.present)+' more drivers needed</div>'
+    +'<div style="font-size:12px;color:var(--text3)">'+z.present+' present / '+z.needed+' needed</div></div>'
+    +'</div>'
+  ).join('');
+
+  // Zone demand chart
+  const hourMap = {};
+  flights.forEach(f => {
+    const hr = (f['Scheduled Arrival Time']||'00:00').split(':')[0];
+    if(!hourMap[hr]) hourMap[hr]={demand:0,level:'Low'};
+    hourMap[hr].demand += parseInt(f['Expected Ride Demand']||0);
+    if(f['Zone Demand Level']==='Surge') hourMap[hr].level='Surge';
+    else if(f['Zone Demand Level']==='High'&&hourMap[hr].level!=='Surge') hourMap[hr].level='High';
+    else if(f['Zone Demand Level']==='Medium'&&!['Surge','High'].includes(hourMap[hr].level)) hourMap[hr].level='Medium';
+  });
+  const maxD = Math.max(...Object.values(hourMap).map(h=>h.demand),1);
+  const bc = {Low:'db-low',Medium:'db-medium',High:'db-high',Surge:'db-surge'};
+  const chartEl = g('dt-demand-chart');
+  if(chartEl) chartEl.innerHTML = Object.keys(hourMap).sort().map(hr => {
+    const h = hourMap[hr];
+    const pct = Math.round(h.demand/maxD*100);
+    return '<div class="dbar-wrap"><div class="dbar-time">'+hr+':00</div>'
+      +'<div class="dbar-bg"><div class="dbar '+bc[h.level]+'" style="width:'+pct+'%">'+h.level+' — '+h.demand+'</div></div></div>';
+  }).join('');
+
+  // Active incentives
+  const incEl = g('dt-incentives-panel');
+  const activeInc = [
+    {zone:'KLIA2',amount:'RM 5/trip',since:'14:00',expires:'16:00',status:'Live'},
+    {zone:'Cheras',amount:'RM 3/trip',since:'15:30',expires:'17:30',status:'Live'},
+    {zone:'Shah Alam',amount:'RM 2/trip',since:'16:00',expires:'18:00',status:'Scheduled'},
+  ];
+  if(incEl) incEl.innerHTML = '<div class="tbl-wrap"><table>'
+    +'<thead><tr><th style="font-size:12px;padding:12px 14px">Zone</th><th style="font-size:12px;padding:12px 14px">Amount</th><th style="font-size:12px;padding:12px 14px">Since</th><th style="font-size:12px;padding:12px 14px">Expires</th><th style="font-size:12px;padding:12px 14px">Status</th></tr></thead><tbody>'
+    +activeInc.map(i =>
+      '<tr><td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+i.zone+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:var(--green)">'+i.amount+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px">'+i.since+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px">'+i.expires+'</td>'
+      +'<td style="padding:12px 14px"><span class="badge '+(i.status==='Live'?'bg-green':'bg-amber')+'">'+i.status+'</span></td>'
+      +'</tr>'
+    ).join('')+'</tbody></table></div>';
+
+  // WATI messages for driver team
+  const watiBody = g('dt-wati-body');
+  if(watiBody) watiBody.innerHTML = driverWati.length===0
+    ? '<tr><td colspan="5" style="padding:16px;color:var(--text3);font-size:14px">No driver messages requiring action</td></tr>'
+    : driverWati.map(m =>
+        '<tr>'
+        +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;font-weight:700;color:var(--text)">'+m['Message ID']+'</td>'
+        +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:12px 14px">'+((m['Timestamp']||'').substring(11,16))+'</td>'
+        +'<td style="font-size:14px;padding:12px 14px;font-weight:500;color:var(--text)">'+m['Sender Name']+'</td>'
+        +'<td style="font-size:13px;padding:12px 14px;max-width:300px;overflow:hidden;text-overflow:ellipsis;color:var(--text2)">'+m['Message Content']+'</td>'
+        +'<td style="padding:12px 14px"><span class="badge '+(m['Resolution Status']==='Resolved'?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey')+'">'+m['Resolution Status']+'</span></td>'
+        +'</tr>'
+      ).join('');
+
+  // Driver performance
+  const perfBody = g('dt-performance-body');
+  if(perfBody) perfBody.innerHTML = drivers.slice(0,20).map(d => {
+    const weeklyTrips = Math.round((d['Total Trips This Month']||0)/4);
+    const weeklyEarnings = (weeklyTrips * 52.4).toFixed(0);
+    const totalTrips = d['Total Trips This Month']||0;
+    const cancels = d['Cancellation Count This Month']||0;
+    const completionRate = totalTrips>0 ? Math.round(((totalTrips-cancels)/totalTrips)*100) : 0;
+    const ratingColor = d['Rating']>=4.5?'var(--green)':d['Rating']>=4.0?'var(--amber)':'var(--red)';
+    const crColor = completionRate>=90?'var(--green)':completionRate>=75?'var(--amber)':'var(--red)';
+    return '<tr>'
+      +'<td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+d['Driver Name']+'</td>'
+      +'<td style="font-size:13px;padding:12px 14px">'+d['Zone']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+weeklyTrips+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:600;color:var(--green)">RM '+weeklyEarnings+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+ratingColor+'">'+d['Rating']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+crColor+'">'+completionRate+'%</td>'
+      +'</tr>';
+  }).join('');
+}
+
 // ── CUSTOMER SUPPORT ──────────────────────────────────────────────────────────
 async function loadCustomerSupport() {
   const [wati, stats, alerts] = await Promise.all([
@@ -1835,6 +2013,7 @@ async function loadAll() {
   if (id === 'tab-nerve-content') await loadNerve();
   else if (id === 'tab-tower-content') await loadTower();
   else if (id === 'tab-driver-content') await loadDriverSupport();
+  else if (id === 'tab-driverteam-content') await loadDriverTeam();
   else if (id === 'tab-customer-content') await loadCustomerSupport();
   else if (id === 'tab-pricing-content') await loadPricing();
   else if (id === 'tab-spark-content') loadSpark();
