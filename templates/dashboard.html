@@ -252,7 +252,7 @@ tr:hover td{background:var(--bg3)}
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('nerve')" id="tab-nerve"><span class="tab-icon">⚡</span>Nerve Centre</button>
   <button class="tab-btn" onclick="showTab('tower')" id="tab-tower"><span class="tab-icon">🗼</span>Control Tower</button>
-  <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Support</button>
+  <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Backend</button>
   <button class="tab-btn" onclick="showTab('customer')" id="tab-customer"><span class="tab-icon">💬</span>Customer Support</button>
   <button class="tab-btn" onclick="showTab('pricing')" id="tab-pricing"><span class="tab-icon">💰</span>Pricing</button>
   <button class="tab-btn" onclick="showTab('spark')" id="tab-spark"><span class="tab-icon">📡</span>Demand Map</button>
@@ -528,61 +528,70 @@ tr:hover td{background:var(--bg3)}
 
 </div>
 <!-- ══════════════════════════════════════════════════════ -->
-<!-- DRIVER SUPPORT -->
+<!-- DRIVER BACKEND -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-driver-content">
+
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
     <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-total">--</div><div class="kpi-label">Total Drivers</div></div>
     <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="ds-compliant">--</div><div class="kpi-label">Compliant</div></div>
     <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-lapsing">--</div><div class="kpi-label">Lapsing</div></div>
-    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-lapsed">--</div><div class="kpi-label">Lapsed</div></div>
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-flights">--</div><div class="kpi-label">Flights Today</div></div>
-    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-surge">--</div><div class="kpi-label">Surge Zones</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-lapsed">--</div><div class="kpi-label">Lapsed — Blocked</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-active">60</div><div class="kpi-label">Active Today</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-fulltime">--</div><div class="kpi-label">Full Time</div></div>
   </div>
-  <div class="grid-2">
-    <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-head"><div><div class="panel-title">Lapsing Drivers Action Required</div></div></div>
-        <div class="panel-body"><div class="tbl-wrap"><table>
-          <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Expiry</th><th>Reminder</th></tr></thead>
-          <tbody id="ds-lapsing-body"></tbody>
-        </table></div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Lapsed Drivers Jobs Blocked</div></div></div>
-        <div class="panel-body"><div class="tbl-wrap"><table>
-          <thead><tr><th>Driver</th><th>Zone</th><th>Document</th><th>Status</th></tr></thead>
-          <tbody id="ds-lapsed-body"></tbody>
-        </table></div></div>
-      </div>
-    </div>
-    <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-head">
-          <div><div class="panel-title">Zone Demand Timeline</div></div>
-          <button class="btn btn-red" onclick="generateApad()">APAD Report</button>
-        </div>
-        <div class="panel-body"><div id="ds-demand-chart"></div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">BUDI95 Subsidy Tiers</div></div></div>
-        <div class="panel-body" id="ds-budi"></div>
-      </div>
-    </div>
-  </div>
-  <!-- Driver Support Alerts -->
-  <div class="panel mt-sm">
-    <div class="panel-head"><div><div class="panel-title">Driver Support Alerts</div><div class="panel-sub">Compliance and performance issues</div></div></div>
+
+  <!-- Driver Backend Alerts — TOP -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Backend Alerts</div><div class="panel-sub" style="font-size:12px;margin-top:4px">From Master Intelligence</div></div></div>
     <div class="panel-body" id="ds-alerts-list"></div>
   </div>
-  <div id="apad-report-section" style="display:none;margin-top:16px">
-    <div class="panel">
-      <div class="panel-head"><div><div class="panel-title">APAD Compliance Report <span id="apad-ts"></span></div></div></div>
-      <div class="panel-body" id="apad-content"></div>
+
+  <!-- Lapsing Drivers -->
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(240,165,0,0.25)">
+    <div class="panel-head" style="background:rgba(240,165,0,0.04);padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px;color:var(--amber)">Lapsing Drivers — Action Required</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Documents expiring within 30 days. Send WATI reminder to driver.</div></div>
+    </div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Phone</th><th style="font-size:12px;padding:12px 14px">Zone</th><th style="font-size:12px;padding:12px 14px">Document</th><th style="font-size:12px;padding:12px 14px">Expiry Date</th><th style="font-size:12px;padding:12px 14px">Days Left</th><th style="font-size:12px;padding:12px 14px">Reminder</th><th style="font-size:12px;padding:12px 14px">Action</th></tr></thead>
+        <tbody id="ds-lapsing-body"></tbody>
+      </table></div>
     </div>
   </div>
-</div>
 
+  <!-- Lapsed Drivers -->
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(232,0,45,0.25)">
+    <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px;color:var(--red)">Lapsed Drivers — Blocked from Jobs</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Documents expired. Driver cannot accept bookings until renewed.</div></div>
+    </div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Phone</th><th style="font-size:12px;padding:12px 14px">Zone</th><th style="font-size:12px;padding:12px 14px">Document</th><th style="font-size:12px;padding:12px 14px">Expired On</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">Action</th></tr></thead>
+        <tbody id="ds-lapsed-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- BUDI95 + APAD side by side -->
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:16px 20px">
+        <div><div class="panel-title" style="font-size:13px">BUDI95 Subsidy Eligibility</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Monthly fuel subsidy tiers based on mileage</div></div>
+        <button class="btn btn-red" onclick="downloadBudi95()" style="font-size:11px;padding:6px 14px">Download Report</button>
+      </div>
+      <div class="panel-body" id="ds-budi"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:16px 20px">
+        <div><div class="panel-title" style="font-size:13px">APAD Compliance Report</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Fleet compliance summary for APAD submission</div></div>
+        <button class="btn btn-red" onclick="generateApad()" style="font-size:11px;padding:6px 14px">Generate Report</button>
+      </div>
+      <div class="panel-body" id="apad-content"><div style="color:var(--text3);font-size:14px">Click Generate Report to create the APAD compliance report.</div></div>
+    </div>
+  </div>
+
+</div>
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- CUSTOMER SUPPORT -->
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1406,85 +1415,124 @@ async function loadTower() {
 
 // ── DRIVER SUPPORT ────────────────────────────────────────────────────────────
 async function loadDriverSupport() {
-  const [drivers, flights, stats, alerts] = await Promise.all([
+  const [drivers, stats, alerts] = await Promise.all([
     fetch('/api/drivers').then(r=>r.json()),
-    fetch('/api/flights').then(r=>r.json()),
     fetch('/api/stats').then(r=>r.json()),
     fetch('/api/master-alerts?team=driver_support').then(r=>r.json()).catch(()=>[])
   ]);
-
-  document.getElementById('ds-total').textContent = stats.drivers.total;
-  document.getElementById('ds-compliant').textContent = stats.drivers.compliant;
-  document.getElementById('ds-lapsing').textContent = stats.drivers.lapsing;
-  document.getElementById('ds-lapsed').textContent = stats.drivers.lapsed;
-  document.getElementById('ds-flights').textContent = stats.flights.total;
-  document.getElementById('ds-surge').textContent = stats.flights.surge_zones;
-
-  const lapsing = drivers.filter(d=>d['Compliance Status']==='Lapsing');
-  document.getElementById('ds-lapsing-body').innerHTML = lapsing.slice(0,10).map(d=>{
-    const n30 = new Date(Date.now()+30*864e5);
-    const docs = [];
-    if(d['PSV Expiry Date']&&new Date(d['PSV Expiry Date'])<n30) docs.push({doc:'PSV',exp:d['PSV Expiry Date']});
-    if(d['EVP Expiry Date']&&new Date(d['EVP Expiry Date'])<n30) docs.push({doc:'EVP',exp:d['EVP Expiry Date']});
-    if(d['Insurance Expiry Date']&&new Date(d['Insurance Expiry Date'])<n30) docs.push({doc:'Insurance',exp:d['Insurance Expiry Date']});
-    const doc = docs[0]||{doc:'Document',exp:'Soon'};
-    return`<tr>
-      <td style="color:var(--text)">${d['Driver Name']}</td>
-      <td>${d['Zone']}</td>
-      <td><span class="badge bg-amber">${doc.doc}</span></td>
-      <td style="color:var(--amber);font-family:'DM Mono',monospace;font-size:11px">${doc.exp}</td>
-      <td><span class="badge ${d['Reminder Sent']==='Yes'?'bg-green':'bg-red'}">${d['Reminder Sent']==='Yes'?'Sent':'Pending'}</span></td>
-    </tr>`;
-  }).join('');
-
-  document.getElementById('ds-lapsed-body').innerHTML = drivers.filter(d=>d['Compliance Status']==='Lapsed').map(d=>
-    `<tr><td style="color:var(--text)">${d['Driver Name']}</td><td>${d['Zone']}</td><td>Documents Expired</td><td><span class="badge bg-blocked">BLOCKED</span></td></tr>`
-  ).join('');
-
-  const hourMap = {};
-  flights.forEach(f=>{
-    const hr=(f['Scheduled Arrival Time']||'00:00').split(':')[0];
-    if(!hourMap[hr]) hourMap[hr]={demand:0,level:'Low'};
-    hourMap[hr].demand += parseInt(f['Expected Ride Demand']||0);
-    if(f['Zone Demand Level']==='Surge') hourMap[hr].level='Surge';
-    else if(f['Zone Demand Level']==='High'&&hourMap[hr].level!=='Surge') hourMap[hr].level='High';
-    else if(f['Zone Demand Level']==='Medium'&&!['Surge','High'].includes(hourMap[hr].level)) hourMap[hr].level='Medium';
-  });
-  const maxD = Math.max(...Object.values(hourMap).map(h=>h.demand),1);
-  const bc = {Low:'db-low',Medium:'db-medium',High:'db-high',Surge:'db-surge'};
-  document.getElementById('ds-demand-chart').innerHTML = Object.keys(hourMap).sort().map(hr=>{
-    const h=hourMap[hr]; const pct=Math.round(h.demand/maxD*100);
-    return`<div class="dbar-wrap"><div class="dbar-time">${hr}:00</div><div class="dbar-bg"><div class="dbar ${bc[h.level]}" style="width:${pct}%">${h.level} ${h.demand}</div></div></div>`;
-  }).join('');
-
-  const t1=drivers.filter(d=>d['BUDI95 Tier']==='Tier 1').length;
-  const t2=drivers.filter(d=>d['BUDI95 Tier']==='Tier 2').length;
-  document.getElementById('ds-budi').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="mult-card"><div class="mult-val" style="color:var(--amber)">${t1}</div><div class="mult-zone">Tier 1 Below 2,000 km</div></div>
-      <div class="mult-card"><div class="mult-val" style="color:var(--green)">${t2}</div><div class="mult-zone">Tier 2 Above 2,000 km</div></div>
-    </div>
-    <div style="font-size:11px;color:var(--text3);margin-top:12px">Next BUDI95 submission: 1st of next month at 9:00 AM</div>`;
-
+  const g = id => document.getElementById(id);
+  if(g('ds-total')) g('ds-total').textContent = stats.drivers.total;
+  if(g('ds-compliant')) g('ds-compliant').textContent = stats.drivers.compliant;
+  if(g('ds-lapsing')) g('ds-lapsing').textContent = stats.drivers.lapsing;
+  if(g('ds-lapsed')) g('ds-lapsed').textContent = stats.drivers.lapsed;
+  if(g('ds-fulltime')) g('ds-fulltime').textContent = drivers.filter(d=>d['Driver Type']==='Full Time').length;
   renderAlerts(alerts, 'ds-alerts-list', false);
+  const n30 = new Date(Date.now()+30*864e5);
+  const lapsing = drivers.filter(d=>d['Compliance Status']==='Lapsing');
+  const lapsingBody = g('ds-lapsing-body');
+  if(lapsingBody) lapsingBody.innerHTML = lapsing.length===0
+    ? '<tr><td colspan="8" style="padding:16px;color:var(--text3);font-size:14px">No lapsing drivers</td></tr>'
+    : lapsing.slice(0,20).map(d => {
+        const docs = [];
+        if(d['PSV Expiry Date']&&new Date(d['PSV Expiry Date'])<n30) docs.push({doc:'PSV',exp:d['PSV Expiry Date']});
+        if(d['EVP Expiry Date']&&new Date(d['EVP Expiry Date'])<n30) docs.push({doc:'EVP',exp:d['EVP Expiry Date']});
+        if(d['Insurance Expiry Date']&&new Date(d['Insurance Expiry Date'])<n30) docs.push({doc:'Insurance',exp:d['Insurance Expiry Date']});
+        const doc = docs[0]||{doc:'Document',exp:'Soon'};
+        const daysLeft = Math.ceil((new Date(doc.exp)-new Date())/864e5);
+        const dc = daysLeft<=7?'var(--red)':daysLeft<=14?'var(--amber)':'var(--text2)';
+        const reminded = d['Reminder Sent']==='Yes';
+        return '<tr>'
+          +'<td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+d['Driver Name']+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:var(--cyan)">'+String(d['Phone Number']||'')+'</td>'
+          +'<td style="font-size:14px;padding:12px 14px">'+d['Zone']+'</td>'
+          +'<td style="padding:12px 14px"><span class="badge bg-amber">'+doc.doc+'</span></td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:var(--amber)">'+doc.exp+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+dc+'">'+daysLeft+' days</td>'
+          +'<td style="padding:12px 14px"><span class="badge '+(reminded?'bg-green':'bg-red')+'">'+(reminded?'Sent':'Pending')+'</span></td>'
+          +'<td style="padding:12px 14px"><button onclick="watiModal(this)" data-name="'+d['Driver Name'].replace(/"/g,'')+'" data-phone="'+String(d['Phone Number']||'')+'" data-doc="'+doc.doc+'" style="padding:5px 12px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:4px;font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer">Send Reminder</button></td>'
+          +'</tr>';
+      }).join('');
+  const lapsed = drivers.filter(d=>d['Compliance Status']==='Lapsed');
+  const lapsedBody = g('ds-lapsed-body');
+  if(lapsedBody) lapsedBody.innerHTML = lapsed.length===0
+    ? '<tr><td colspan="7" style="padding:16px;color:var(--text3);font-size:14px">No lapsed drivers</td></tr>'
+    : lapsed.map(d =>
+        '<tr style="background:rgba(232,0,45,0.03)">'
+        +'<td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+d['Driver Name']+'</td>'
+        +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:var(--cyan)">'+String(d['Phone Number']||'')+'</td>'
+        +'<td style="font-size:14px;padding:12px 14px">'+d['Zone']+'</td>'
+        +'<td style="padding:12px 14px"><span class="badge bg-red">Documents Expired</span></td>'
+        +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:var(--red)">'+(d['PSV Expiry Date']||d['EVP Expiry Date']||'N/A')+'</td>'
+        +'<td style="padding:12px 14px"><span class="badge bg-blocked">BLOCKED</span></td>'
+        +'<td style="padding:12px 14px"><button onclick="watiModal(this)" data-name="'+d['Driver Name'].replace(/"/g,'')+'" data-phone="'+String(d['Phone Number']||'')+'" data-doc="All Documents" style="padding:5px 12px;background:rgba(232,0,45,0.08);border:1px solid rgba(232,0,45,0.2);border-radius:4px;font-size:12px;font-weight:700;color:var(--red);cursor:pointer">Remind to Renew</button></td>'
+        +'</tr>'
+      ).join('');
+  const t1 = drivers.filter(d=>d['BUDI95 Tier']==='Tier 1');
+  const t2 = drivers.filter(d=>d['BUDI95 Tier']==='Tier 2');
+  const budiEl = g('ds-budi');
+  if(budiEl) budiEl.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">'
+    +'<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">'
+    +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Tier 1</div>'
+    +'<div style="font-family:Syne,sans-serif;font-size:28px;font-weight:700;color:var(--amber)">'+t1.length+'</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-top:4px">Below 2,000 km/month</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-top:6px;font-weight:600">RM 30 subsidy/month</div></div>'
+    +'<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">'
+    +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Tier 2</div>'
+    +'<div style="font-family:Syne,sans-serif;font-size:28px;font-weight:700;color:var(--green)">'+t2.length+'</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-top:4px">Above 2,000 km/month</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-top:6px;font-weight:600">RM 80 subsidy/month</div></div></div>'
+    +'<div style="font-size:13px;color:var(--text3)">Next BUDI95 submission: 1st of next month at 9:00 AM.</div>';
+}
+
+function watiModal(btn) {
+  const name = btn.getAttribute('data-name');
+  const phone = btn.getAttribute('data-phone');
+  const doc = btn.getAttribute('data-doc');
+  const m = document.createElement('div');
+  m.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  m.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:420px;max-width:90vw">'
+    +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">WATI Reminder Sent</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.8">Sent to <strong style="color:var(--text)">'+name+'</strong> at <span style="color:var(--cyan);font-family:DM Mono,monospace">'+phone+'</span>.<br>Message: Your <strong>'+doc+'</strong> is expiring. Please renew to avoid being blocked from jobs.</div>'
+    +'<div style="padding:10px 14px;background:rgba(0,210,106,0.06);border:1px solid rgba(0,210,106,0.2);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:16px">Delivered via WATI at '+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true})+'</div>'
+    +'<button onclick="this.closest(\'div\').parentElement.remove()" style="width:100%;padding:10px;background:var(--green);border:none;border-radius:6px;color:#000;font-size:13px;font-weight:700;cursor:pointer">Done</button>'
+    +'</div>';
+  document.body.appendChild(m);
+  btn.textContent='Sent'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(0,210,106,0.3)'; btn.disabled=true;
+}
+
+function downloadBudi95() {
+  fetch('/api/drivers').then(r=>r.json()).then(drivers => {
+    const now = new Date().toLocaleDateString('en-MY');
+    let csv = 'BUDI95 Subsidy Report - '+now+'\n\nDriver ID,Driver Name,Phone,Zone,Monthly KM,Tier,Subsidy\n';
+    drivers.forEach(d => {
+      const tier = d['BUDI95 Tier']||'Tier 1';
+      csv += d['Driver ID']+','+d['Driver Name']+','+d['Phone Number']+','+d['Zone']+','+d['Monthly KM']+','+tier+','+(tier==='Tier 2'?'RM 80':'RM 30')+'\n';
+    });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download = 'BUDI95_'+now.replace(/\//g,'-')+'.csv';
+    a.click();
+  });
 }
 
 function generateApad() {
-  fetch('/api/stats').then(r=>r.json()).then(s=>{
-    const now = new Date().toLocaleString('en-MY');
-    document.getElementById('apad-ts').textContent = now;
-    document.getElementById('apad-content').innerHTML=`
-      <div style="font-family:'DM Mono',monospace;font-size:12px;line-height:2;color:var(--text)">
-        <div style="color:var(--red);font-weight:700;margin-bottom:12px;font-size:13px;letter-spacing:1px">APAD FLEET COMPLIANCE REPORT ${new Date().toLocaleDateString('en-MY')}</div>
-        <div>Total Fleet: <strong>${s.drivers.total}</strong></div>
-        <div>Fully Compliant: <strong style="color:var(--green)">${s.drivers.compliant}</strong> (${(s.drivers.compliant/s.drivers.total*100).toFixed(1)}%)</div>
-        <div>Lapsing (within 30 days): <strong style="color:var(--amber)">${s.drivers.lapsing}</strong></div>
-        <div>Lapsed (non-compliant): <strong style="color:var(--red)">${s.drivers.lapsed}</strong></div>
-        <div>Jobs Blocked Today: <strong style="color:var(--red)">${s.drivers.lapsed}</strong></div>
-        <div style="margin-top:12px;color:var(--text3);font-size:11px">Generated: ${now}</div>
-        <div style="color:var(--text3);font-size:11px">Prepared by: PULSE AirAsia Ride Operations Intelligence</div>
-      </div>`;
-    document.getElementById('apad-report-section').style.display='block';
+  fetch('/api/stats').then(r=>r.json()).then(s => {
+    const el = document.getElementById('apad-content');
+    if(!el) return;
+    el.innerHTML = '<div style="font-family:DM Mono,monospace;font-size:13px;line-height:2.2;color:var(--text)">'
+      +'<div style="color:var(--red);font-weight:700;margin-bottom:14px;font-size:14px">APAD E-HAILING FLEET COMPLIANCE REPORT</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 40px">'
+      +'<div>Operator: <strong>AirAsia Ride</strong></div>'
+      +'<div>Date: <strong>'+new Date().toLocaleDateString('en-MY')+'</strong></div>'
+      +'<div>Period: <strong>'+new Date().toLocaleDateString('en-MY',{month:'long',year:'numeric'})+'</strong></div>'
+      +'<div>Generated: <strong>'+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true})+'</strong></div>'
+      +'<div>Total Fleet: <strong>'+s.drivers.total+'</strong></div>'
+      +'<div>Compliant: <strong style="color:var(--green)">'+s.drivers.compliant+' ('+Math.round(s.drivers.compliant/s.drivers.total*100)+'%)</strong></div>'
+      +'<div>Lapsing: <strong style="color:var(--amber)">'+s.drivers.lapsing+'</strong></div>'
+      +'<div>Lapsed: <strong style="color:var(--red)">'+s.drivers.lapsed+'</strong></div>'
+      +'</div>'
+      +'<div style="margin-top:14px;padding:10px 14px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:6px;font-size:11px;color:var(--text3)">Placeholder format. Final format to be confirmed with APAD. Generated by PULSE.</div>'
+      +'</div>';
   });
 }
 
