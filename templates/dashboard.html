@@ -7,479 +7,216 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-:root[data-theme="dark"] {
-  --neon-opacity: 0.28;
-  --neon-opacity-hover: 0.45;
-  --neon-panel-opacity: 0.2;
-  --bg: #060912;
-  --bg2: #0A0F1C;
-  --bg3: #0F1628;
-  --bg4: #141D35;
-  --border: #1A2440;
-  --border2: #243055;
-  --text: #F0F4FF;
-  --text2: #A8B4C8;
-  --text3: #6A7890;
-  --red: #E8002D;
-  --red-glow: rgba(232,0,45,0.15);
-  --red-dim: #B8002A;
-  --green: #00D26A;
-  --amber: #F0A500;
-  --blue: #0088FF;
-  --card-bg: linear-gradient(145deg, #0F1628 0%, #0C1220 100%);
-  --card-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px #1A2440;
-  --glow-red: 0 0 30px rgba(232,0,45,0.08);
-  --header-bg: rgba(6,9,18,0.95);
-  --tab-bg: #060912;
-  --alert-bg: #0C1220;
-  --mode-icon: '☀️';
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root[data-theme="dark"]{
+  --bg:#060912;--bg2:#0A0F1C;--bg3:#0D1525;--bg4:#141D35;
+  --border:rgba(0,212,255,0.07);--border2:rgba(0,212,255,0.18);
+  --text:#F0F4FF;--text2:#A8B4C8;--text3:#506070;
+  --red:#E8002D;--red-dim:#B8002A;--green:#00D26A;--amber:#F0A500;--blue:#0088FF;--cyan:#00D4FF;
+  --card-bg:linear-gradient(145deg,#0D1525 0%,#090E1A 100%);
+  --panel-bg:linear-gradient(145deg,#0D1525 0%,#090E1A 100%);
+  --header-bg:rgba(6,9,18,0.9);--tab-bg:#060912;--alert-bg:#0C1220;
+  --neon:0.28;--neon-hover:0.5;--neon-panel:0.18;
+  --signal:rgba(0,212,255,0.5);
 }
-:root[data-theme="light"] {
-  --neon-opacity: 0.08;
-  --neon-opacity-hover: 0.15;
-  --neon-panel-opacity: 0.06;
-  --bg: #F0F2F7;
-  --bg2: #FFFFFF;
-  --bg3: #F8F9FC;
-  --bg4: #EEF0F7;
-  --border: #DDE2EE;
-  --border2: #C8D0E4;
-  --text: #0F1628;
-  --text2: #4A5568;
-  --text3: #8894A8;
-  --red: #D40028;
-  --red-glow: rgba(212,0,40,0.08);
-  --red-dim: #AA0020;
-  --green: #008844;
-  --amber: #CC8800;
-  --blue: #0066CC;
-  --card-bg: linear-gradient(145deg, #FFFFFF 0%, #F8F9FC 100%);
-  --card-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(212,0,40,0.12), 0 0 20px rgba(212,0,40,0.05);
-  --glow-red: 0 4px 16px rgba(212,0,40,0.1);
-  --header-bg: rgba(240,242,247,0.95);
-  --tab-bg: #FFFFFF;
-  --alert-bg: #F8F9FC;
-  --mode-icon: '🌙';
+:root[data-theme="light"]{
+  --bg:#EEF1F8;--bg2:#FFFFFF;--bg3:#F4F6FC;--bg4:#E8EDF8;
+  --border:rgba(0,80,180,0.1);--border2:rgba(0,80,180,0.22);
+  --text:#0A0F1C;--text2:#3A4A60;--text3:#8090A8;
+  --red:#D40028;--red-dim:#AA0020;--green:#007A3D;--amber:#B87800;--blue:#0055CC;--cyan:#0055AA;
+  --card-bg:linear-gradient(145deg,#FFFFFF 0%,#F4F6FC 100%);
+  --panel-bg:linear-gradient(145deg,#FFFFFF 0%,#F4F6FC 100%);
+  --header-bg:rgba(238,241,248,0.92);--tab-bg:#FFFFFF;--alert-bg:#F4F6FC;
+  --neon:0.1;--neon-hover:0.18;--neon-panel:0.07;
+  --signal:rgba(0,85,170,0.4);
 }
+body{background:var(--bg);font-family:"DM Sans",sans-serif;font-size:14px;min-height:100vh;transition:background 0.3s,color 0.3s;color:var(--text)}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  min-height: 100vh;
-  transition: background 0.3s, color 0.3s;
-}
+/* ANIMATED BG */
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:50px 50px;animation:gridshift 40s linear infinite}
+@keyframes gridshift{0%{background-position:0 0}100%{background-position:50px 50px}}
+.radar-wrap{position:absolute;left:50%;top:35%;transform:translate(-50%,-50%)}
+.rring{position:absolute;border-radius:50%;border:1px solid var(--cyan);transform:translate(-50%,-50%);left:50%;top:50%;animation:rexpand 5s ease-out infinite;opacity:0}
+.rring:nth-child(2){animation-delay:1.7s}
+.rring:nth-child(3){animation-delay:3.4s}
+@keyframes rexpand{0%{width:0;height:0;opacity:0.3}100%{width:900px;height:900px;opacity:0}}
+#particle-canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 36px;
-  height: 58px;
-  background: var(--header-bg);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
+.header{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:64px;background:var(--header-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2)}
+.logo{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;color:var(--red);letter-spacing:3px;margin-top:0}
+.logo span{color:var(--text)}
+.logo-divider{display:none}
+.logo-sub{font-size:11px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;opacity:0.85;font-weight:600;margin-top:0}
+.header-right{display:flex;align-items:center;gap:14px}
+.status-pill{display:flex;align-items:center;gap:7px;background:rgba(0,210,106,0.06);border:1px solid rgba(0,210,106,0.2);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--green);font-weight:600;letter-spacing:0.5px}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pdotpulse 2s infinite}
+@keyframes pdotpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,210,106,0.5)}50%{opacity:0.4;box-shadow:0 0 0 5px rgba(0,210,106,0)}}
+.clock{font-family:"DM Mono",monospace;font-size:11px;color:var(--text3)}
+.mode-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.mode-btn:hover{border-color:var(--cyan)}
 
-.logo-wrap { display: flex; align-items: center; gap: 14px; }
-.logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--red);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-.logo span { color: var(--text); }
-.logo-divider { width: 1px; height: 20px; background: var(--border2); }
-.logo-sub { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
-
-.header-right { display: flex; align-items: center; gap: 16px; }
-
-.status-pill {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 11px;
-  color: var(--green);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-.pulse-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.4)} }
-
-.clock { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text3); }
-
-.mode-btn {
-  width: 34px; height: 34px; border-radius: 8px;
-  background: var(--bg3); border: 1px solid var(--border);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 15px; transition: all 0.2s;
-}
-.mode-btn:hover { border-color: var(--border2); }
-
-/* SIGNAL LINE */
-.signal-line {
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, var(--red) 20%, var(--red) 80%, transparent 100%);
-  opacity: 0.4;
-  animation: signal 3s ease-in-out infinite;
-}
-@keyframes signal { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
+/* SIGNAL WAVE */
+.signal-bar{height:2px;position:relative;overflow:hidden;background:transparent}
+.signal-wave{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,var(--cyan),var(--red),var(--cyan),transparent);animation:swave 2.5s ease-in-out infinite}
+@keyframes swave{0%{left:-100%}100%{left:100%}}
 
 /* TABS */
-.tabs {
-  display: flex;
-  background: var(--tab-bg);
-  border-bottom: 1px solid var(--border);
-  padding: 0 36px;
-  overflow-x: auto;
-  gap: 2px;
-}
-.tabs::-webkit-scrollbar { display: none; }
-.tab-btn {
-  padding: 14px 20px;
-  background: transparent;
-  border: none;
-  color: var(--text3);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: all 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
-.tab-btn:hover { color: var(--text2); }
-.tab-btn.active { color: var(--red); border-bottom: 2px solid var(--red); }
-.tab-icon { margin-right: 7px; font-size: 13px; }
+.tabs{display:flex;background:var(--tab-bg);border-bottom:1px solid var(--border);padding:0 32px;overflow-x:auto;position:relative;z-index:10}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 20px;background:transparent;border:none;color:var(--text3);font-size:11px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;transition:all 0.2s;font-family:"DM Sans",sans-serif}
+.tab-btn:hover{color:var(--text2)}
+.tab-btn.active{color:var(--red);border-bottom:2px solid var(--red)}
 
 /* CONTENT */
-.tab-content { display: none; padding: 28px 36px; }
-.tab-content.active { display: block; }
+.tab-content{display:none;padding:24px 32px;position:relative;z-index:5}
+.tab-content.active{display:block}
 
 /* SECTION LABEL */
-.section-label {
-  font-size: 11px;
-  color: var(--text2);
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.section-label::before {
-  content: '';
-  width: 3px; height: 12px;
-  background: var(--red);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
+.section-label{font-size:12px;color:var(--cyan);opacity:0.8;text-transform:uppercase;letter-spacing:3px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+[data-theme="light"] .section-label{color:var(--blue);opacity:0.9}
+.section-label::before{content:"";width:2px;height:11px;background:var(--red);border-radius:2px;flex-shrink:0}
+.section-label::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
 
-/* KPI CARDS */
-.kpi-grid { display: grid; gap: 12px; margin-bottom: 6px; }
-.kpi-6 { grid-template-columns: repeat(6, 1fr); }
-.kpi-4 { grid-template-columns: repeat(4, 1fr); }
-.kpi-8 { grid-template-columns: repeat(8, 1fr); }
+/* KPI CARD */
+.kpi-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:visible;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+.kpi-card::before{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(145deg,rgba(255,255,255,0.03),transparent);pointer-events:none}
+.kpi-card::after{content:"";position:absolute;bottom:-6px;left:10%;right:10%;height:14px;background:var(--red);filter:blur(12px);border-radius:50%;opacity:var(--neon);pointer-events:none;transition:all 0.3s}
+.kpi-card:hover{transform:translateY(-5px);border-color:var(--border2)}
+.kpi-card:hover::after{opacity:var(--neon-hover);bottom:-9px;left:5%;right:5%}
 
-.kpi-card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 18px 20px 16px;
-  position: relative;
-  overflow: visible;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform: translateY(0) translateZ(0);
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.5),
-    0 8px 16px rgba(0,0,0,0.4);
-}
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 1;
-}
-.kpi-card::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 8%;
-  right: 8%;
-  height: 20px;
-  background: #E8002D;
-  filter: blur(14px);
-  border-radius: 50%;
-  opacity: var(--neon-opacity, 0.7);
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-.kpi-card:hover {
-  transform: translateY(-6px) translateZ(0);
-  box-shadow:
-    0 4px 8px rgba(0,0,0,0.5),
-    0 16px 32px rgba(0,0,0,0.4);
-}
-.kpi-card:hover::after {
-  bottom: -8px;
-  left: 5%;
-  right: 5%;
-  height: 24px;
-  opacity: var(--neon-opacity-hover, 1);
-  filter: blur(16px);
-}
+/* HUD BRACKETS */
+.hb{position:absolute;width:10px;height:10px;opacity:0.35}
+.hb-tl{top:6px;left:6px;border-top:1.5px solid var(--cyan);border-left:1.5px solid var(--cyan)}
+.hb-tr{top:6px;right:6px;border-top:1.5px solid var(--cyan);border-right:1.5px solid var(--cyan)}
+.hb-bl{bottom:6px;left:6px;border-bottom:1.5px solid var(--cyan);border-left:1.5px solid var(--cyan)}
+.hb-br{bottom:6px;right:6px;border-bottom:1.5px solid var(--cyan);border-right:1.5px solid var(--cyan)}
 
-.kpi-val {
-  font-family: 'Syne', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-  letter-spacing: -0.5px;
-}
-.kpi-val-lg {
-  font-family: 'Syne', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1;
-  letter-spacing: -1px;
-}
-.kpi-label {
-  font-size: 12px;
-  color: var(--text2);
-  margin-top: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
-}
-.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+/* KPI VALUES */
+.kpi-val{font-family:"Syne",sans-serif;font-size:28px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-0.5px}
+.kpi-val-lg{font-family:"Syne",sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-1px}
+.kpi-label{font-size:11px;color:var(--text2);margin-top:9px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.kpi-sub{display:none}
+.kpi-critical .kpi-val{color:var(--red)}
+.kpi-warn .kpi-val{color:var(--amber)}
+.c-red{color:var(--red)} .c-green{color:var(--green)} .c-amber{color:var(--amber)} .c-blue{color:var(--blue)} .c-white{color:var(--text)} .c-orange{color:#FF6D00}
 
-.kpi-critical .kpi-val { color: var(--red); }
-.kpi-warn .kpi-val { color: var(--amber); }
-
-/* PANELS */
-.panel {
-  background: var(--card-bg);
-  border-radius: 12px;
-  overflow: visible;
-  margin-bottom: 24px;
-  position: relative;
-  transition: all 0.3s ease;
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.5),
-    0 8px 20px rgba(0,0,0,0.35);
-}
-.panel::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 5%;
-  right: 5%;
-  height: 20px;
-  background: #E8002D;
-  filter: blur(16px);
-  border-radius: 50%;
-  opacity: var(--neon-panel-opacity, 0.55);
-  pointer-events: none;
-}
-.panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-}
-.panel-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text);
-}
-.panel-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.panel-body { padding: 16px 20px; }
+/* PANEL */
+.panel{background:var(--panel-bg);border:1px solid var(--border);border-radius:10px;overflow:visible;margin-bottom:20px;position:relative;transition:border-color 0.2s}
+.panel::after{content:"";position:absolute;bottom:-6px;left:5%;right:5%;height:14px;background:var(--red);filter:blur(14px);border-radius:50%;opacity:var(--neon-panel);pointer-events:none}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border)}
+.panel-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text)}
+.panel-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.panel-body{padding:16px 20px}
 
 /* GRID */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.kpi-grid{display:grid;gap:12px;margin-bottom:6px}
+.kpi-6{grid-template-columns:repeat(6,1fr)}
+.kpi-4{grid-template-columns:repeat(4,1fr)}
+.kpi-8{grid-template-columns:repeat(8,1fr)}
 
 /* MINI */
-.mini {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-}
-.mini h4 {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text3);
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-/* ALERT CARDS */
-.alert-card {
-  border-radius: 8px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  border-left: 3px solid;
-  background: var(--alert-bg);
-  transition: all 0.2s;
-}
-.alert-card:hover { transform: translateX(2px); }
-.alert-high { border-color: var(--red); }
-.alert-medium { border-color: var(--amber); }
-.alert-plan { border-color: var(--green); }
-.alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.alert-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
-.alert-detail { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 6px; }
-.alert-action { font-size: 11px; color: var(--text3); font-style: italic; }
-.alert-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
-.ack-btn {
-  padding: 4px 12px; background: transparent;
-  border: 1px solid var(--border2); border-radius: 4px;
-  color: var(--text3); font-size: 10px; cursor: pointer;
-  letter-spacing: 1px; text-transform: uppercase;
-  font-family: 'DM Sans', sans-serif; font-weight: 600;
-  transition: all 0.2s;
-}
-.ack-btn:hover { border-color: var(--green); color: var(--green); }
-
-/* BADGES */
-.badge {
-  display: inline-flex; align-items: center;
-  padding: 2px 9px; border-radius: 10px;
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.5px;
-}
-.bg-red { background: rgba(232,0,45,0.12); color: var(--red); border: 1px solid rgba(232,0,45,0.25); }
-.bg-green { background: rgba(0,210,106,0.1); color: var(--green); border: 1px solid rgba(0,210,106,0.2); }
-.bg-amber { background: rgba(240,165,0,0.1); color: var(--amber); border: 1px solid rgba(240,165,0,0.2); }
-.bg-blue { background: rgba(0,136,255,0.1); color: var(--blue); border: 1px solid rgba(0,136,255,0.2); }
-.bg-grey { background: rgba(72,85,100,0.15); color: var(--text3); border: 1px solid var(--border); }
-.bg-orange { background: rgba(255,109,0,0.1); color: #FF6D00; border: 1px solid rgba(255,109,0,0.2); }
-.bg-blocked { background: rgba(232,0,45,0.15); color: var(--red); border: 1px solid rgba(232,0,45,0.3); font-size: 10px; letter-spacing: 1px; }
+.mini{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.mini h4{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:12px;font-weight:600}
 
 /* TABLE */
-.tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th {
-  text-align: left; padding: 8px 12px;
-  background: var(--bg3); color: var(--text3);
-  font-size: 10px; text-transform: uppercase;
-  letter-spacing: 1.5px; border-bottom: 1px solid var(--border);
-  white-space: nowrap; font-weight: 600;
-}
-td { padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; color: var(--text2); }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--bg3); }
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 12px;background:var(--bg3);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border);white-space:nowrap;font-weight:600}
+td{padding:9px 12px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+.bg-red{background:rgba(232,0,45,0.1);color:var(--red);border:1px solid rgba(232,0,45,0.2)}
+.bg-green{background:rgba(0,210,106,0.08);color:var(--green);border:1px solid rgba(0,210,106,0.18)}
+.bg-amber{background:rgba(240,165,0,0.1);color:var(--amber);border:1px solid rgba(240,165,0,0.18)}
+.bg-blue{background:rgba(0,136,255,0.1);color:var(--blue);border:1px solid rgba(0,136,255,0.18)}
+.bg-grey{background:rgba(72,85,100,0.12);color:var(--text3);border:1px solid var(--border)}
+.bg-orange{background:rgba(255,109,0,0.1);color:#FF6D00;border:1px solid rgba(255,109,0,0.18)}
+.bg-blocked{background:rgba(232,0,45,0.12);color:var(--red);border:1px solid rgba(232,0,45,0.25);letter-spacing:1px}
+
+/* ALERT */
+.alert-card{border-radius:8px;padding:14px 16px;margin-bottom:10px;border-left:3px solid;background:var(--alert-bg);transition:transform 0.2s}
+.alert-card:hover{transform:translateX(3px)}
+.alert-high{border-color:var(--red);box-shadow:-2px 0 8px rgba(232,0,45,0.12)}
+.alert-medium{border-color:var(--amber)}
+.alert-plan{border-color:var(--green)}
+.alert-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.alert-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:5px}
+.alert-detail{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:5px}
+.alert-action{font-size:11px;color:var(--text3);font-style:italic}
+.alert-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.ack-btn{padding:4px 12px;background:transparent;border:1px solid var(--border2);border-radius:4px;color:var(--text3);font-size:10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;font-family:"DM Sans",sans-serif;font-weight:700;transition:all 0.2s}
+.ack-btn:hover{border-color:var(--green);color:var(--green)}
 
 /* DEMAND BAR */
-.dbar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.dbar-time { width: 38px; font-size: 10px; color: var(--text3); text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; }
-.dbar-bg { flex: 1; background: var(--bg3); border-radius: 3px; height: 16px; overflow: hidden; }
-.dbar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; }
-.db-low { background: rgba(0,210,106,0.12); color: var(--green); }
-.db-medium { background: rgba(240,165,0,0.12); color: var(--amber); }
-.db-high { background: rgba(255,109,0,0.12); color: #FF6D00; }
-.db-surge { background: rgba(232,0,45,0.15); color: var(--red); }
+.dbar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.dbar-time{width:38px;font-size:10px;color:var(--text3);text-align:right;flex-shrink:0;font-family:"DM Mono",monospace}
+.dbar-bg{flex:1;background:var(--bg3);border-radius:3px;height:16px;overflow:hidden}
+.dbar{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:600;font-family:"DM Mono",monospace}
+.db-low{background:rgba(0,210,106,0.1);color:var(--green)}
+.db-medium{background:rgba(240,165,0,0.1);color:var(--amber)}
+.db-high{background:rgba(255,109,0,0.1);color:#FF6D00}
+.db-surge{background:rgba(232,0,45,0.12);color:var(--red)}
 
 /* MULT CARD */
-.mult-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
-.mult-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
-.mult-zone { font-size: 10px; color: var(--text3); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.mult-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.mult-val{font-family:"Syne",sans-serif;font-size:26px;font-weight:700}
+.mult-zone{font-size:10px;color:var(--text3);margin-top:4px;letter-spacing:1px;text-transform:uppercase}
 
 /* PHONE FRAME */
-.phone-wrap { display: flex; justify-content: center; align-items: flex-start; padding: 20px 0; gap: 48px; flex-wrap: wrap; }
-.phone-frame {
-  width: 375px; height: 760px;
-  background: #000;
-  border-radius: 50px;
-  border: 8px solid #1a1a1a;
-  box-shadow: 0 0 0 2px #2a2a2a, 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(232,0,45,0.05);
-  overflow: hidden; position: relative; flex-shrink: 0;
-}
-.phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 110px; height: 28px; background: #000; border-radius: 0 0 18px 18px; z-index: 10; }
-.phone-screen { width: 100%; height: 100%; border: none; border-radius: 42px; }
-.phone-info { max-width: 380px; padding-top: 20px; }
-.phone-info h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
-.phone-info p { color: var(--text2); font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
-.layer-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; }
-.layer-card .lt { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-.layer-card p { font-size: 12px; color: var(--text2); line-height: 1.5; margin: 0; }
+.phone-wrap{display:flex;justify-content:center;align-items:flex-start;padding:20px 0;gap:48px;flex-wrap:wrap}
+.phone-frame{width:375px;height:760px;background:#000;border-radius:50px;border:8px solid #1a1a1a;box-shadow:0 0 0 2px #2a2a2a,0 40px 80px rgba(0,0,0,0.6),0 0 60px rgba(232,0,45,0.05);overflow:hidden;position:relative;flex-shrink:0}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:110px;height:28px;background:#000;border-radius:0 0 18px 18px;z-index:10}
+.phone-screen{width:100%;height:100%;border:none;border-radius:42px}
+.phone-info{max-width:380px;padding-top:20px}
+.phone-info h2{font-family:"Syne",sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:14px}
+.phone-info p{color:var(--text2);font-size:13px;line-height:1.7;margin-bottom:10px}
+.layer-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:10px}
+.layer-card .lt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.layer-card p{font-size:12px;color:var(--text2);line-height:1.5;margin:0}
 
 /* PROD NOTE */
-.prod-note { font-size: 11px; color: var(--amber); background: rgba(240,165,0,0.06); border: 1px solid rgba(240,165,0,0.15); border-radius: 4px; padding: 7px 12px; margin-top: 10px; }
-
-/* REFUND CARD */
-.refund-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+.prod-note{font-size:11px;color:var(--amber);background:rgba(240,165,0,0.05);border:1px solid rgba(240,165,0,0.15);border-radius:4px;padding:7px 12px;margin-top:10px}
 
 /* BTN */
-.btn { display: inline-block; padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
-.btn-red { background: var(--red); color: #fff; }
+.btn{display:inline-block;padding:7px 16px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;font-family:"DM Sans",sans-serif}
+.btn-red{background:var(--red);color:#fff}
 
-/* FLASH */
-.flash { animation: flashred 1.2s infinite; }
-@keyframes flashred { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* REFUND CARD */
+.refund-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:8px}
 
 /* DATE TOGGLE */
-.date-btn {
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--border2);
-  background: transparent;
-  color: var(--text3);
-  font-family: 'DM Sans', sans-serif;
-  letter-spacing: 0.5px;
-  transition: all 0.2s;
-}
-.date-btn:hover { border-color: var(--red); color: var(--text2); }
-.date-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+.date-btn{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text3);font-family:"DM Sans",sans-serif;letter-spacing:0.5px;transition:all 0.2s}
+.date-btn:hover{border-color:var(--red);color:var(--text2)}
+.date-btn.active{background:var(--red);border-color:var(--red);color:#fff}
 
-/* COUNT UP */
-@keyframes countup { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.count-animate { animation: countup 0.6s ease-out forwards; }
+/* FLASH */
+.flash{animation:flashred 1.2s infinite}
+@keyframes flashred{0%,100%{opacity:1}50%{opacity:0.3}}
 
 /* SCROLLBAR */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-/* SPACER */
-.mt-sm { margin-top: 16px; }
-.mt-md { margin-top: 24px; }
+/* RESOLVE MODAL backdrop handled in JS */
+.mt-sm{margin-top:14px} .mt-md{margin-top:22px}
 </style>
+
+<div class="bg-layer">
+  <div class="grid-bg"></div>
+  <div class="radar-wrap">
+    <div class="rring"></div><div class="rring"></div><div class="rring"></div>
+  </div>
+  <canvas id="particle-canvas"></canvas>
+</div>
 </head>
 <body>
 
@@ -523,20 +260,20 @@ tr:hover td { background: var(--bg3); }
     </div>
   </div>
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="n-trips">--</div><div class="kpi-label">Trips Completed</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-gmv">--</div><div class="kpi-label">GMV Today</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-completion">--</div><div class="kpi-label">Completion Rate</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-avgfare">--</div><div class="kpi-label">Avg Fare</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-cancellation">--</div><div class="kpi-label">Cancellation Rate</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="n-active-drivers">--</div><div class="kpi-label">Active Drivers</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-trips">--</div><div class="kpi-label">Trips Completed</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-gmv">--</div><div class="kpi-label">GMV Today</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-completion">--</div><div class="kpi-label">Completion Rate</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-avgfare">--</div><div class="kpi-label">Avg Fare</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-cancellation">--</div><div class="kpi-label">Cancellation Rate</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-active-drivers">--</div><div class="kpi-label">Active Drivers</div></div>
   </div>
 
   <div class="section-label mt-md">Weekly and Monthly Performance</div>
   <div class="kpi-grid kpi-4" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-gmv">--</div><div class="kpi-label">Weekly GMV</div></div>
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-weekly-trips">--</div><div class="kpi-label">Weekly Trips</div></div>
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-gmv">--</div><div class="kpi-label">Monthly GMV</div></div>
-    <div class="kpi-card"><div class="kpi-val-lg" id="n-monthly-trips">--</div><div class="kpi-label">Monthly Trips</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val-lg" id="n-weekly-gmv">--</div><div class="kpi-label">Weekly GMV</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val-lg" id="n-weekly-trips">--</div><div class="kpi-label">Weekly Trips</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val-lg" id="n-monthly-gmv">--</div><div class="kpi-label">Monthly GMV</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val-lg" id="n-monthly-trips">--</div><div class="kpi-label">Monthly Trips</div></div>
   </div>
 
   <div class="section-label mt-md">Operations Health</div>
@@ -617,10 +354,10 @@ tr:hover td { background: var(--bg3); }
       </div>
     </div>
 
-    <!-- Demand and Supply -->
+    <!-- Supply and Demand -->
     <div class="kpi-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">Demand and Supply</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px">Supply and Demand</div>
         <div id="n-demand-dot" style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:2px"></div>
       </div>
       <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:700;color:var(--text);line-height:1" id="n-surge">--</div>
@@ -642,23 +379,19 @@ tr:hover td { background: var(--bg3); }
 
   <div class="section-label mt-md">Revenue Intelligence</div>
   <div class="kpi-grid kpi-4" style="margin-bottom:20px">
-    <div class="kpi-card">
-      <div class="kpi-val" id="n-rev-per-driver">--</div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-rev-per-driver">--</div>
       <div class="kpi-label">Revenue per Active Driver</div>
       
     </div>
-    <div class="kpi-card">
-      <div class="kpi-val" id="n-top-zone">--</div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-top-zone">--</div>
       <div class="kpi-label">Top Earning Zone</div>
       
     </div>
-    <div class="kpi-card">
-      <div class="kpi-val" id="n-peak-gmv">--</div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-peak-gmv">--</div>
       <div class="kpi-label">Peak Hour GMV</div>
       
     </div>
-    <div class="kpi-card">
-      <div class="kpi-val" id="n-util-rate">--</div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="n-util-rate">--</div>
       <div class="kpi-label">Driver Utilisation</div>
       
     </div>
@@ -725,12 +458,12 @@ tr:hover td { background: var(--bg3); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-tower-content">
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="ct-total">--</div><div class="kpi-label">Total Bookings</div></div>
-    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="ct-ontrack">--</div><div class="kpi-label">On Track</div></div>
-    <div class="kpi-card kpi-critical"><div class="kpi-val" id="ct-urgent">--</div><div class="kpi-label">Urgent</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="ct-completed">--</div><div class="kpi-label">Completed</div></div>
-    <div class="kpi-card kpi-warn"><div class="kpi-val" id="ct-cancelled">--</div><div class="kpi-label">Cancelled</div></div>
-    <div class="kpi-card"><div class="kpi-val" style="color:var(--text3)" id="ct-alerts">--</div><div class="kpi-label">Active Alerts</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-total">--</div><div class="kpi-label">Total Bookings</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="ct-ontrack">--</div><div class="kpi-label">On Track</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-urgent">--</div><div class="kpi-label">Urgent</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-completed">--</div><div class="kpi-label">Completed</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ct-cancelled">--</div><div class="kpi-label">Cancelled</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--text3)" id="ct-alerts">--</div><div class="kpi-label">Active Alerts</div></div>
   </div>
   <div class="grid-2" style="margin-bottom:16px">
     <div class="mini"><h4>B2B Intake — Today</h4><div id="ct-b2b"></div></div>
@@ -757,12 +490,12 @@ tr:hover td { background: var(--bg3); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-driver-content">
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="ds-total">--</div><div class="kpi-label">Total Drivers</div></div>
-    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="ds-compliant">--</div><div class="kpi-label">Compliant</div></div>
-    <div class="kpi-card kpi-warn"><div class="kpi-val" id="ds-lapsing">--</div><div class="kpi-label">Lapsing</div></div>
-    <div class="kpi-card kpi-critical"><div class="kpi-val" id="ds-lapsed">--</div><div class="kpi-label">Lapsed</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="ds-flights">--</div><div class="kpi-label">Flights Today</div></div>
-    <div class="kpi-card kpi-critical"><div class="kpi-val" id="ds-surge">--</div><div class="kpi-label">Surge Zones</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-total">--</div><div class="kpi-label">Total Drivers</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="ds-compliant">--</div><div class="kpi-label">Compliant</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-lapsing">--</div><div class="kpi-label">Lapsing</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-lapsed">--</div><div class="kpi-label">Lapsed</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-flights">--</div><div class="kpi-label">Flights Today</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="ds-surge">--</div><div class="kpi-label">Surge Zones</div></div>
   </div>
   <div class="grid-2">
     <div>
@@ -813,12 +546,12 @@ tr:hover td { background: var(--bg3); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-customer-content">
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="cs-total">--</div><div class="kpi-label">Messages Today</div></div>
-    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="cs-resolved">--</div><div class="kpi-label">Auto-Resolved</div></div>
-    <div class="kpi-card kpi-warn"><div class="kpi-val" id="cs-escalated">--</div><div class="kpi-label">Escalated</div></div>
-    <div class="kpi-card kpi-critical"><div class="kpi-val flash" id="cs-expiry">--</div><div class="kpi-label">Expiring Soon</div></div>
-    <div class="kpi-card kpi-warn"><div class="kpi-val" id="cs-refunds">--</div><div class="kpi-label">Refund Requests</div></div>
-    <div class="kpi-card kpi-critical"><div class="kpi-val" id="cs-complaints">--</div><div class="kpi-label">Driver Complaints</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-total">--</div><div class="kpi-label">Messages Today</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="cs-resolved">--</div><div class="kpi-label">Auto-Resolved</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-escalated">--</div><div class="kpi-label">Escalated</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val flash" id="cs-expiry">--</div><div class="kpi-label">Expiring Soon</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-refunds">--</div><div class="kpi-label">Refund Requests</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-complaints">--</div><div class="kpi-label">Driver Complaints</div></div>
   </div>
   <div class="grid-2">
     <div>
@@ -856,12 +589,12 @@ tr:hover td { background: var(--bg3); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-pricing-content">
   <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="pr-current">--x</div><div class="kpi-label">Current Multiplier</div><div class="kpi-sub" id="pr-zone">--</div></div>
-    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="pr-recommended">--x</div><div class="kpi-label">Recommended</div><div class="kpi-sub">SPARK suggestion</div></div>
-    <div class="kpi-card kpi-warn"><div class="kpi-val" id="pr-grab">--x</div><div class="kpi-label">Grab (simulated)</div><div class="kpi-sub">Competitor rate</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="pr-traffic">--</div><div class="kpi-label">Traffic</div><div class="kpi-sub" id="pr-weather">--</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="pr-demand">--</div><div class="kpi-label">Demand Level</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="pr-incentive">--</div><div class="kpi-label">Incentive Active</div><div class="kpi-sub" id="pr-inc-val">--</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="pr-current">--x</div><div class="kpi-label">Current Multiplier</div><div class="kpi-sub" id="pr-zone">--</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="pr-recommended">--x</div><div class="kpi-label">Recommended</div><div class="kpi-sub">SPARK suggestion</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="pr-grab">--x</div><div class="kpi-label">Grab (simulated)</div><div class="kpi-sub">Competitor rate</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="pr-traffic">--</div><div class="kpi-label">Traffic</div><div class="kpi-sub" id="pr-weather">--</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="pr-demand">--</div><div class="kpi-label">Demand Level</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="pr-incentive">--</div><div class="kpi-label">Incentive Active</div><div class="kpi-sub" id="pr-inc-val">--</div></div>
   </div>
   <div class="grid-2">
     <div class="panel">
@@ -1135,7 +868,7 @@ async function loadNerve() {
   const commsDot = document.getElementById('n-comms-dot');
   if (commsDot) commsDot.style.background = stats.wati.expiry_warning > 0 ? 'var(--red)' : stats.wati.escalated > 0 ? 'var(--amber)' : 'var(--green)';
 
-  // Demand and Supply card
+  // Supply and Demand card
   document.getElementById('n-surge').textContent = stats.flights.surge_zones;
   const gapCount = allZones.filter(z => z.drivers_present < z.drivers_needed).length;
   document.getElementById('n-gap-zones').textContent = gapCount;
