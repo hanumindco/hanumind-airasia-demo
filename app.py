@@ -189,6 +189,32 @@ def api_companion_ask():
 def health():
     return jsonify({"status": "ok"})
 
+
+
+@app.route("/api/master-alerts/<int:alert_id>/resolve", methods=["POST"])
+def api_resolve_alert(alert_id):
+    data = request.get_json() or {}
+    user = data.get("user", "Gowrish")
+    note = data.get("note", "")
+    if not note:
+        return jsonify({"error": "Resolution note is required"}), 400
+    try:
+        conn = psycopg2.connect(os.getenv("HANUMIND_MEMORY_DB_URL"))
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE aar_master_alerts
+            SET resolved = true, resolved_by = %s, resolved_at = NOW(),
+                resolution_note = %s, acknowledged = true,
+                acknowledged_by = COALESCE(acknowledged_by, %s)
+            WHERE id = %s
+        """, (user, note, user, alert_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"status": "resolved", "by": user})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)

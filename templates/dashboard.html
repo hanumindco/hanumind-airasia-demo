@@ -683,6 +683,11 @@ tr:hover td { background: var(--bg3); }
           <div><div class="panel-title">Master Intelligence — All Teams</div><div class="panel-sub">Cross-system pattern detection</div></div>
           <div style="font-size:11px;color:var(--text3)" id="n-alert-count"></div>
         </div>
+        <div style="padding:10px 20px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">
+          <button class="date-btn active" id="btn-active-alerts" onclick="switchAlertView('active')">Active</button>
+          <button class="date-btn" id="btn-resolved-alerts" onclick="switchAlertView('resolved')">Resolved Log</button>
+          <span style="font-size:11px;color:var(--text3);margin-left:8px" id="alert-view-label">Unresolved alerts</span>
+        </div>
         <div class="panel-body" id="master-alerts-list"><div style="color:var(--text3)">Loading...</div></div>
       </div>
     </div>
@@ -1279,7 +1284,10 @@ async function loadNerve() {
     </div>`;
   }).join('');
 
-  const alerts = await fetch('/api/master-alerts').then(r=>r.json()).catch(()=>[]);
+  const allAlerts = await fetch('/api/master-alerts?show_resolved=true').then(r=>r.json()).catch(()=>[]);
+  const alerts = currentAlertView === 'resolved'
+    ? allAlerts.filter(a => a.resolved === true)
+    : allAlerts.filter(a => !a.resolved);
   const countEl = document.getElementById('n-alert-count');
   if (countEl) countEl.textContent = alerts.length + ' active';
   renderAlerts(alerts, 'master-alerts-list', true);
@@ -1634,6 +1642,17 @@ async function loadPricing() {
 }
 
 // ── LOAD ALL ──────────────────────────────────────────────────────────────────
+let currentAlertView = 'active';
+
+function switchAlertView(view) {
+  currentAlertView = view;
+  document.getElementById('btn-active-alerts').className = 'date-btn' + (view === 'active' ? ' active' : '');
+  document.getElementById('btn-resolved-alerts').className = 'date-btn' + (view === 'resolved' ? ' active' : '');
+  const label = document.getElementById('alert-view-label');
+  if (label) label.textContent = view === 'active' ? 'Unresolved alerts' : 'Full resolution log';
+  loadNerve();
+}
+
 async function loadAll() {
   const active = document.querySelector('.tab-content.active');
   if (!active) return;
