@@ -512,6 +512,22 @@ tr:hover td{background:var(--bg3)}
     </div>
   </div>
 
+  <!-- WATI Messages — Control Tower owns -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px">WATI Messages</div><div class="panel-sub" style="font-size:12px;margin-top:4px">All driver and customer messages. Control Tower owns and responds.</div></div>
+      <span style="font-size:12px;color:var(--text3)" id="ct-wati-count"></span>
+    </div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Time</th><th style="font-size:12px;padding:12px 14px">Sender</th><th style="font-size:12px;padding:12px 14px">Type</th><th style="font-size:12px;padding:12px 14px">Message</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">Expiry</th></tr></thead>
+        <tbody id="ct-wati-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  </div>
+
   <div class="panel" style="margin-bottom:16px">
     <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Cancellations Today</div><div class="panel-sub" style="font-size:12px;margin-top:4px">All cancelled advance bookings</div></div></div>
     <div class="panel-body" style="padding:4px 20px" id="ct-cancels"></div>
@@ -602,7 +618,7 @@ tr:hover td{background:var(--bg3)}
     <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-active">--</div><div class="kpi-label">Active Drivers</div></div>
     <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-gap-zones">--</div><div class="kpi-label">Zones with Shortage</div></div>
     <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-incentives">--</div><div class="kpi-label">Active Incentives</div></div>
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-wati">--</div><div class="kpi-label">Driver WATI Messages</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="dt-avg-rating">--</div><div class="kpi-label">Avg Driver Rating</div></div>
   </div>
 
   <!-- Driver Team Alerts -->
@@ -621,9 +637,9 @@ tr:hover td{background:var(--bg3)}
       <div class="panel-body" id="dt-gaps"></div>
     </div>
 
-    <!-- Zone Demand by Hour -->
+    <!-- Airport Demand by Hour -->
     <div class="panel" style="margin-bottom:0">
-      <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Zone Demand by Hour</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Based on flight arrivals and historical patterns</div></div></div>
+      <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Airport Demand by Hour</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Based on flight arrivals and historical patterns</div></div></div>
       <div class="panel-body" id="dt-demand-chart"></div>
     </div>
 
@@ -635,16 +651,7 @@ tr:hover td{background:var(--bg3)}
     <div class="panel-body" id="dt-incentives-panel"></div>
   </div>
 
-  <!-- WATI Messages — Driver Team -->
-  <div class="panel" style="margin-bottom:16px">
-    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">WATI Messages — Driver Team</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Driver queries escalated to team. Auto-resolved messages excluded.</div></div></div>
-    <div class="panel-body" style="padding:0 20px 16px">
-      <div class="tbl-wrap"><table>
-        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Time</th><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Message</th><th style="font-size:12px;padding:12px 14px">Status</th></tr></thead>
-        <tbody id="dt-wati-body"></tbody>
-      </table></div>
-    </div>
-  </div>
+
 
   <!-- Driver Performance -->
   <div class="panel" style="margin-bottom:16px">
@@ -1445,6 +1452,27 @@ async function loadTower() {
       + '<td style="font-family:DM Mono,monospace;font-size:14px;padding:13px 14px;font-weight:600">RM ' + (b['Booking Value (RM)']||'0') + '</td>'
       + '</tr>';
   }).join('');
+  // WATI
+  const watiData = await fetch('/api/wati').then(r=>r.json()).catch(()=>[]);
+  const ctWatiCount = g('ct-wati-count');
+  if(ctWatiCount) ctWatiCount.textContent = watiData.length + ' messages today';
+  const ctWatiBody = g('ct-wati-body');
+  if(ctWatiBody) ctWatiBody.innerHTML = watiData.length===0
+    ? '<tr><td colspan="7" style="padding:16px;color:var(--text3);font-size:14px">No messages</td></tr>'
+    : watiData.map(m => {
+        const hrs = parseFloat(m['Hours Until Expiry']||99);
+        const ec = hrs<2?'var(--red)':hrs<6?'var(--amber)':'var(--text3)';
+        return '<tr>'
+          +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;font-weight:700;color:var(--text)">'+m['Message ID']+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:12px 14px">'+((m['Timestamp']||'').substring(11,16))+'</td>'
+          +'<td style="font-size:14px;padding:12px 14px;font-weight:500;color:var(--text)">'+m['Sender Name']+'</td>'
+          +'<td style="padding:12px 14px">'+watiTypeBadge(m['Classified Type'])+'</td>'
+          +'<td style="font-size:13px;padding:12px 14px;max-width:200px;overflow:hidden;text-overflow:ellipsis;color:var(--text2)">'+m['Message Content']+'</td>'
+          +'<td style="padding:12px 14px"><span class="badge '+(m['Resolution Status']==='Resolved'?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey')+'">'+m['Resolution Status']+'</span></td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:'+ec+'">'+hrs+'h</td>'
+          +'</tr>';
+      }).join('');
+
   const cancelsEl = g('ct-cancels');
   if(cancelsEl) cancelsEl.innerHTML = cancelled.length===0
     ? '<div style="color:var(--text3);font-size:14px;padding:16px 0">No cancellations today</div>'
@@ -1617,9 +1645,10 @@ async function loadDriverTeam() {
   // KPIs
   if(g('dt-active')) g('dt-active').textContent = 60;
   if(g('dt-gap-zones')) g('dt-gap-zones').textContent = 4;
-  if(g('dt-incentives')) g('dt-incentives').textContent = stats.flights.active_incentives||18;
+  if(g('dt-incentives')) g('dt-incentives').textContent = 3;
   const driverWati = wati.filter(m=>m['Classified Type']==='Driver Status Check'||m['Escalated To']==='Driver Team');
-  if(g('dt-wati')) g('dt-wati').textContent = driverWati.length;
+  const avgRating = (drivers.reduce((s,d)=>s+(d['Rating']||0),0)/drivers.length).toFixed(1);
+  if(g('dt-avg-rating')) g('dt-avg-rating').textContent = avgRating;
 
   // Alerts
   renderAlerts(alerts, 'dt-alerts-list', false);
