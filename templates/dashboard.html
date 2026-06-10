@@ -276,6 +276,7 @@ tr:hover td{background:var(--bg3)}
 <!-- TABS -->
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('nerve')" id="tab-nerve"><span class="tab-icon">⚡</span>Nerve Centre</button>
+  <button class="tab-btn" onclick="showTab('master')" id="tab-master"><span class="tab-icon">🧠</span>Master Intelligence</button>
   <button class="tab-btn" onclick="showTab('tower')" id="tab-tower"><span class="tab-icon">🗼</span>Control Tower</button>
   <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Backend</button>
   <button class="tab-btn" onclick="showTab('driverteam')" id="tab-driverteam"><span class="tab-icon">👥</span>Driver Team</button>
@@ -491,6 +492,48 @@ tr:hover td{background:var(--bg3)}
       </div>
     </div>
   </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- MASTER INTELLIGENCE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-master-content">
+
+  <!-- KPIs -->
+  <div class="kpi-grid kpi-4" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="mi-patterns">--</div><div class="kpi-label">Patterns Detected</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val flash" id="mi-critical">--</div><div class="kpi-label">Critical Patterns</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="mi-agents">7</div><div class="kpi-label">Agents Monitored</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="mi-resolved">--</div><div class="kpi-label">Resolved Today</div></div>
+  </div>
+
+  <!-- Agent Health -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Agent Health Status</div><div class="panel-sub" style="font-size:12px;margin-top:4px">All 7 agents — last run and current status</div></div></div>
+    <div class="panel-body" id="mi-agent-health"></div>
+  </div>
+
+  <!-- Cross-Agent Patterns -->
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(232,0,45,0.2)">
+    <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px;color:var(--red)">Cross-Agent Patterns</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Insights no single agent can detect alone. Requires immediate attention.</div></div>
+    </div>
+    <div class="panel-body" id="mi-patterns-list"></div>
+  </div>
+
+  <!-- All Alerts Unified View -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px">Unified Alert Feed</div><div class="panel-sub" style="font-size:12px;margin-top:4px">All alerts from all agents — Master Intelligence routed</div></div>
+      <div style="display:flex;gap:8px" id="mi-filter-btns">
+        <button onclick="miFilter('all')" id="mi-f-all" style="padding:4px 12px;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);border-radius:4px;font-size:11px;font-weight:700;color:var(--cyan);cursor:pointer">All</button>
+        <button onclick="miFilter('high')" id="mi-f-high" style="padding:4px 12px;background:transparent;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--text3);cursor:pointer">High</button>
+        <button onclick="miFilter('medium')" id="mi-f-medium" style="padding:4px 12px;background:transparent;border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--text3);cursor:pointer">Medium</button>
+      </div>
+    </div>
+    <div class="panel-body" id="mi-alerts-list"></div>
+  </div>
+
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1434,6 +1477,162 @@ async function acknowledgeAlert(id, e) {
     body: JSON.stringify({user: 'Gowrish'})
   }).catch(()=>{});
   loadAll();
+}
+
+// ── MASTER INTELLIGENCE ───────────────────────────────────────────────────────
+let _miAllAlerts = [];
+let _miFilterLevel = 'all';
+
+async function loadMasterIntel() {
+  const alerts = await fetch('/api/master-alerts?show_resolved=false').then(r=>r.json()).catch(()=>[]);
+  _miAllAlerts = alerts;
+  const g = id => document.getElementById(id);
+
+  const critical = alerts.filter(a=>a.priority==='High');
+  const resolved = alerts.filter(a=>a.resolved);
+  if(g('mi-patterns')) g('mi-patterns').textContent = crossPatterns.length;
+  if(g('mi-critical')) g('mi-critical').textContent = critical.length;
+  if(g('mi-resolved')) g('mi-resolved').textContent = resolved.length;
+
+  // Agent health
+  const agentHealth = [
+    {name:'WATI Agent', icon:'💬', lastRun:'2 mins ago', status:'Active', team:'customer_support'},
+    {name:'Control Tower Agent', icon:'🗼', lastRun:'1 min ago', status:'Active', team:'control_tower'},
+    {name:'Forecast Agent', icon:'📡', lastRun:'5 mins ago', status:'Active', team:'nerve_centre'},
+    {name:'Document Agent', icon:'📋', lastRun:'3 mins ago', status:'Active', team:'driver_support'},
+    {name:'Driver AI Companion', icon:'🤖', lastRun:'Just now', status:'Active', team:'driver_support'},
+    {name:'Dynamic Fare Intelligence', icon:'💰', lastRun:'8 mins ago', status:'Active', team:'pricing'},
+    {name:'Driver Earnings Coach', icon:'📊', lastRun:'11:00 PM', status:'Scheduled', team:'driver_support'},
+  ];
+  const healthEl = g('mi-agent-health');
+  if(healthEl) healthEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">'
+    +agentHealth.map(a =>
+      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px">'
+      +'<div style="font-size:22px">'+a.icon+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+a.name+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">Last run: '+a.lastRun+'</div>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'
+      +'<div style="width:6px;height:6px;border-radius:50%;background:'+(a.status==='Active'?'#00D26A':'var(--amber)')+';box-shadow:0 0 6px '+(a.status==='Active'?'#00D26A':'var(--amber)')+'"></div>'
+      +'<span style="font-size:11px;font-weight:600;color:'+(a.status==='Active'?'var(--green)':'var(--amber)')+'">'+a.status+'</span>'
+      +'</div></div>'
+    ).join('')+'</div>';
+
+  // Cross-agent patterns
+  renderMiPatterns();
+
+  // Unified alert feed
+  renderMiAlerts();
+}
+
+const crossPatterns = [
+  {
+    id:'PAT-001',
+    severity:'Critical',
+    title:'KLIA2 Supply Crisis — Multiple Agent Signals',
+    agents:['Forecast Agent','Control Tower Agent','Document Agent'],
+    signals:[
+      'Forecast Agent: KLIA2 surge demand — 343 rides expected at 15:00',
+      'Control Tower Agent: 3 B2B bookings for KLIA2 unassigned — no driver confirmed',
+      'Document Agent: 4 drivers in KLIA2 zone are lapsed and blocked from jobs'
+    ],
+    insight:'Peak demand is arriving at KLIA2 in under 2 hours. 4 drivers who normally cover this zone are blocked. 3 B2B bookings have no driver. This will result in missed pickups and customer complaints if not actioned immediately.',
+    action:'Activate KLIA2 incentive now. Reassign drivers from Shah Alam zone. Contact B2B partners to confirm pickup status.',
+    time:'10:42 AM'
+  },
+  {
+    id:'PAT-002',
+    severity:'High',
+    title:'Repeat Driver Complaint Pattern — DRV067',
+    agents:['WATI Agent','Customer Support','Control Tower Agent'],
+    signals:[
+      'WATI Agent: 2 customer complaints about DRV067 in past 48 hours',
+      'Customer Support: Driver complaint DC-003 — Asked for extra payment',
+      'Control Tower Agent: DRV067 has 3 cancellations in past 7 days'
+    ],
+    insight:'DRV067 Rajan Muthu shows a pattern of misconduct across three independent data sources. Single complaints are normal. This combination across agents indicates a systemic issue.',
+    action:'Escalate to Driver Team for immediate investigation. Consider temporary suspension pending review.',
+    time:'09:15 AM'
+  },
+  {
+    id:'PAT-003',
+    severity:'High',
+    title:'Revenue Leak — Surge Zone with No Incentive',
+    agents:['Forecast Agent','Dynamic Fare Intelligence'],
+    signals:[
+      'Forecast Agent: Shah Alam High demand — 60 rides expected at 17:00',
+      'Dynamic Fare Intelligence: No incentive active for Shah Alam zone at peak hour',
+    ],
+    insight:'Shah Alam will hit High demand at 5PM with no incentive deployed to attract drivers. Without drivers in position, rides will go unmatched and revenue will be lost.',
+    action:'Activate Shah Alam incentive at RM 3/trip from 16:30 to 18:00.',
+    time:'08:30 AM'
+  },
+  {
+    id:'PAT-004',
+    severity:'Medium',
+    title:'Driver Earnings Below Target — Retention Risk',
+    agents:['Driver Earnings Coach','Driver AI Companion'],
+    signals:[
+      'Driver Earnings Coach: 12 drivers below 60% of weekly target by Wednesday',
+      'Driver AI Companion: 5 drivers asking about switching to competitor platforms'
+    ],
+    insight:'12 drivers are on track to miss their weekly earnings target. 5 of them have been asking the Driver AI Companion about competitor platforms. This is an early churn signal.',
+    action:'Driver Team to reach out personally to the 5 at-risk drivers. Offer zone guidance and incentive information.',
+    time:'07:00 AM'
+  },
+];
+
+function renderMiPatterns() {
+  const el = document.getElementById('mi-patterns-list');
+  if(!el) return;
+  el.innerHTML = crossPatterns.map(p => {
+    const sc = p.severity==='Critical'?'var(--red)':p.severity==='High'?'var(--amber)':'var(--cyan)';
+    const bc = p.severity==='Critical'?'rgba(232,0,45,0.1)':p.severity==='High'?'rgba(240,165,0,0.08)':'rgba(0,212,255,0.06)';
+    return '<div style="padding:18px;margin-bottom:12px;background:'+bc+';border:1px solid '+sc.replace('var(--red)','rgba(232,0,45,0.2)').replace('var(--amber)','rgba(240,165,0,0.2)').replace('var(--cyan)','rgba(0,212,255,0.15)')+';border-radius:8px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+      +'<span style="font-family:DM Mono,monospace;font-size:12px;font-weight:700;color:'+sc+'">'+p.id+'</span>'
+      +'<span class="badge '+(p.severity==='Critical'?'bg-red':p.severity==='High'?'bg-amber':'bg-grey')+'">'+p.severity+'</span>'
+      +'</div>'
+      +'<span style="font-size:12px;color:var(--text3)">'+p.time+'</span>'
+      +'</div>'
+      +'<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">'+p.title+'</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">'
+      +p.agents.map(a=>'<span style="padding:3px 10px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.12);border-radius:4px;font-size:11px;color:var(--cyan);font-weight:600">'+a+'</span>').join('')
+      +'</div>'
+      +'<div style="margin-bottom:10px">'
+      +p.signals.map(s=>'<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:4px"><div style="width:4px;height:4px;border-radius:50%;background:'+sc+';flex-shrink:0;margin-top:6px"></div><div style="font-size:13px;color:var(--text2)">'+s+'</div></div>').join('')
+      +'</div>'
+      +'<div style="padding:10px 12px;background:rgba(0,0,0,0.2);border-radius:6px;margin-bottom:10px">'
+      +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Master Intelligence Insight</div>'
+      +'<div style="font-size:13px;color:var(--text);line-height:1.6">'+p.insight+'</div>'
+      +'</div>'
+      +'<div style="padding:8px 12px;background:rgba(0,210,106,0.05);border:1px solid rgba(0,210,106,0.15);border-radius:6px">'
+      +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Recommended Action</div>'
+      +'<div style="font-size:13px;color:var(--green);font-weight:600">'+p.action+'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function miFilter(level) {
+  _miFilterLevel = level;
+  ['all','high','medium'].forEach(l => {
+    const btn = document.getElementById('mi-f-'+l);
+    if(btn) {
+      btn.style.background = l===level?'rgba(0,212,255,0.15)':'transparent';
+      btn.style.borderColor = l===level?'rgba(0,212,255,0.3)':'var(--border)';
+      btn.style.color = l===level?'var(--cyan)':'var(--text3)';
+    }
+  });
+  renderMiAlerts();
+}
+
+function renderMiAlerts() {
+  const filtered = _miFilterLevel==='all' ? _miAllAlerts
+    : _miAllAlerts.filter(a => a.priority===(_miFilterLevel==='high'?'High':'Medium'));
+  renderAlerts(filtered, 'mi-alerts-list', false);
 }
 
 // ── CONTROL TOWER ─────────────────────────────────────────────────────────────
@@ -2402,6 +2601,7 @@ async function loadAll() {
   if (!active) return;
   const id = active.id;
   if (id === 'tab-nerve-content') await loadNerve();
+  else if (id === 'tab-master-content') await loadMasterIntel();
   else if (id === 'tab-tower-content') await loadTower();
   else if (id === 'tab-driver-content') await loadDriverSupport();
   else if (id === 'tab-driverteam-content') await loadDriverTeam();
