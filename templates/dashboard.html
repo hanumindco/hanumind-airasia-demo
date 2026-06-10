@@ -658,7 +658,14 @@ tr:hover td{background:var(--bg3)}
     <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Performance</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Weekly trips, earnings, rating, completion rate by driver</div></div></div>
     <div class="panel-body" style="padding:0 20px 16px">
       <div class="tbl-wrap"><table>
-        <thead><tr><th style="font-size:12px;padding:12px 14px">Driver</th><th style="font-size:12px;padding:12px 14px">Zone</th><th style="font-size:12px;padding:12px 14px">Weekly Trips</th><th style="font-size:12px;padding:12px 14px">Weekly Earnings</th><th style="font-size:12px;padding:12px 14px">Rating</th><th style="font-size:12px;padding:12px 14px">Completion Rate</th></tr></thead>
+        <thead><tr>
+          <th style="font-size:12px;padding:12px 14px">Driver</th>
+          <th style="font-size:12px;padding:12px 14px">Zone</th>
+          <th style="font-size:12px;padding:12px 14px;cursor:pointer;user-select:none" onclick="sortPerformance('trips')" id="sort-trips">Weekly Trips <span id="sort-trips-icon" style="color:var(--cyan)">▼</span></th>
+          <th style="font-size:12px;padding:12px 14px;cursor:pointer;user-select:none" onclick="sortPerformance('earnings')" id="sort-earnings">Weekly Earnings <span id="sort-earnings-icon" style="color:var(--text3)">▼</span></th>
+          <th style="font-size:12px;padding:12px 14px;cursor:pointer;user-select:none" onclick="sortPerformance('rating')" id="sort-rating">Rating <span id="sort-rating-icon" style="color:var(--text3)">▼</span></th>
+          <th style="font-size:12px;padding:12px 14px;cursor:pointer;user-select:none" onclick="sortPerformance('completion')" id="sort-completion">Completion Rate <span id="sort-completion-icon" style="color:var(--text3)">▼</span></th>
+        </tr></thead>
         <tbody id="dt-performance-body"></tbody>
       </table></div>
     </div>
@@ -670,45 +677,73 @@ tr:hover td{background:var(--bg3)}
 <!-- CUSTOMER SUPPORT -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-customer-content">
-  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-total">--</div><div class="kpi-label">Messages Today</div></div>
-    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="cs-resolved">--</div><div class="kpi-label">Auto-Resolved</div></div>
-    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-escalated">--</div><div class="kpi-label">Escalated</div></div>
-    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val flash" id="cs-expiry">--</div><div class="kpi-label">Expiring Soon</div></div>
-    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-refunds">--</div><div class="kpi-label">Refund Requests</div></div>
-    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-complaints">--</div><div class="kpi-label">Driver Complaints</div></div>
-  </div>
-  <div class="grid-2">
-    <div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Live Message Feed</div><div class="panel-sub">RELAY auto-classified and responded</div></div></div>
-        <div class="panel-body">
-          <div class="tbl-wrap"><table>
-            <thead><tr><th>ID</th><th>Time</th><th>Sender</th><th>Type</th><th>Message</th><th>Status</th><th>Expiry</th></tr></thead>
-            <tbody id="cs-messages-body"></tbody>
-          </table></div>
-          <div class="prod-note">Production: live WATI webhook replaces this sheet feed. Zero rebuild required.</div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="panel" style="margin-bottom:16px">
-        <div class="panel-head"><div><div class="panel-title">Refund Requests</div></div></div>
-        <div class="panel-body" id="cs-refunds-panel"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><div><div class="panel-title">Driver Complaints</div></div></div>
-        <div class="panel-body" id="cs-complaints-panel"></div>
-      </div>
-    </div>
-  </div>
-  <!-- Customer Support Alerts -->
-  <div class="panel mt-sm">
-    <div class="panel-head"><div><div class="panel-title">Customer Support Alerts</div><div class="panel-sub">Unresolved issues requiring action</div></div></div>
+
+  <!-- Alerts -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Customer Support Alerts</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Unresolved issues requiring immediate action</div></div></div>
     <div class="panel-body" id="cs-alerts-list"></div>
   </div>
-</div>
 
+  <!-- KPIs -->
+  <div class="kpi-grid kpi-6" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-wati-total">--</div><div class="kpi-label">WATI Direct Today</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-sf-total">--</div><div class="kpi-label">Salesforce Escalations</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val flash" id="cs-pending">--</div><div class="kpi-label">Pending Action</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="cs-resolved">--</div><div class="kpi-label">Resolved Today</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-refunds">--</div><div class="kpi-label">Refunds Pending</div></div>
+    <div class="kpi-card kpi-critical"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="cs-safety">--</div><div class="kpi-label">Safety Incidents</div></div>
+  </div>
+
+  <!-- Issue Category Breakdown + Safety Incidents -->
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Issue Breakdown Today</div><div class="panel-sub" style="font-size:12px;margin-top:4px">All channels combined</div></div></div>
+      <div class="panel-body" id="cs-issue-breakdown"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0;border:1px solid rgba(232,0,45,0.25)">
+      <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:16px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--red)">Safety Incidents</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Highest priority. Immediate escalation required.</div></div></div>
+      <div class="panel-body" id="cs-safety-panel"></div>
+    </div>
+  </div>
+
+  <!-- WATI Direct Messages -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px">WATI Messages — Direct from Passenger</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Passenger contacted AAR team directly. Respond via WATI. Escalate via email or phone if needed.</div></div>
+      <span style="font-size:12px;color:var(--text3)" id="cs-wati-count"></span>
+    </div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Time</th><th style="font-size:12px;padding:12px 14px">Passenger</th><th style="font-size:12px;padding:12px 14px">Issue Type</th><th style="font-size:12px;padding:12px 14px">Message</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">SLA</th><th style="font-size:12px;padding:12px 14px">Action</th></tr></thead>
+        <tbody id="cs-wati-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Salesforce Escalations -->
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(240,165,0,0.2)">
+    <div class="panel-head" style="background:rgba(240,165,0,0.04);padding:16px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--amber)">Salesforce Escalations</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Issues Salesforce could not resolve. Escalated to AAR team via email.</div></div></div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">Ref</th><th style="font-size:12px;padding:12px 14px">Received</th><th style="font-size:12px;padding:12px 14px">Passenger</th><th style="font-size:12px;padding:12px 14px">Issue Type</th><th style="font-size:12px;padding:12px 14px">Summary</th><th style="font-size:12px;padding:12px 14px">Severity</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">Handler</th></tr></thead>
+        <tbody id="cs-sf-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Refund Workflow -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Refund Workflow Tracker</div><div class="panel-sub" style="font-size:12px;margin-top:4px">4-stage process: Received, Acknowledged, Approved/Rejected, Executed to Cash Wallet</div></div></div>
+    <div class="panel-body" id="cs-refund-workflow"></div>
+  </div>
+
+  <!-- Driver Complaints -->
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Complaints</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Passenger complaints about driver conduct. Investigate and log outcome.</div></div></div>
+    <div class="panel-body" id="cs-complaints-panel"></div>
+  </div>
+
+</div>
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- PRICING -->
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1632,6 +1667,45 @@ function generateApad() {
 }
 
 // ── DRIVER TEAM ───────────────────────────────────────────────────────────────
+let _perfData = [];
+let _perfSort = {col:'trips', dir:-1};
+
+function sortPerformance(col) {
+  if(_perfSort.col === col) { _perfSort.dir *= -1; }
+  else { _perfSort.col = col; _perfSort.dir = -1; }
+  ['trips','earnings','rating','completion'].forEach(c => {
+    const el = document.getElementById('sort-'+c+'-icon');
+    if(el) el.style.color = c===col ? 'var(--cyan)' : 'var(--text3)';
+  });
+  renderPerformance();
+}
+
+function renderPerformance() {
+  const sorted = [..._perfData].sort((a,b) => {
+    let av, bv;
+    if(_perfSort.col==='trips') { av=a.weeklyTrips; bv=b.weeklyTrips; }
+    else if(_perfSort.col==='earnings') { av=parseFloat(a.weeklyEarnings); bv=parseFloat(b.weeklyEarnings); }
+    else if(_perfSort.col==='rating') { av=a.rating; bv=b.rating; }
+    else { av=a.completionRate; bv=b.completionRate; }
+    return (av-bv)*_perfSort.dir;
+  });
+  const body = document.getElementById('dt-performance-body');
+  if(!body) return;
+  body.innerHTML = sorted.map(d => {
+    const rc = d.rating>=4.5?'var(--green)':d.rating>=4.0?'var(--amber)':'var(--red)';
+    const cc = d.completionRate>=90?'var(--green)':d.completionRate>=75?'var(--amber)':'var(--red)';
+    return '<tr>'
+      +'<td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+d.name+'</td>'
+      +'<td style="font-size:13px;padding:12px 14px">'+d.zone+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:var(--text)">'+d.weeklyTrips+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:600;color:var(--green)">RM '+d.weeklyEarnings+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+rc+'">'+d.rating+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+cc+'">'+d.completionRate+'%</td>'
+      +'</tr>';
+  }).join('');
+}
+
+
 async function loadDriverTeam() {
   const [drivers, wati, flights, stats, alerts] = await Promise.all([
     fetch('/api/drivers').then(r=>r.json()),
@@ -1722,83 +1796,198 @@ async function loadDriverTeam() {
         +'</tr>'
       ).join('');
 
-  // Driver performance
-  const perfBody = g('dt-performance-body');
-  if(perfBody) perfBody.innerHTML = drivers.slice(0,20).map(d => {
+  // Driver performance — store globally for sorting
+  _perfData = drivers.slice(0,20).map(d => {
     const weeklyTrips = Math.round((d['Total Trips This Month']||0)/4);
     const weeklyEarnings = (weeklyTrips * 52.4).toFixed(0);
     const totalTrips = d['Total Trips This Month']||0;
     const cancels = d['Cancellation Count This Month']||0;
     const completionRate = totalTrips>0 ? Math.round(((totalTrips-cancels)/totalTrips)*100) : 0;
-    const ratingColor = d['Rating']>=4.5?'var(--green)':d['Rating']>=4.0?'var(--amber)':'var(--red)';
-    const crColor = completionRate>=90?'var(--green)':completionRate>=75?'var(--amber)':'var(--red)';
-    return '<tr>'
-      +'<td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+d['Driver Name']+'</td>'
-      +'<td style="font-size:13px;padding:12px 14px">'+d['Zone']+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+weeklyTrips+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:600;color:var(--green)">RM '+weeklyEarnings+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+ratingColor+'">'+d['Rating']+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:'+crColor+'">'+completionRate+'%</td>'
-      +'</tr>';
-  }).join('');
+    return {name:d['Driver Name'],zone:d['Zone'],weeklyTrips,weeklyEarnings,rating:d['Rating']||0,completionRate};
+  });
+  _perfSort = {col:'trips', dir:-1};
+  renderPerformance();
 }
 
 // ── CUSTOMER SUPPORT ──────────────────────────────────────────────────────────
 async function loadCustomerSupport() {
-  const [wati, stats, alerts] = await Promise.all([
-    fetch('/api/wati').then(r=>r.json()),
-    fetch('/api/stats').then(r=>r.json()),
+  const [wati, alerts] = await Promise.all([
+    fetch('/api/wati').then(r=>r.json()).catch(()=>[]),
     fetch('/api/master-alerts?team=customer_support').then(r=>r.json()).catch(()=>[])
   ]);
+  const g = id => document.getElementById(id);
+  renderAlerts(alerts, 'cs-alerts-list', false);
 
-  document.getElementById('cs-total').textContent = stats.wati.total;
-  document.getElementById('cs-resolved').textContent = stats.wati.auto_resolved;
-  document.getElementById('cs-escalated').textContent = stats.wati.escalated;
-  document.getElementById('cs-expiry').textContent = stats.wati.expiry_warning;
-  const refunds = wati.filter(m=>m['Classified Type']==='Refund Request');
-  const complaints = wati.filter(m=>m['Classified Type']==='Driver Complaint');
-  document.getElementById('cs-refunds').textContent = refunds.length;
-  document.getElementById('cs-complaints').textContent = complaints.length;
+  // Simulated Salesforce escalations
+  const sfEscalations = [
+    {ref:'SF-2026-0341', time:'08:14', passenger:'Priya Nair', type:'Refund', summary:'Charged for cancelled ride. Driver cancelled but fare deducted.', severity:'High', status:'Pending', handler:'Unassigned'},
+    {ref:'SF-2026-0338', time:'07:45', passenger:'Lee Wei Ming', type:'Fare Dispute', summary:'Surge fare applied during non-peak hour. Passenger disputes RM 45 charge.', severity:'Medium', status:'In Progress', handler:'Amirah (CS)'},
+    {ref:'SF-2026-0335', time:'06:30', passenger:'Rohani binti Ahmad', type:'Driver Conduct', summary:'Driver used inappropriate language. Passenger requests formal action.', severity:'High', status:'Pending', handler:'Unassigned'},
+    {ref:'SF-2026-0330', time:'Yesterday', passenger:'Ganesh Kumar', type:'App Issue', summary:'Cash wallet withdrawal failed 3 times. RM 120 stuck in wallet.', severity:'Medium', status:'Resolved', handler:'Suresh (CS)'},
+    {ref:'SF-2026-0328', time:'Yesterday', passenger:'Tan Mei Lin', type:'Booking', summary:'Advance booking confirmed but driver never arrived. No refund processed.', severity:'High', status:'In Progress', handler:'Amirah (CS)'},
+  ];
 
-  document.getElementById('cs-messages-body').innerHTML = wati.slice(0,10).map(m=>{
-    const hrs = parseFloat(m['Hours Until Expiry'])||99;
-    const ec = hrs<2?'flash':'';
-    return`<tr>
-      <td style="font-family:'DM Mono',monospace;font-size:11px;font-weight:600">${m['Message ID']}</td>
-      <td style="font-size:11px;font-family:'DM Mono',monospace">${(m['Timestamp']||'').substring(11,16)}</td>
-      <td style="color:var(--text)">${m['Sender Name']||''}</td>
-      <td>${watiTypeBadge(m['Classified Type'])}</td>
-      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${m['Message Content']||''}</td>
-      <td><span class="badge ${m['Resolution Status']==='Resolved'?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey'}">${m['Resolution Status']}</span></td>
-      <td class="${ec}" style="${hrs<2?'color:var(--red)':''};font-family:'DM Mono',monospace;font-size:11px">${hrs<2?'⚠ ':''} ${hrs}h</td>
-    </tr>`;
+  // Simulated safety incidents
+  const safetyIncidents = [
+    {ref:'SAF-001', time:'09:23', passenger:'Anonymous', driver:'DRV034 Ahmad Razif', type:'Unsafe Driving', summary:'Passenger reports driver ran 2 red lights and was speeding on KLIA highway.', status:'Under Investigation'},
+    {ref:'SAF-002', time:'Yesterday 22:14', passenger:'Anonymous', driver:'DRV067 Rajan Muthu', type:'Misconduct', summary:'Driver made inappropriate comments. Passenger felt unsafe.', status:'Driver Suspended Pending Review'},
+  ];
+
+  // KPIs
+  const customerWati = wati.filter(m => m['Classified Type']!=='Driver Status Check');
+  const pending = sfEscalations.filter(e=>e.status==='Pending').length + customerWati.filter(m=>m['Resolution Status']==='Pending').length;
+  const resolved = sfEscalations.filter(e=>e.status==='Resolved').length + customerWati.filter(m=>m['Resolution Status']==='Resolved').length;
+  const refundsPending = sfEscalations.filter(e=>e.type==='Refund'&&e.status!=='Resolved').length;
+
+  if(g('cs-wati-total')) g('cs-wati-total').textContent = customerWati.length;
+  if(g('cs-sf-total')) g('cs-sf-total').textContent = sfEscalations.length;
+  if(g('cs-pending')) g('cs-pending').textContent = pending;
+  if(g('cs-resolved')) g('cs-resolved').textContent = resolved;
+  if(g('cs-refunds')) g('cs-refunds').textContent = refundsPending;
+  if(g('cs-safety')) g('cs-safety').textContent = safetyIncidents.length;
+
+  // Issue breakdown
+  const issueTypes = {Refund:0,'Fare Dispute':0,'Driver Conduct':0,Safety:0,Booking:0,'App Issue':0};
+  sfEscalations.forEach(e => { if(issueTypes[e.type]!==undefined) issueTypes[e.type]++; });
+  customerWati.forEach(m => {
+    const t = m['Classified Type']||'Other';
+    if(t.includes('Refund')) issueTypes['Refund']++;
+    else if(t.includes('Driver')) issueTypes['Driver Conduct']++;
+    else if(t.includes('Booking')) issueTypes['Booking']++;
+    else if(t.includes('Fare')) issueTypes['Fare Dispute']++;
+  });
+  issueTypes['Safety'] = safetyIncidents.length;
+  const totalIssues = Object.values(issueTypes).reduce((a,b)=>a+b,0)||1;
+  const issueColors = {Refund:'var(--amber)','Fare Dispute':'var(--cyan)','Driver Conduct':'var(--red)',Safety:'var(--red)',Booking:'var(--text2)','App Issue':'var(--text3)'};
+  const breakdownEl = g('cs-issue-breakdown');
+  if(breakdownEl) breakdownEl.innerHTML = Object.entries(issueTypes).map(([type,count]) =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:'+issueColors[type]+';flex-shrink:0"></div>'
+    +'<span style="font-size:14px;color:var(--text)">'+type+'</span></div>'
+    +'<div style="display:flex;align-items:center;gap:12px">'
+    +'<div style="width:100px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">'
+    +'<div style="height:100%;background:'+issueColors[type]+';width:'+Math.round(count/totalIssues*100)+'%;border-radius:3px"></div></div>'
+    +'<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:'+issueColors[type]+'">'+count+'</span>'
+    +'</div></div>'
+  ).join('');
+
+  // Safety incidents
+  const safetyEl = g('cs-safety-panel');
+  if(safetyEl) safetyEl.innerHTML = safetyIncidents.length===0
+    ? '<div style="color:var(--text3);font-size:14px;padding:12px 0">No safety incidents today</div>'
+    : safetyIncidents.map(s =>
+        '<div style="padding:14px 0;border-bottom:1px solid var(--border)">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<span style="font-weight:700;font-family:DM Mono,monospace;font-size:14px;color:var(--red)">'+s.ref+'</span>'
+        +'<span class="badge bg-red">'+s.type+'</span></div>'
+        +'<div style="font-size:13px;color:var(--text2);margin-bottom:4px">Driver: <strong style="color:var(--text)">'+s.driver+'</strong></div>'
+        +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">'+s.summary+'</div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<span style="font-size:12px;color:var(--text3)">'+s.time+'</span>'
+        +'<span class="badge bg-red">'+s.status+'</span></div>'
+        +'</div>'
+      ).join('');
+
+  // WATI messages
+  const watiCount = g('cs-wati-count');
+  if(watiCount) watiCount.textContent = customerWati.length + ' messages today';
+  const watiBody = g('cs-wati-body');
+  if(watiBody) watiBody.innerHTML = customerWati.length===0
+    ? '<tr><td colspan="8" style="padding:16px;color:var(--text3);font-size:14px">No direct passenger messages today</td></tr>'
+    : customerWati.map(m => {
+        const hrs = parseFloat(m['Hours Until Expiry']||99);
+        const sc = hrs<2?'var(--red)':hrs<6?'var(--amber)':'var(--text3)';
+        const action = hrs<2
+          ? '<span style="font-size:12px;font-weight:700;color:var(--red)">Call Now</span>'
+          : hrs<6
+          ? '<span style="font-size:12px;font-weight:700;color:var(--amber)">Email Today</span>'
+          : '<span style="font-size:12px;color:var(--text3)">Monitor</span>';
+        return '<tr>'
+          +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;font-weight:700;color:var(--text)">'+m['Message ID']+'</td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:12px 14px">'+((m['Timestamp']||'').substring(11,16))+'</td>'
+          +'<td style="font-size:14px;padding:12px 14px;font-weight:500;color:var(--text)">'+m['Sender Name']+'</td>'
+          +'<td style="padding:12px 14px">'+watiTypeBadge(m['Classified Type'])+'</td>'
+          +'<td style="font-size:13px;padding:12px 14px;max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--text2)">'+m['Message Content']+'</td>'
+          +'<td style="padding:12px 14px"><span class="badge '+(m['Resolution Status']==='Resolved'?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey')+'">'+m['Resolution Status']+'</span></td>'
+          +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:'+sc+'">'+hrs+'h</td>'
+          +'<td style="padding:12px 14px">'+action+'</td>'
+          +'</tr>';
+      }).join('');
+
+  // Salesforce escalations
+  const sfBody = g('cs-sf-body');
+  if(sfBody) sfBody.innerHTML = sfEscalations.map(e => {
+    const sc = e.severity==='High'?'bg-red':'bg-amber';
+    const stc = e.status==='Resolved'?'bg-green':e.status==='In Progress'?'bg-amber':'bg-grey';
+    return '<tr style="'+(e.severity==='High'&&e.status==='Pending'?'background:rgba(232,0,45,0.03)':'')+'">'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;font-weight:700;color:var(--text)">'+e.ref+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:12px 14px;color:var(--text3)">'+e.time+'</td>'
+      +'<td style="font-size:14px;padding:12px 14px;font-weight:500;color:var(--text)">'+e.passenger+'</td>'
+      +'<td style="padding:12px 14px">'+watiTypeBadge(e.type)+'</td>'
+      +'<td style="font-size:13px;padding:12px 14px;max-width:200px;overflow:hidden;text-overflow:ellipsis;color:var(--text2)">'+e.summary+'</td>'
+      +'<td style="padding:12px 14px"><span class="badge '+sc+'">'+e.severity+'</span></td>'
+      +'<td style="padding:12px 14px"><span class="badge '+stc+'">'+e.status+'</span></td>'
+      +'<td style="font-size:13px;padding:12px 14px;color:var(--text2)">'+e.handler+'</td>'
+      +'</tr>';
   }).join('');
 
-  document.getElementById('cs-refunds-panel').innerHTML = refunds.length===0
-    ? '<div style="color:var(--text3);font-size:12px">No refund requests</div>'
-    : refunds.map(m=>`
-      <div class="refund-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">${m['Message ID']}</span>
-          <span class="badge ${m['Resolution Status']==='Resolved'?'bg-green':'bg-amber'}">${m['Resolution Status']}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} ${m['Message Content']}</div>
-        <div style="font-size:11px;color:var(--blue);margin-top:6px">${m['Auto Response Content']||''}</div>
-      </div>`).join('');
+  // Refund workflow
+  const refunds = [
+    {id:'REF-001', passenger:'Priya Nair', amount:'RM 45.00', issue:'Charged for driver cancellation', stage:1, acknowledged_by:null, approved_by:null, executed_at:null, channel:'Salesforce'},
+    {id:'REF-002', passenger:'Tan Mei Lin', amount:'RM 78.50', issue:'No show — advance booking', stage:2, acknowledged_by:'Amirah (CS)', acknowledged_at:'10:15', approved_by:null, executed_at:null, channel:'Salesforce'},
+    {id:'REF-003', passenger:'Ahmad Razif bin Hassan', amount:'RM 23.00', issue:'Fare dispute — wrong route', stage:3, acknowledged_by:'Suresh (CS)', acknowledged_at:'08:30', approved_by:'Ruben (Ops)', approved_at:'09:45', executed_at:null, channel:'WATI'},
+    {id:'REF-004', passenger:'Lee Wei Ming', amount:'RM 55.00', issue:'Duplicate charge', stage:4, acknowledged_by:'Amirah (CS)', acknowledged_at:'Yesterday 14:00', approved_by:'Ruben (Ops)', approved_at:'Yesterday 15:30', executed_at:'Yesterday 16:00', channel:'WATI'},
+  ];
+  const stages = ['Received','Acknowledged','Approved','Executed to Cash Wallet'];
+  const refundEl = g('cs-refund-workflow');
+  if(refundEl) refundEl.innerHTML = refunds.map(r =>
+    '<div style="padding:16px;margin-bottom:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div><span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--text)">'+r.id+'</span>'
+    +'<span style="font-size:13px;color:var(--text2);margin-left:12px">'+r.passenger+'</span>'
+    +'<span class="badge bg-grey" style="margin-left:8px">'+r.channel+'</span></div>'
+    +'<div style="font-family:DM Mono,monospace;font-size:15px;font-weight:700;color:var(--amber)">'+r.amount+'</div></div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:14px">'+r.issue+'</div>'
+    +'<div style="display:flex;align-items:center;gap:0">'
+    +stages.map((s,i) => {
+      const done = i < r.stage;
+      const active = i === r.stage - 1;
+      const sc = done ? 'var(--green)' : active ? 'var(--cyan)' : 'var(--text3)';
+      const bg = done ? 'rgba(0,210,106,0.15)' : active ? 'rgba(0,212,255,0.1)' : 'var(--bg2)';
+      const bc = done ? 'rgba(0,210,106,0.3)' : active ? 'rgba(0,212,255,0.2)' : 'var(--border)';
+      let detail = '';
+      if(i===1&&r.acknowledged_by) detail = '<div style="font-size:11px;color:var(--text3);margin-top:3px">'+r.acknowledged_by+'<br>'+r.acknowledged_at+'</div>';
+      if(i===2&&r.approved_by) detail = '<div style="font-size:11px;color:var(--text3);margin-top:3px">'+r.approved_by+'<br>'+r.approved_at+'</div>';
+      if(i===3&&r.executed_at) detail = '<div style="font-size:11px;color:var(--green);margin-top:3px">'+r.executed_at+'</div>';
+      return '<div style="flex:1;padding:8px 10px;background:'+bg+';border:1px solid '+bc+';border-radius:6px;margin-right:'+(i<3?'6px':'0')+'">'
+        +'<div style="font-size:11px;font-weight:700;color:'+sc+';text-transform:uppercase;letter-spacing:0.5px">'+(done?'✓ ':active?'● ':'')+s+'</div>'
+        +detail
+        +'</div>';
+    }).join('')
+    +'</div></div>'
+  ).join('');
 
-  document.getElementById('cs-complaints-panel').innerHTML = complaints.length===0
-    ? '<div style="color:var(--text3);font-size:12px">No complaints</div>'
-    : complaints.map(m=>`
-      <div class="refund-card" style="border-left:2px solid var(--red)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-weight:600;color:var(--text);font-family:'DM Mono',monospace;font-size:11px">${m['Message ID']}</span>
-          <span class="badge bg-red">Complaint</span>
-        </div>
-        <div style="font-size:12px;color:var(--text2)">${m['Sender Name']} ${m['Message Content']}</div>
-        <div style="font-size:13px;color:var(--text2);margin-top:4px">Escalated to: ${m['Escalated To']||'Driver Support'}</div>
-      </div>`).join('');
-
-  renderAlerts(alerts, 'cs-alerts-list', false);
+  // Driver complaints
+  const complaints = [
+    {id:'DC-001', passenger:'Norzahra a/l Rajan', driver:'DRV045 Hafiz bin Hassan', type:'Rude Behaviour', summary:'Driver was rude and refused to help with luggage.', severity:'Medium', status:'Warning Issued', time:'09:10'},
+    {id:'DC-002', passenger:'Suraya binti Zainudin', driver:'DRV023 Suresh binti Salleh', type:'Wrong Route', summary:'Driver took a longer route. Passenger suspects intentional.', severity:'Low', status:'Dismissed', time:'08:45'},
+    {id:'DC-003', passenger:'Meena a/l Kumar', driver:'DRV067 Rajan Muthu', type:'Asked Extra Payment', summary:'Driver demanded RM 10 cash on top of app fare.', severity:'High', status:'Under Investigation', time:'07:30'},
+  ];
+  const compEl = g('cs-complaints-panel');
+  if(compEl) compEl.innerHTML = complaints.map(c => {
+    const sc = c.severity==='High'?'bg-red':c.severity==='Medium'?'bg-amber':'bg-grey';
+    const stc = c.status==='Warning Issued'?'bg-amber':c.status==='Dismissed'?'bg-grey':c.status==='Under Investigation'?'bg-red':'bg-green';
+    return '<div style="padding:14px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--text)">'+c.id+'</span>'
+      +'<div style="display:flex;gap:6px"><span class="badge '+sc+'">'+c.severity+'</span><span class="badge '+stc+'">'+c.status+'</span></div></div>'
+      +'<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">'+c.type+'</div>'
+      +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">'+c.summary+'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3)">'
+      +'<span>Passenger: '+c.passenger+'</span><span>Driver: '+c.driver+'</span><span>'+c.time+'</span></div>'
+      +'</div>';
+  }).join('');
 }
 
 // ── PRICING ───────────────────────────────────────────────────────────────────
