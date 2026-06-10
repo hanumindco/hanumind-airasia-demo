@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirAsia Ride — Operations Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060912;color:#F0F4FF;font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.content{position:relative;z-index:1}
+
+/* Header */
+.header{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center}
+.logo{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.logo-red{color:#E8002D;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.5px}
+.logo-white{color:#F0F4FF;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.5px}
+.logo-divider{width:2px;height:32px;background:rgba(232,0,45,0.4)}
+.subtitle{font-size:13px;color:rgba(0,212,255,0.7);letter-spacing:3px;text-transform:uppercase;font-weight:600}
+.headline{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,#F0F4FF 0%,rgba(0,212,255,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tagline{font-size:16px;color:rgba(168,180,200,0.8);max-width:560px;line-height:1.7;margin-bottom:40px}
+.enter-btn{padding:14px 48px;background:linear-gradient(135deg,#E8002D,#FF4D6D);border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s;text-decoration:none;display:inline-block}
+.enter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,0,45,0.4)}
+
+/* Stats bar */
+.stats-bar{display:flex;justify-content:center;gap:60px;padding:24px 40px;border-top:1px solid rgba(0,212,255,0.08);border-bottom:1px solid rgba(0,212,255,0.08);margin-bottom:60px;background:rgba(6,9,18,0.6);backdrop-filter:blur(10px)}
+.stat{text-align:center}
+.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:#F0F4FF}
+.stat-label{font-size:11px;color:rgba(168,180,200,0.5);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+
+/* Agents grid */
+.section-label{font-size:11px;color:rgba(0,212,255,0.6);text-transform:uppercase;letter-spacing:3px;font-weight:700;text-align:center;margin-bottom:32px}
+.agents-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:1200px;margin:0 auto;padding:0 40px 80px}
+.agent-card{background:linear-gradient(145deg,rgba(10,15,28,0.9),rgba(6,9,18,0.95));border:1px solid rgba(0,212,255,0.1);border-radius:12px;padding:24px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden}
+.agent-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(0,212,255,0.04),transparent 70%);pointer-events:none}
+.agent-card:hover{transform:translateY(-6px);border-color:rgba(0,212,255,0.3);box-shadow:0 0 30px rgba(0,212,255,0.08),0 20px 40px rgba(0,0,0,0.4)}
+.agent-card.master{border-color:rgba(232,0,45,0.2)}
+.agent-card.master::before{background:radial-gradient(circle at 50% 0%,rgba(232,0,45,0.06),transparent 70%)}
+.agent-card.master:hover{border-color:rgba(232,0,45,0.4);box-shadow:0 0 30px rgba(232,0,45,0.1),0 20px 40px rgba(0,0,0,0.4)}
+.agent-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.1)}
+.agent-card.master .agent-icon{background:rgba(232,0,45,0.06);border-color:rgba(232,0,45,0.1)}
+.agent-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#F0F4FF;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.agent-desc{font-size:12px;color:rgba(168,180,200,0.7);line-height:1.6;margin-bottom:16px}
+.agent-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:rgba(0,210,106,0.8)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#00D26A;box-shadow:0 0 6px #00D26A;animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+.agent-card.master .agent-status{color:rgba(232,0,45,0.8)}
+.agent-card.master .status-dot{background:#E8002D;box-shadow:0 0 6px #E8002D}
+.click-hint{position:absolute;bottom:16px;right:16px;font-size:10px;color:rgba(0,212,255,0.3);letter-spacing:1px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:linear-gradient(145deg,#0A0F1C,#060912);border:1px solid rgba(0,212,255,0.15);border-radius:16px;padding:36px;width:100%;max-width:580px;max-height:85vh;overflow-y:auto;position:relative}
+.modal.master-modal{border-color:rgba(232,0,45,0.2)}
+.modal-close{position:absolute;top:20px;right:20px;background:rgba(168,180,200,0.1);border:none;color:rgba(168,180,200,0.6);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(168,180,200,0.2);color:#F0F4FF}
+.modal-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.1)}
+.master-modal .modal-icon{background:rgba(232,0,45,0.06);border-color:rgba(232,0,45,0.1)}
+.modal-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:rgba(0,212,255,0.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.master-modal .modal-name{color:rgba(232,0,45,0.7)}
+.modal-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:#F0F4FF;margin-bottom:12px;line-height:1.3}
+.modal-summary{font-size:14px;color:rgba(168,180,200,0.8);line-height:1.7;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(0,212,255,0.08)}
+.modal-section-title{font-size:11px;font-weight:700;color:rgba(0,212,255,0.5);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.master-modal .modal-section-title{color:rgba(232,0,45,0.5)}
+.task-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.task-item{display:flex;gap:12px;align-items:flex-start}
+.task-dot{width:6px;height:6px;border-radius:50%;background:rgba(0,212,255,0.6);flex-shrink:0;margin-top:6px}
+.master-modal .task-dot{background:rgba(232,0,45,0.6)}
+.task-text{font-size:13px;color:rgba(168,180,200,0.8);line-height:1.6}
+.modal-value{background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.08);border-radius:8px;padding:16px;margin-bottom:24px}
+.master-modal .modal-value{background:rgba(232,0,45,0.04);border-color:rgba(232,0,45,0.08)}
+.modal-value-text{font-size:13px;color:rgba(168,180,200,0.8);line-height:1.7;font-style:italic}
+.modal-footer{display:flex;gap:12px}
+.modal-btn-primary{flex:1;padding:12px;background:linear-gradient(135deg,#E8002D,#FF4D6D);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.modal-btn-secondary{flex:1;padding:12px;background:rgba(168,180,200,0.08);border:1px solid rgba(168,180,200,0.1);border-radius:8px;color:rgba(168,180,200,0.7);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.modal-btn-secondary:hover{background:rgba(168,180,200,0.12)}
+
+/* HUD corners */
+.hb{position:absolute;width:10px;height:10px;border-color:rgba(0,212,255,0.3);border-style:solid}
+.hb-tl{top:8px;left:8px;border-width:1px 0 0 1px}
+.hb-tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.hb-bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.hb-br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="content">
+  <div class="header">
+    <div class="logo">
+      <div><span class="logo-red">AIRASIA</span> <span class="logo-white">RIDE</span></div>
+      <div class="logo-divider"></div>
+      <div class="subtitle">Operations Intelligence</div>
+    </div>
+    <div class="headline">Your Operations.<br>Powered by AI.</div>
+    <div class="tagline">8 intelligent agents running 24/7 — monitoring bookings, drivers, compliance, customer messages, and demand in real time. No manual work. No missed alerts.</div>
+    <a href="/dashboard" class="enter-btn">Enter Operations Dashboard</a>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-val">8</div><div class="stat-label">AI Agents</div></div>
+    <div class="stat"><div class="stat-val">24/7</div><div class="stat-label">Always On</div></div>
+    <div class="stat"><div class="stat-val">100</div><div class="stat-label">Drivers Monitored</div></div>
+    <div class="stat"><div class="stat-val">150</div><div class="stat-label">Bookings Tracked</div></div>
+    <div class="stat"><div class="stat-val">0</div><div class="stat-label">Manual Reports</div></div>
+  </div>
+
+  <div class="section-label">Intelligent Agents — Click to learn more</div>
+
+  <div class="agents-grid">
+
+    <div class="agent-card" onclick="openModal('wati')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">💬</div>
+      <div class="agent-name">WATI Agent</div>
+      <div class="agent-desc">Classifies and responds to all WhatsApp messages. Escalates refunds and monitors expiry windows.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card" onclick="openModal('tower')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">🗼</div>
+      <div class="agent-name">Control Tower Agent</div>
+      <div class="agent-desc">Monitors all advance bookings. Manages B2B intake, driver reminders, and cancellation escalations.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card" onclick="openModal('forecast')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">📡</div>
+      <div class="agent-name">Forecast Agent</div>
+      <div class="agent-desc">Forecasts demand using KLIA2 flight data. Positions drivers and activates incentives before peaks.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card" onclick="openModal('document')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">📋</div>
+      <div class="agent-name">Document Agent</div>
+      <div class="agent-desc">Monitors driver compliance. Handles BUDI95 reconciliation and APAD reporting automatically.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card" onclick="openModal('companion')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">🤖</div>
+      <div class="agent-name">Driver AI Companion</div>
+      <div class="agent-desc">24/7 multilingual AI support for drivers. Answers questions, shows earnings, guides zone positioning.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card" onclick="openModal('fare')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">💰</div>
+      <div class="agent-name">Dynamic Fare Intelligence</div>
+      <div class="agent-desc">Reads traffic, weather, flights, and events every 15 minutes. Recommends optimal fare multipliers.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card" onclick="openModal('earnings')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">📊</div>
+      <div class="agent-name">Driver Earnings Coach</div>
+      <div class="agent-desc">Sends personalised daily earnings summary to each driver at end of shift with zone recommendations.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+    <div class="agent-card master" onclick="openModal('master')">
+      <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
+      <div class="agent-icon">⚡</div>
+      <div class="agent-name">Master Intelligence</div>
+      <div class="agent-desc">Reads all 7 agents simultaneously. Finds patterns none of them can see alone. Routes alerts to the right team.</div>
+      <div class="agent-status"><div class="status-dot"></div>Live</div>
+      <div class="click-hint">CLICK TO LEARN MORE</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal overlay -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-icon" id="modal-icon"></div>
+    <div class="modal-name" id="modal-agent-name"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-summary" id="modal-summary"></div>
+    <div class="modal-section-title">What this agent does</div>
+    <div class="task-list" id="modal-tasks"></div>
+    <div class="modal-value"><div class="modal-value-text" id="modal-value"></div></div>
+    <div class="modal-footer">
+      <button class="modal-btn-secondary" onclick="closeModalDirect()">Close</button>
+      <button class="modal-btn-primary" onclick="window.location.href='/dashboard'">View in Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const agents = {
+  wati: {
+    icon:'💬', name:'WATI Agent', isMaster:false,
+    title:'Your WhatsApp operations, fully automated',
+    summary:'Every WhatsApp message from a driver or customer is read, classified, and responded to automatically. Your team only steps in when human judgment is needed.',
+    tasks:[
+      'Reads every incoming WATI message and classifies it — refund request, promo enquiry, booking question, driver complaint, or general query',
+      'Sends auto-responses immediately for routine messages — no customer waiting hours for a reply',
+      'Flags refund requests and escalates to the Customer Support team with full context',
+      'Monitors every open conversation for the 24-hour expiry window — alerts the team before a message times out',
+      'Delivers promo codes automatically when a passenger qualifies',
+      'Logs every interaction with timestamp, classification, and resolution status on the dashboard'
+    ],
+    value:'Every customer message is acknowledged in seconds, not hours. Your CS team works on exceptions, not routine replies.'
+  },
+  tower: {
+    icon:'🗼', name:'Control Tower Agent', isMaster:false,
+    title:'Every advance booking monitored from confirmation to pickup',
+    summary:'Control Tower watches every advance booking from the moment it is confirmed. It sends driver reminders, flags non-responses, and manages all B2B partner intake automatically.',
+    tasks:[
+      'Monitors all advance bookings — KLOOK, KKdays, KPJ, Sunway Medical, Hospital Form, and direct bookings',
+      'Sends WATI reminder to driver at T-45 minutes before pickup',
+      'Flags unresponsive drivers at T-35 minutes — Control Tower team prompted to call immediately',
+      'Detects cancellations in real time and notifies the Control Tower dashboard instantly',
+      'Tracks B2B partner booking completion rates — surfaces underperforming partners',
+      'Monitors premature No Show attempts — flags drivers who press No Show before the 5-minute wait rule',
+      'Routes all control tower alerts to the Master Intelligence for cross-agent pattern detection'
+    ],
+    value:'Zero advance booking goes unmonitored. Your Control Tower team responds to exceptions — not routine check-ins.'
+  },
+  forecast: {
+    icon:'📡', name:'Forecast Agent', isMaster:false,
+    title:'Demand intelligence built on your own flight data',
+    summary:'FORECAST reads live KLIA2 arrival data and converts it into zone-level demand forecasts. Drivers are in position before passengers land. Incentives activate automatically.',
+    tasks:[
+      'Scrapes KLIA2 arrival data continuously — flight number, arrival time, passenger count, origin',
+      'Calculates expected ride demand by zone and hour based on flight load',
+      'Identifies surge zones before they happen — not after',
+      'Recommends driver positioning — which zones need more drivers in the next 2 hours',
+      'Activates incentives automatically when a zone is forecast to surge',
+      'Sends morning positioning brief to the Driver Team Lead at 6AM',
+      'Feeds zone demand data to the Master Intelligence for cross-agent analysis'
+    ],
+    value:'AirAsia Ride has something no competitor can replicate — its own group flight data. FORECAST turns that into a supply advantage every single day.'
+  },
+  document: {
+    icon:'📋', name:'Document Agent', isMaster:false,
+    title:'AirAsia Ride will never face what Maxim and inDrive faced',
+    summary:'DOCUMENT monitors every driver document continuously. PSV licences, EVP, insurance, PUSPAKOM. Lapsing drivers get reminders. Lapsed drivers are blocked automatically. APAD reports generate on demand.',
+    tasks:[
+      'Monitors PSV licence, EVP, insurance, and PUSPAKOM expiry for all 100 drivers continuously',
+      'Flags drivers with documents expiring within 30 days — sends WATI reminder automatically',
+      'Blocks lapsed drivers from receiving bookings immediately upon expiry',
+      'Calculates BUDI95 fuel subsidy eligibility — Tier 1 below 2,000 km, Tier 2 above 2,000 km',
+      'Generates BUDI95 subsidy report for Ministry of Finance submission on demand',
+      'Generates APAD fleet compliance report on demand — one click, ready for submission',
+      'Logs all compliance events with timestamps for full audit trail'
+    ],
+    value:'Maxim had its licence revoked. inDrive was suspended. Both for compliance failures that DOCUMENT would have caught weeks in advance.'
+  },
+  companion: {
+    icon:'🤖', name:'Driver AI Companion', isMaster:false,
+    title:'Every driver has a 24/7 intelligent assistant in their pocket',
+    summary:'Drivers ask questions in any language at any hour and get instant, accurate answers. Earnings, zone guidance, compliance status, booking help — all without calling anyone.',
+    tasks:[
+      'Answers driver questions 24/7 in any language — English, Bahasa Malaysia, Tamil, Mandarin',
+      'Shows driver their earnings today, this week, and progress toward weekly target',
+      'Guides driver to the highest-demand zones based on FORECAST agent data',
+      'Answers compliance questions — when documents expire, what needs renewing',
+      'Explains booking issues, cancellation policies, and platform rules',
+      'Three-layer response cache — FAQ cache first, then conversation cache, then Claude AI — minimises API cost',
+      'Accessible via the Driver AI tab on the dashboard — phone frame interface for realistic demo'
+    ],
+    value:'Drivers stop calling your team for routine questions. Your team stops answering the same 10 questions 50 times a day.'
+  },
+  fare: {
+    icon:'💰', name:'Dynamic Fare Intelligence', isMaster:false,
+    title:'Fare recommendations that reflect what is actually happening right now',
+    summary:'Every 15 minutes, Dynamic Fare Intelligence reads live traffic, weather, flight demand, and competitor signals. It recommends the optimal fare multiplier for each zone so you capture revenue without losing passengers.',
+    tasks:[
+      'Reads live traffic conditions via Google Maps API every 15 minutes',
+      'Monitors weather conditions — rain events trigger automatic fare review',
+      'Cross-references KLIA2 flight demand from the FORECAST agent',
+      'Reads competitor fare signals across Grab and Gojek',
+      'Recommends zone-level fare multipliers — not a blanket surge',
+      'Shows fare timeline — what multipliers applied across the day and why',
+      'Feeds multiplier data to the Pricing tab on the dashboard for team review'
+    ],
+    value:'You stop leaving revenue on the table during peaks and you stop losing passengers with blunt surge pricing. Zone-level precision replaces platform-wide blunt force.'
+  },
+  earnings: {
+    icon:'📊', name:'Driver Earnings Coach', isMaster:false,
+    title:'Every driver knows exactly where they stand at the end of every shift',
+    summary:'At the end of each shift, every driver receives a personalised earnings summary via WhatsApp. How much they earned, how close they are to their weekly target, and which zones to hit tomorrow.',
+    tasks:[
+      'Calculates each driver\'s earnings at end of shift — trips completed, total fare, platform fee deducted',
+      'Compares earnings against weekly target — percentage achieved, amount remaining',
+      'Identifies the top-earning zones for the next morning based on FORECAST data',
+      'Sends personalised WhatsApp message to each driver via WATI — reads as a personal message, not a broadcast',
+      'Tracks drivers consistently below target — flags to Driver Team for outreach',
+      'Monthly earnings summary generated automatically for BUDI95 tier calculation',
+      'Feeds driver performance data to the Driver Team dashboard'
+    ],
+    value:'Drivers who know their numbers work smarter. Drivers who get zone guidance show up where they are needed. Retention improves. Earnings improve. Platform performance improves.'
+  },
+  master: {
+    icon:'⚡', name:'Master Intelligence', isMaster:true,
+    title:'The agent that reads all other agents and finds what none of them can see alone',
+    summary:'Master Intelligence sits above all 7 agents. It reads their outputs simultaneously, finds cross-agent patterns, and routes prioritised alerts to the right team before situations escalate.',
+    tasks:[
+      'Reads outputs from all 7 agents simultaneously — WATI, Control Tower, Forecast, Document, Companion, Fare Intelligence, Earnings Coach',
+      'Detects cross-agent patterns — a surge zone with lapsed drivers and unresponding B2B bookings is a pattern no single agent can see',
+      'Routes alerts to the correct team — Control Tower, Driver Backend, Driver Team, Customer Support, or Pricing',
+      'Assigns priority levels — High, Medium, Plan — based on operational impact',
+      'Surfaces alerts on the Nerve Centre dashboard for management visibility',
+      'Triggers escalation protocols when multiple agents flag the same zone or driver simultaneously',
+      'Logs every alert with timestamp, source agent, team routed to, and resolution status'
+    ],
+    value:'Seven agents watching seven things. One agent watching all seven. That is the difference between operations that react and operations that anticipate.'
+  }
+};
+
+function openModal(id) {
+  const a = agents[id];
+  if(!a) return;
+  const overlay = document.getElementById('modal-overlay');
+  const box = document.getElementById('modal-box');
+  document.getElementById('modal-icon').textContent = a.icon;
+  document.getElementById('modal-agent-name').textContent = a.name;
+  document.getElementById('modal-title').textContent = a.title;
+  document.getElementById('modal-summary').textContent = a.summary;
+  document.getElementById('modal-tasks').innerHTML = a.tasks.map(t =>
+    '<div class="task-item"><div class="task-dot"></div><div class="task-text">'+t+'</div></div>'
+  ).join('');
+  document.getElementById('modal-value').textContent = a.value;
+  if(a.isMaster) { box.classList.add('master-modal'); } else { box.classList.remove('master-modal'); }
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if(e.target === document.getElementById('modal-overlay')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Particle background
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+for(let i=0;i<60;i++) particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,r:Math.random()*1.5+0.5,c:Math.random()>0.5?'rgba(0,212,255,':'rgba(232,0,45,'});
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1;
+    if(p.y<0||p.y>canvas.height) p.vy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.c+'0.4)';
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

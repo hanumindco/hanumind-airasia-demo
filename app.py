@@ -12,6 +12,10 @@ load_dotenv('/Users/gowrishnambiar/hanumind_airasia_demo/.env')
 app = Flask(__name__)
 
 @app.route("/")
+def index():
+    return render_template("landing.html")
+
+@app.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
 
