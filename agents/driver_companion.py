@@ -80,7 +80,7 @@ def save_to_cache(conn, driver_id, question, answer):
 def layer3_api(conn, driver_id, question, language):
     from sheets.sheets_client import get_drivers, read_all
     drivers = get_drivers()
-    earnings = read_all("Driver Earnings")
+    earnings = read_all("Driver — Earnings")
     driver_info = drivers[driver_id-1] if driver_id <= len(drivers) else {}
     earn_info = next((e for e in earnings if e.get("Driver ID") == driver_info.get("Driver ID","")), {})
     memory = get_driver_memory(conn, driver_id)

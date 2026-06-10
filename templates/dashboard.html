@@ -283,6 +283,7 @@ tr:hover td{background:var(--bg3)}
   <button class="tab-btn" onclick="showTab('customer')" id="tab-customer"><span class="tab-icon">💬</span>Customer Support</button>
   <button class="tab-btn" onclick="showTab('pricing')" id="tab-pricing"><span class="tab-icon">💰</span>Pricing</button>
   <button class="tab-btn" onclick="showTab('spark')" id="tab-spark"><span class="tab-icon">📡</span>Demand Map</button>
+  <button class="tab-btn" onclick="showTab('airport')" id="tab-airport"><span class="tab-icon">✈️</span>Airport Queue</button>
   <button class="tab-btn" onclick="showTab('companion')" id="tab-companion"><span class="tab-icon">🤖</span>Driver AI</button>
 </div>
 
@@ -962,6 +963,113 @@ tr:hover td{background:var(--bg3)}
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
+<!-- AIRPORT QUEUE  (SPARK) -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-airport-content">
+<style>
+  .aq-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+  .aq-title{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;color:var(--text);letter-spacing:0.5px}
+  .aq-sub{font-size:12px;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-top:4px}
+  .aq-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px}
+  .aq-badge.live{background:rgba(0,210,106,0.1);color:var(--green);border:1px solid rgba(0,210,106,0.25)}
+  .aq-badge.sim{background:rgba(240,165,0,0.1);color:var(--amber);border:1px solid rgba(240,165,0,0.22)}
+  .aq-updated{font-family:"DM Mono",monospace;font-size:11px;color:var(--text3);margin-top:6px;text-align:right}
+  .aq-queue-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:8px}
+  .aq-qcard{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+  .aq-qcard::before{content:"";position:absolute;top:0;left:0;right:0;height:4px}
+  .aq-qcard.priority::before{background:var(--green);box-shadow:0 0 12px var(--green)}
+  .aq-qcard.community::before{background:var(--blue);box-shadow:0 0 12px var(--blue)}
+  .aq-qcard.normal::before{background:var(--text3)}
+  .aq-qcount{font-family:"Syne",sans-serif;font-size:34px;font-weight:800;line-height:1;letter-spacing:-1px}
+  .aq-qcard.priority .aq-qcount{color:var(--green)} .aq-qcard.community .aq-qcount{color:var(--blue)} .aq-qcard.normal .aq-qcount{color:var(--text2)}
+  .aq-qname{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text);margin-top:8px}
+  .aq-qdesc{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4}
+  .aq-alloc{position:absolute;top:14px;right:14px;font-family:"DM Mono",monospace;font-size:16px;font-weight:700}
+  .aq-qcard.priority .aq-alloc{color:var(--green)} .aq-qcard.community .aq-alloc{color:var(--blue)} .aq-qcard.normal .aq-alloc{color:var(--text3)}
+  .aq-gap-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border)}
+  .aq-gap-row:last-child{border-bottom:none}
+  .aq-gap-nums{font-family:"DM Mono",monospace;font-size:13px;font-weight:700}
+  #aq-forecast td,#aq-forecast th{text-align:center}
+  #aq-forecast td:first-child,#aq-forecast th:first-child{text-align:left}
+  .aq-row-critical{background:rgba(232,0,45,0.10);animation:flashred 1.6s infinite}
+  .aq-row-high{background:rgba(255,109,0,0.08)}
+  .aq-row-watch{background:rgba(240,165,0,0.06)}
+  .aq-flight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .aq-fcard{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:14px 16px}
+  .aq-fhead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .aq-fno{font-family:"Syne",sans-serif;font-size:17px;font-weight:800;color:var(--red)}
+  .aq-forigin{font-size:12px;color:var(--text2);margin-top:2px}
+  .aq-calc{background:var(--bg2);border:1px dashed var(--border2);border-radius:7px;padding:10px 12px;margin-top:8px;font-family:"DM Mono",monospace;font-size:11px;color:var(--text2);line-height:1.7}
+  .aq-calc b{color:var(--text)} .aq-calc .step{color:var(--cyan)}
+  .aq-calc .res{color:var(--green);font-weight:700}
+  .aq-win-head{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:10px;display:flex;align-items:center;gap:10px}
+  .aq-deploy-driver{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
+  .aq-deploy-driver:last-child{border-bottom:none}
+  .aq-assume-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .aq-assume{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+  .aq-assume .k{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:600}
+  .aq-assume .v{font-family:"DM Mono",monospace;font-size:15px;font-weight:700;color:var(--cyan);margin-top:4px}
+  @media(max-width:768px){
+    .aq-queue-grid{grid-template-columns:1fr}
+    .aq-flight-grid{grid-template-columns:1fr}
+    .aq-assume-grid{grid-template-columns:1fr}
+    .aq-header{flex-direction:column}
+    .aq-updated{text-align:left}
+    #aq-forecast{min-width:560px}
+  }
+</style>
+
+  <!-- 1 · HEADER ROW -->
+  <div class="aq-header">
+    <div>
+      <div class="aq-title">✈️ KLIA2 Airport Queue Intelligence</div>
+      <div class="aq-sub">Powered by SPARK Agent</div>
+    </div>
+    <div>
+      <span id="aq-badge" class="aq-badge sim">SIMULATED</span>
+      <div id="aq-updated" class="aq-updated">—</div>
+    </div>
+  </div>
+
+  <!-- 2 · THREE QUEUE STATUS CARDS -->
+  <div class="section-label">Three-Queue Allocation — KLIA &amp; KLIA2</div>
+  <div id="aq-queue-cards" class="aq-queue-grid"></div>
+
+  <!-- DRIVERS NEEDED NOW (per-queue gap) -->
+  <div class="section-label mt-md">Drivers Needed Now vs Present in Queue</div>
+  <div class="panel"><div class="panel-body" id="aq-queue-gap" style="padding:6px 16px"></div></div>
+
+  <!-- 3 · 2-HOUR FORECAST TIMELINE -->
+  <div class="section-label mt-md">2-Hour Forecast — 30 Minute Windows</div>
+  <div class="panel"><div class="tbl-wrap"><table id="aq-forecast">
+    <thead><tr>
+      <th>Window</th><th>Time</th><th>Flights</th><th>Pax</th><th>AAR Demand</th>
+      <th>Drivers Needed</th><th>Present</th><th>Gap</th><th>Status</th>
+    </tr></thead>
+    <tbody id="aq-forecast-body"></tbody>
+  </table></div></div>
+
+  <!-- 4 · FLIGHT-BY-FLIGHT BREAKDOWN -->
+  <div class="section-label mt-md">How We Calculate Demand — Flight by Flight</div>
+  <div id="aq-flights" class="aq-flight-grid"></div>
+
+  <!-- 5 · DEPLOYMENT RECOMMENDATION (conditional) -->
+  <div id="aq-deploy"></div>
+
+  <!-- 6 · ASSUMPTIONS PANEL (always visible) -->
+  <div class="section-label mt-md">Assumptions</div>
+  <div class="panel" style="border:1px solid rgba(0,212,255,0.18)"><div class="panel-body">
+    <div class="aq-assume-grid">
+      <div class="aq-assume"><div class="k">AAR booking rate at KLIA2</div><div class="v" id="aq-a-ride">10% of arriving passengers</div></div>
+      <div class="aq-assume"><div class="k">Driver cycle time</div><div class="v" id="aq-a-cycle">2 hours per trip (1h trip + 1h return)</div></div>
+      <div class="aq-assume"><div class="k">Load factor</div><div class="v" id="aq-a-load">84% of aircraft capacity</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6">Note: These figures are estimates based on IATA averages and AAR planning assumptions. They update automatically when live AAR booking data is connected in production.</div>
+  </div></div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
 <!-- DRIVER AI COMPANION -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-companion-content">
@@ -1142,12 +1250,13 @@ async function submitResolve(alertId) {
 
 // ── NERVE CENTRE ──────────────────────────────────────────────────────────────
 async function loadNerve() {
-  const [stats, bookings, drivers, flights, nerveStats] = await Promise.all([
+  const [stats, bookings, drivers, flights, nerveStats, zoneDemand] = await Promise.all([
     fetch('/api/stats').then(r=>r.json()),
     fetch('/api/bookings').then(r=>r.json()),
     fetch('/api/drivers').then(r=>r.json()),
     fetch('/api/flights').then(r=>r.json()),
-    fetch('/api/nerve-stats').then(r=>r.json())
+    fetch('/api/nerve-stats').then(r=>r.json()),
+    fetch('/api/zone-demand').then(r=>r.json()).catch(()=>[])
   ]);
 
   countUp(document.getElementById('n-active-drivers'), nerveStats.active_drivers);
@@ -1156,17 +1265,12 @@ async function loadNerve() {
   countUp(document.getElementById('n-monthly-gmv'), nerveStats.monthly_gmv, 'RM ', '', 2200);
   countUp(document.getElementById('n-monthly-trips'), nerveStats.monthly_trips, '', '', 2200);
 
-  // Supply vs Demand data defined here so available to both ops health and supply panels
-  const allZones = [
-    { zone: 'KLIA2',        demand: 'Surge',  drivers_present: 18, drivers_needed: 32 },
-    { zone: 'Shah Alam',    demand: 'High',   drivers_present: 2,  drivers_needed: 8  },
-    { zone: 'Cheras',       demand: 'High',   drivers_present: 4,  drivers_needed: 9  },
-    { zone: 'KLIA',         demand: 'Surge',  drivers_present: 14, drivers_needed: 22 },
-    { zone: 'Petaling Jaya',demand: 'Medium', drivers_present: 12, drivers_needed: 10 },
-    { zone: 'Subang',       demand: 'Medium', drivers_present: 9,  drivers_needed: 7  },
-    { zone: 'Ampang',       demand: 'Low',    drivers_present: 8,  drivers_needed: 5  },
-    { zone: 'Klang',        demand: 'Low',    drivers_present: 11, drivers_needed: 6  },
-  ];
+  // Supply vs Demand — live from "Demand — Zone Demand" (same source as Demand Map + Driver Team)
+  const allZones = (zoneDemand||[]).map(z => ({
+    zone: z['Zone'], demand: z['Demand Level'],
+    drivers_present: parseInt(z['Drivers Present']||0),
+    drivers_needed: parseInt(z['Drivers Needed']||0)
+  }));
 
   // Bookings Health card
   const advanceBookings = bookings.filter(b=>b['Source']==='Advance Booking'||b['Source']==='KLOOK'||b['Source']==='KKdays'||b['Source']==='KPJ'||b['Source']==='Sunway Medical'||b['Source']==='Hospital Form');
@@ -1417,21 +1521,11 @@ async function loadNerve() {
   const hfCompleted = hospitalFormBookings.filter(b=>b['Booking Status']==='Completed').length;
   const hfTotal = hospitalFormBookings.length;
 
-  const kpjBase = bookings.filter(b=>b['Source']==='KPJ');
-  const swBase  = bookings.filter(b=>b['Source']==='Sunway Medical');
-
-  // Split hospital form bookings: 4 to KPJ, 3 to Sunway, 3 to Pantai
-  const kpjTotal     = kpjBase.length + 4;
-  const kpjCompleted = kpjBase.filter(b=>b['Booking Status']==='Completed').length + 2;
-  const swTotal      = swBase.length + 3;
-  const swCompleted  = swBase.filter(b=>b['Booking Status']==='Completed').length + 2;
-
   const b2bPartners = [
-    { name: 'KLOOK',          total: bookings.filter(b=>b['Source']==='KLOOK').length,    completed: bookings.filter(b=>b['Source']==='KLOOK'&&b['Booking Status']==='Completed').length,    color: '#0088FF' },
-    { name: 'KKdays',         total: bookings.filter(b=>b['Source']==='KKdays').length,   completed: bookings.filter(b=>b['Source']==='KKdays'&&b['Booking Status']==='Completed').length,   color: '#FF6D00' },
-    { name: 'KPJ',            total: kpjTotal,     completed: kpjCompleted,     color: '#00D26A' },
-    { name: 'Sunway Medical', total: swTotal,       completed: swCompleted,      color: '#9B59B6' },
-    { name: 'Pantai Medical', total: 21,            completed: 17,               color: '#E8002D', simulated: true },
+    { name: 'KLOOK',          total: bookings.filter(b=>b['Source']==='KLOOK').length,          completed: bookings.filter(b=>b['Source']==='KLOOK'&&b['Booking Status']==='Completed').length,          color: '#0088FF' },
+    { name: 'KKdays',         total: bookings.filter(b=>b['Source']==='KKdays').length,         completed: bookings.filter(b=>b['Source']==='KKdays'&&b['Booking Status']==='Completed').length,         color: '#FF6D00' },
+    { name: 'KPJ',            total: bookings.filter(b=>b['Source']==='KPJ').length,            completed: bookings.filter(b=>b['Source']==='KPJ'&&b['Booking Status']==='Completed').length,            color: '#00D26A' },
+    { name: 'Sunway Medical', total: bookings.filter(b=>b['Source']==='Sunway Medical').length, completed: bookings.filter(b=>b['Source']==='Sunway Medical'&&b['Booking Status']==='Completed').length, color: '#9B59B6' },
   ];
 
   const b2bEl = document.getElementById('b2b-completion');
@@ -1494,30 +1588,27 @@ async function loadMasterIntel() {
   if(g('mi-critical')) g('mi-critical').textContent = critical.length;
   if(g('mi-resolved')) g('mi-resolved').textContent = resolved.length;
 
-  // Agent health
-  const agentHealth = [
-    {name:'WATI Agent', icon:'💬', lastRun:'2 mins ago', status:'Active', team:'customer_support'},
-    {name:'Control Tower Agent', icon:'🗼', lastRun:'1 min ago', status:'Active', team:'control_tower'},
-    {name:'Forecast Agent', icon:'📡', lastRun:'5 mins ago', status:'Active', team:'nerve_centre'},
-    {name:'Document Agent', icon:'📋', lastRun:'3 mins ago', status:'Active', team:'driver_support'},
-    {name:'Driver AI Companion', icon:'🤖', lastRun:'Just now', status:'Active', team:'driver_support'},
-    {name:'Dynamic Fare Intelligence', icon:'💰', lastRun:'8 mins ago', status:'Active', team:'pricing'},
-    {name:'Driver Earnings Coach', icon:'📊', lastRun:'11:00 PM', status:'Scheduled', team:'driver_support'},
-  ];
+  // Agent health — live from "System — Agent Health" tab
+  const AGENT_ICONS = {'WATI Agent':'💬','Control Tower Agent':'🗼','Forecast Agent':'📡','Document Agent':'📋','Driver AI Companion':'🤖','Dynamic Fare Intelligence':'💰','Driver Earnings Coach':'📊','Master Intelligence':'🧠'};
+  const agentHealth = await fetch('/api/agent-health').then(r=>r.json()).catch(()=>[]);
+  if(g('mi-agents')) g('mi-agents').textContent = agentHealth.length;
   const healthEl = g('mi-agent-health');
   if(healthEl) healthEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">'
-    +agentHealth.map(a =>
-      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px">'
-      +'<div style="font-size:22px">'+a.icon+'</div>'
+    +agentHealth.map(a => {
+      const name=a['Agent Name']||''; const status=a['Status']||'Live';
+      const live = status==='Live'||status==='Active';
+      const col = live?'#00D26A':'var(--amber)';
+      return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px">'
+      +'<div style="font-size:22px">'+(AGENT_ICONS[name]||'⚙️')+'</div>'
       +'<div style="flex:1;min-width:0">'
-      +'<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+a.name+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">Last run: '+a.lastRun+'</div>'
+      +'<div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+name+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:2px">Last run: '+(a['Last Run Time']||'')+' · Uptime '+(a['Uptime Percent']||'')+'%</div>'
       +'</div>'
       +'<div style="display:flex;align-items:center;gap:4px;flex-shrink:0">'
-      +'<div style="width:6px;height:6px;border-radius:50%;background:'+(a.status==='Active'?'#00D26A':'var(--amber)')+';box-shadow:0 0 6px '+(a.status==='Active'?'#00D26A':'var(--amber)')+'"></div>'
-      +'<span style="font-size:11px;font-weight:600;color:'+(a.status==='Active'?'var(--green)':'var(--amber)')+'">'+a.status+'</span>'
-      +'</div></div>'
-    ).join('')+'</div>';
+      +'<div style="width:6px;height:6px;border-radius:50%;background:'+col+';box-shadow:0 0 6px '+col+'"></div>'
+      +'<span style="font-size:11px;font-weight:600;color:'+(live?'var(--green)':'var(--amber)')+'">'+status+'</span>'
+      +'</div></div>';
+    }).join('')+'</div>';
 
   // Cross-agent patterns
   renderMiPatterns();
@@ -1676,25 +1767,27 @@ async function loadTower() {
           + '<span style="color:var(--text3);margin-left:8px">Reminder sent, no response. Call now.</span>'
           + '</div></div>';
       }).join('');
-  const prematureNoShow = [
-    { id:'BK0034', driver:'DRV023 Hafiz bin Salleh', customer:'Priya Nair', pickup:'KLCC', scheduledPickup:'14:30', noshow:'14:32', minsAfterPickup:2 },
-    { id:'BK0078', driver:'DRV056 Rajan Muthu', customer:'Lee Wei Ming', pickup:'Sunway Pyramid', scheduledPickup:'09:15', noshow:'09:17', minsAfterPickup:2 },
-  ];
+  // No Show log — live from Bookings tab (Booking Status = No Show)
+  const noShowBookings = bookings.filter(b => b['Booking Status']==='No Show');
   const noshowListEl = g('ct-noshow-list');
-  if(noshowListEl) noshowListEl.innerHTML = prematureNoShow.map(ns => {
-    const ev = ns.scheduledPickup.split(':')[0] + ':' + String(parseInt(ns.scheduledPickup.split(':')[1])+5).padStart(2,'0');
-    return '<div style="padding:18px 0;border-bottom:1px solid var(--border)">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-      + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:var(--amber)">' + ns.id + '</span>'
-      + '<span class="badge bg-amber">Premature No Show</span></div>'
-      + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px">Driver: ' + ns.driver + '</div>'
-      + '<div style="font-size:14px;color:var(--text2);margin-bottom:12px">Customer: ' + ns.customer + ' - ' + ns.pickup + '</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px;background:rgba(240,165,0,0.05);border-radius:6px;border:1px solid rgba(240,165,0,0.15)">'
-      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Scheduled Pickup</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--text)">' + ns.scheduledPickup + '</div></div>'
-      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Earliest Valid No Show</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--green)">' + ev + '</div></div>'
-      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">No Show Pressed</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--amber)">' + ns.noshow + '</div></div>'
-      + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Time Waited</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--red)">' + ns.minsAfterPickup + ' min only. Min is 5.</div></div>'
-      + '</div></div>';
+  if(noshowListEl) noshowListEl.innerHTML = noShowBookings.length===0
+    ? '<div style="color:var(--text3);font-size:14px;padding:16px 0">No no-show bookings today</div>'
+    : noShowBookings.slice(0,8).map(b => {
+      const pt = (b['Pickup Time']||'00:00');
+      const hh = parseInt(pt.split(':')[0])||0, mm = parseInt(pt.split(':')[1])||0;
+      const evMin = mm+5;
+      const ev = evMin>=60 ? String(hh+1).padStart(2,'0')+':'+String(evMin-60).padStart(2,'0') : String(hh).padStart(2,'0')+':'+String(evMin).padStart(2,'0');
+      return '<div style="padding:18px 0;border-bottom:1px solid var(--border)">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+        + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:var(--amber)">' + (b['Booking ID']||'') + '</span>'
+        + srcBadge(b['Source'])
+        + '<span class="badge bg-red">No Show</span></div>'
+        + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px">Driver: ' + (b['Driver Name']||'Unassigned') + '</div>'
+        + '<div style="font-size:14px;color:var(--text2);margin-bottom:12px">Customer: ' + (b['Customer Name']||'') + ' - ' + (b['Pickup Location']||'') + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px;background:rgba(240,165,0,0.05);border-radius:6px;border:1px solid rgba(240,165,0,0.15)">'
+        + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Scheduled Pickup</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--text)">' + pt + '</div></div>'
+        + '<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Earliest Valid No Show (pickup + 5 min)</div><div style="font-size:17px;font-weight:700;font-family:DM Mono,monospace;color:var(--green)">' + ev + '</div></div>'
+        + '</div></div>';
   }).join('');
   const sorted = [...adv].sort((a,b) => {
     const au = a['Driver Response']==='No Response'&&a['Booking Status']==='Confirmed'?0:1;
@@ -1754,12 +1847,12 @@ async function loadTower() {
         + '<div style="font-size:14px;color:var(--red)">Reason: ' + (b['Cancellation Reason']||'Not specified') + '</div>'
         + '</div>'
       ).join('');
-  const b2bPartners = ['KLOOK','KKdays','KPJ','Sunway Medical','Pantai Medical'];
+  const b2bPartners = ['KLOOK','KKdays','KPJ','Sunway Medical'];   // live from Bookings Source
   const b2bEl = g('ct-b2b-body');
   if(b2bEl) b2bEl.innerHTML = b2bPartners.map(p => {
     const pb = adv.filter(b => b['Source']===p);
-    const pt = p==='Pantai Medical'?21:pb.length;
-    const pc = p==='Pantai Medical'?17:pb.filter(b=>b['Booking Status']==='Completed').length;
+    const pt = pb.length;
+    const pc = pb.filter(b=>b['Booking Status']==='Completed').length;
     const pu = pb.filter(b=>b['Driver Response']==='No Response').length;
     const pca = pb.filter(b=>b['Booking Status']==='Cancelled').length;
     const po = pt-pc-pca;
@@ -1941,19 +2034,22 @@ function renderPerformance() {
 
 
 async function loadDriverTeam() {
-  const [drivers, wati, flights, stats, alerts] = await Promise.all([
+  const [drivers, wati, flights, stats, alerts, zoneDemand] = await Promise.all([
     fetch('/api/drivers').then(r=>r.json()),
     fetch('/api/wati').then(r=>r.json()),
     fetch('/api/flights').then(r=>r.json()),
     fetch('/api/stats').then(r=>r.json()),
-    fetch('/api/master-alerts?team=driver_support').then(r=>r.json()).catch(()=>[])
+    fetch('/api/master-alerts?team=driver_support').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/zone-demand').then(r=>r.json()).catch(()=>[])
   ]);
   const g = id => document.getElementById(id);
 
   // KPIs
-  if(g('dt-active')) g('dt-active').textContent = 60;
-  if(g('dt-gap-zones')) g('dt-gap-zones').textContent = 4;
-  if(g('dt-incentives')) g('dt-incentives').textContent = 3;
+  const incentiveFlights = flights.filter(f=>f['Incentive Triggered']==='Yes');   // from Flights tab
+  if(g('dt-active')) g('dt-active').textContent = stats.drivers.compliant;        // Drivers tab Active count
+  const shortZones = (zoneDemand||[]).filter(z=>parseInt(z['Gap']||0)>0);          // Zone Demand tab
+  if(g('dt-gap-zones')) g('dt-gap-zones').textContent = shortZones.length;
+  if(g('dt-incentives')) g('dt-incentives').textContent = incentiveFlights.length; // Flights tab incentives
   const driverWati = wati.filter(m=>m['Classified Type']==='Driver Status Check'||m['Escalated To']==='Driver Team');
   const avgRating = (drivers.reduce((s,d)=>s+(d['Rating']||0),0)/drivers.length).toFixed(1);
   if(g('dt-avg-rating')) g('dt-avg-rating').textContent = avgRating;
@@ -1961,22 +2057,20 @@ async function loadDriverTeam() {
   // Alerts
   renderAlerts(alerts, 'dt-alerts-list', false);
 
-  // Supply and Demand Gaps
-  const gaps = [
-    {zone:'KLIA2',demand:'Surge',present:18,needed:32},
-    {zone:'Shah Alam',demand:'High',present:2,needed:8},
-    {zone:'Cheras',demand:'High',present:4,needed:9},
-    {zone:'KLIA',demand:'Surge',present:14,needed:22},
-  ];
+  // Supply and Demand Gaps — live from "Demand — Zone Demand" tab
+  const gaps = shortZones.slice().sort((a,b)=>parseInt(b['Gap']||0)-parseInt(a['Gap']||0));
   const gapsEl = g('dt-gaps');
-  if(gapsEl) gapsEl.innerHTML = gaps.map(z =>
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">'
-    +'<div><span style="font-size:14px;font-weight:600;color:var(--text)">'+z.zone+'</span>'
-    +'<span class="badge bg-red" style="margin-left:8px">'+z.demand+'</span></div>'
-    +'<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--red)">'+(z.needed-z.present)+' more drivers needed</div>'
-    +'<div style="font-size:12px;color:var(--text3)">'+z.present+' present / '+z.needed+' needed</div></div>'
-    +'</div>'
-  ).join('');
+  if(gapsEl) gapsEl.innerHTML = gaps.length===0
+    ? '<div style="color:var(--text3);font-size:14px;padding:12px 0">All zones adequately supplied</div>'
+    : gaps.map(z => {
+    const present=parseInt(z['Drivers Present']||0), needed=parseInt(z['Drivers Needed']||0), gap=parseInt(z['Gap']||0);
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">'
+    +'<div><span style="font-size:14px;font-weight:600;color:var(--text)">'+(z['Zone']||'')+'</span>'
+    +'<span class="badge bg-red" style="margin-left:8px">'+(z['Demand Level']||'')+'</span></div>'
+    +'<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--red)">'+gap+' more drivers needed</div>'
+    +'<div style="font-size:12px;color:var(--text3)">'+present+' present / '+needed+' needed</div></div>'
+    +'</div>';
+  }).join('');
 
   // Zone demand chart
   const hourMap = {};
@@ -1998,21 +2092,19 @@ async function loadDriverTeam() {
       +'<div class="dbar-bg"><div class="dbar '+bc[h.level]+'" style="width:'+pct+'%">'+h.level+' — '+h.demand+'</div></div></div>';
   }).join('');
 
-  // Active incentives
+  // Active incentives — live from Flights tab incentive columns
   const incEl = g('dt-incentives-panel');
-  const activeInc = [
-    {zone:'KLIA2',amount:'RM 5/trip',since:'14:00',expires:'16:00',status:'Live'},
-    {zone:'Cheras',amount:'RM 3/trip',since:'15:30',expires:'17:30',status:'Live'},
-    {zone:'Shah Alam',amount:'RM 2/trip',since:'16:00',expires:'18:00',status:'Scheduled'},
-  ];
-  if(incEl) incEl.innerHTML = '<div class="tbl-wrap"><table>'
-    +'<thead><tr><th style="font-size:12px;padding:12px 14px">Zone</th><th style="font-size:12px;padding:12px 14px">Amount</th><th style="font-size:12px;padding:12px 14px">Since</th><th style="font-size:12px;padding:12px 14px">Expires</th><th style="font-size:12px;padding:12px 14px">Status</th></tr></thead><tbody>'
-    +activeInc.map(i =>
-      '<tr><td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+i.zone+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:var(--green)">'+i.amount+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px">'+i.since+'</td>'
-      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px">'+i.expires+'</td>'
-      +'<td style="padding:12px 14px"><span class="badge '+(i.status==='Live'?'bg-green':'bg-amber')+'">'+i.status+'</span></td>'
+  if(incEl) incEl.innerHTML = incentiveFlights.length===0
+    ? '<div style="color:var(--text3);font-size:14px;padding:12px 0">No active incentives</div>'
+    : '<div class="tbl-wrap"><table>'
+    +'<thead><tr><th style="font-size:12px;padding:12px 14px">Flight</th><th style="font-size:12px;padding:12px 14px">Origin</th><th style="font-size:12px;padding:12px 14px">Incentive</th><th style="font-size:12px;padding:12px 14px">Value</th><th style="font-size:12px;padding:12px 14px">Demand</th><th style="font-size:12px;padding:12px 14px">Status</th></tr></thead><tbody>'
+    +incentiveFlights.map(f =>
+      '<tr><td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:var(--red)">'+(f['Flight Number']||'')+'</td>'
+      +'<td style="font-size:14px;padding:12px 14px;font-weight:600;color:var(--text)">'+(f['Origin City']||'')+'</td>'
+      +'<td style="font-size:13px;padding:12px 14px;color:var(--text2)">'+(f['Incentive Type']||'')+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:14px;padding:12px 14px;font-weight:700;color:var(--green)">RM '+(f['Incentive Value (RM)']||'0')+'/trip</td>'
+      +'<td style="padding:12px 14px">'+demandBadge(f['Zone Demand Level']||'Medium')+'</td>'
+      +'<td style="padding:12px 14px"><span class="badge bg-green">Live</span></td>'
       +'</tr>'
     ).join('')+'</tbody></table></div>';
 
@@ -2041,6 +2133,22 @@ async function loadDriverTeam() {
   });
   _perfSort = {col:'trips', dir:-1};
   renderPerformance();
+
+  // Escalated complaints panel — from "CS — Driver Complaints" (Escalated = Yes)
+  const complaintRows = await fetch('/api/driver-complaints').then(r=>r.json()).catch(()=>[]);
+  if(!window._escalatedComplaints) window._escalatedComplaints = {};
+  if(!window._dtActioned) window._dtActioned = {};
+  complaintRows.forEach(c => {
+    const id=c['Complaint ID'];
+    if((c['Escalated']||'').toLowerCase()==='yes' && !window._escalatedComplaints[id]){
+      const obj={id, passenger:c['Passenger Name'], driver:((c['Driver ID']||'')+' '+(c['Driver Name']||'')).trim(),
+        driverName:c['Driver Name'], type:c['Complaint Type'], summary:c['Description'],
+        severity:c['Severity'], status:c['Status'], time:c['Date']};
+      window._escalatedComplaints[id]={findings:c['Description']||'', action:c['Driver Team Action']||'Escalated to Driver Team', time:c['Date']||'', complaint:obj};
+      if(c['Outcome'] && !window._dtActioned[id]) window._dtActioned[id]={outcome:c['Outcome'], by:'Driver Team', time:c['Date']||''};
+    }
+  });
+  if(typeof renderDtComplaints==='function') renderDtComplaints();
 }
 
 // ── CUSTOMER SUPPORT ──────────────────────────────────────────────────────────
@@ -2169,33 +2277,35 @@ function csConfirmResolve(msgId, btn) {
 }
 
 async function loadCustomerSupport() {
-  const [wati, alerts] = await Promise.all([
+  const [wati, alerts, sfRows, safetyRows, refundRows, complaintRows] = await Promise.all([
     fetch('/api/wati').then(r=>r.json()).catch(()=>[]),
-    fetch('/api/master-alerts?team=customer_support').then(r=>r.json()).catch(()=>[])
+    fetch('/api/master-alerts?team=customer_support').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/salesforce-escalations').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/safety-incidents').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/refunds').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/driver-complaints').then(r=>r.json()).catch(()=>[])
   ]);
   const g = id => document.getElementById(id);
   renderAlerts(alerts, 'cs-alerts-list', false);
 
-  // Simulated Salesforce escalations
-  const sfEscalations = [
-    {ref:'SF-2026-0341', time:'08:14', passenger:'Priya Nair', type:'Refund', summary:'Charged for cancelled ride. Driver cancelled but fare deducted.', severity:'High', status:'Pending', handler:'Unassigned'},
-    {ref:'SF-2026-0338', time:'07:45', passenger:'Lee Wei Ming', type:'Fare Dispute', summary:'Surge fare applied during non-peak hour. Passenger disputes RM 45 charge.', severity:'Medium', status:'In Progress', handler:'Amirah (CS)'},
-    {ref:'SF-2026-0335', time:'06:30', passenger:'Rohani binti Ahmad', type:'Driver Conduct', summary:'Driver used inappropriate language. Passenger requests formal action.', severity:'High', status:'Pending', handler:'Unassigned'},
-    {ref:'SF-2026-0330', time:'Yesterday', passenger:'Ganesh Kumar', type:'App Issue', summary:'Cash wallet withdrawal failed 3 times. RM 120 stuck in wallet.', severity:'Medium', status:'Resolved', handler:'Suresh (CS)'},
-    {ref:'SF-2026-0328', time:'Yesterday', passenger:'Tan Mei Lin', type:'Booking', summary:'Advance booking confirmed but driver never arrived. No refund processed.', severity:'High', status:'In Progress', handler:'Amirah (CS)'},
-  ];
+  // Salesforce escalations — live from "CS — Salesforce Escalations"
+  const sfEscalations = sfRows.map(e => ({
+    ref:e['Escalation ID'], time:e['Date Received'], passenger:e['Passenger Name'],
+    type:e['Issue Category'], summary:e['Notes'], severity:e['Severity'],
+    status:e['Status'], handler:e['Assigned To']
+  }));
 
-  // Simulated safety incidents
-  const safetyIncidents = [
-    {ref:'SAF-001', time:'09:23', passenger:'Anonymous', driver:'DRV034 Ahmad Razif', type:'Unsafe Driving', summary:'Passenger reports driver ran 2 red lights and was speeding on KLIA highway.', status:'Under Investigation'},
-    {ref:'SAF-002', time:'Yesterday 22:14', passenger:'Anonymous', driver:'DRV067 Rajan Muthu', type:'Misconduct', summary:'Driver made inappropriate comments. Passenger felt unsafe.', status:'Driver Suspended Pending Review'},
-  ];
+  // Safety incidents — live from "CS — Safety Incidents"
+  const safetyIncidents = safetyRows.map(s => ({
+    ref:s['Incident ID'], time:s['Date'], passenger:s['Passenger Name'],
+    driver:s['Driver Name'], type:s['Incident Type'], summary:s['Action Taken'], status:s['Status']
+  }));
 
   // KPIs
   const customerWati = wati.filter(m => m['Classified Type']!=='Driver Status Check');
-  const pending = sfEscalations.filter(e=>e.status==='Pending').length + customerWati.filter(m=>m['Resolution Status']==='Pending').length;
+  const pending = sfEscalations.filter(e=>e.status!=='Resolved').length + customerWati.filter(m=>m['Resolution Status']!=='Resolved').length;
   const resolved = sfEscalations.filter(e=>e.status==='Resolved').length + customerWati.filter(m=>m['Resolution Status']==='Resolved').length;
-  const refundsPending = sfEscalations.filter(e=>e.type==='Refund'&&e.status!=='Resolved').length;
+  const refundsPending = refundRows.filter(r=>r['Stage']!=='Executed').length;
 
   if(g('cs-wati-total')) g('cs-wati-total').textContent = customerWati.length;
   if(g('cs-sf-total')) g('cs-sf-total').textContent = sfEscalations.length;
@@ -2215,6 +2325,7 @@ async function loadCustomerSupport() {
     else if(t.includes('Fare')) issueTypes['Fare Dispute']++;
   });
   issueTypes['Safety'] = safetyIncidents.length;
+  issueTypes['Refund'] = refundRows.length;
   const totalIssues = Object.values(issueTypes).reduce((a,b)=>a+b,0)||1;
   const issueColors = {Refund:'var(--amber)','Fare Dispute':'var(--cyan)','Driver Conduct':'var(--red)',Safety:'var(--red)',Booking:'var(--text2)','App Issue':'var(--text3)'};
   const breakdownEl = g('cs-issue-breakdown');
@@ -2297,13 +2408,17 @@ async function loadCustomerSupport() {
       +'</tr>';
   }).join('');
 
-  // Refund workflow
-  const refunds = [
-    {id:'REF-001', passenger:'Priya Nair', amount:'RM 45.00', issue:'Charged for driver cancellation', stage:1, acknowledged_by:null, approved_by:null, executed_at:null, channel:'Salesforce'},
-    {id:'REF-002', passenger:'Tan Mei Lin', amount:'RM 78.50', issue:'No show — advance booking', stage:2, acknowledged_by:'Amirah (CS)', acknowledged_at:'10:15', approved_by:null, executed_at:null, channel:'Salesforce'},
-    {id:'REF-003', passenger:'Ahmad Razif bin Hassan', amount:'RM 23.00', issue:'Fare dispute — wrong route', stage:3, acknowledged_by:'Suresh (CS)', acknowledged_at:'08:30', approved_by:'Ruben (Ops)', approved_at:'09:45', executed_at:null, channel:'WATI'},
-    {id:'REF-004', passenger:'Lee Wei Ming', amount:'RM 55.00', issue:'Duplicate charge', stage:4, acknowledged_by:'Amirah (CS)', acknowledged_at:'Yesterday 14:00', approved_by:'Ruben (Ops)', approved_at:'Yesterday 15:30', executed_at:'Yesterday 16:00', channel:'WATI'},
-  ];
+  // Refund workflow — live from "CS — Refunds"
+  const STAGE_NUM = {'Received':1,'Acknowledged':2,'Approved':3,'Executed':4};
+  const refunds = refundRows.map(r => ({
+    id:r['Refund ID'], passenger:r['Passenger Name'],
+    amount:'RM '+parseFloat(r['Refund Amount RM']||0).toFixed(2),
+    issue:r['Reason'], stage:STAGE_NUM[r['Stage']]||1,
+    acknowledged_by:r['Acknowledged By']||null, acknowledged_at:r['Acknowledged Date']||'',
+    approved_by:r['Approved By']||null, approved_at:r['Approved Date']||'',
+    executed_at:r['Executed Date']||null,
+    channel:(r['Cash Wallet Updated']==='Yes'?'Wallet Updated':'In Workflow')
+  }));
   const stages = ['Received','Acknowledged','Approved','Executed to Cash Wallet'];
   const refundEl = g('cs-refund-workflow');
   if(refundEl) refundEl.innerHTML = refunds.map(r =>
@@ -2333,13 +2448,27 @@ async function loadCustomerSupport() {
     +'</div></div>'
   ).join('');
 
-  // Driver complaints
+  // Driver complaints — live from "CS — Driver Complaints"
   if(!window._escalatedComplaints) window._escalatedComplaints = {};
-  window._complaintsData = {
-    'DC-001': {id:'DC-001', passenger:'Norzahra a/l Rajan', driver:'DRV045 Hafiz bin Hassan', driverName:'Hafiz bin Hassan', type:'Rude Behaviour', summary:'Driver was rude and refused to help with luggage.', severity:'Medium', status:'Warning Issued', time:'09:10'},
-    'DC-002': {id:'DC-002', passenger:'Suraya binti Zainudin', driver:'DRV023 Suresh binti Salleh', driverName:'Suresh binti Salleh', type:'Wrong Route', summary:'Driver took a longer route. Passenger suspects intentional.', severity:'Low', status:'Dismissed', time:'08:45'},
-    'DC-003': {id:'DC-003', passenger:'Meena a/l Kumar', driver:'DRV067 Rajan Muthu', driverName:'Rajan Muthu', type:'Asked Extra Payment', summary:'Driver demanded RM 10 cash on top of app fare.', severity:'High', status:'Under Investigation', time:'07:30'},
-  };
+  if(!window._dtActioned) window._dtActioned = {};
+  window._complaintsData = {};
+  complaintRows.forEach(c => {
+    const id = c['Complaint ID'];
+    window._complaintsData[id] = {
+      id, passenger:c['Passenger Name'],
+      driver:((c['Driver ID']||'')+' '+(c['Driver Name']||'')).trim(),
+      driverName:c['Driver Name'], type:c['Complaint Type'], summary:c['Description'],
+      severity:c['Severity'], status:c['Status'], time:c['Date']
+    };
+    if((c['Escalated']||'').toLowerCase()==='yes' && !window._escalatedComplaints[id]) {
+      window._escalatedComplaints[id] = {
+        findings:c['Description']||'', action:c['Driver Team Action']||'Escalated to Driver Team',
+        time:c['Date']||'', complaint:window._complaintsData[id]
+      };
+      if(c['Outcome'] && !window._dtActioned[id])
+        window._dtActioned[id] = {outcome:c['Outcome'], by:'Driver Team', time:c['Date']||''};
+    }
+  });
   const complaints = Object.values(window._complaintsData);
   const compEl = g('cs-complaints-panel');
   if(compEl) compEl.innerHTML = complaints.map(c => {
@@ -2416,36 +2545,35 @@ function switchAlertView(view) {
 }
 
 // ── SPARK / DEMAND MAP ───────────────────────────────────────────────────────
-const sparkZones = [
-  { id:'klia2',   name:'KLIA2',         left:'52%', top:'82%', demand:'Surge',  drivers:18, needed:32, traffic:'Heavy',   color:'#E8002D', rec:'RM 5/trip, ongoing' },
-  { id:'klia',    name:'KLIA',          left:'44%', top:'76%', demand:'Surge',  drivers:14, needed:22, traffic:'Moderate',color:'#E8002D', rec:'RM 5/trip, ongoing' },
-  { id:'putrajaya',name:'Putrajaya',    left:'56%', top:'76%', demand:'Medium', drivers:6,  needed:5,  traffic:'Light',   color:'#F0A500', rec:null },
-  { id:'cyberjaya',name:'Cyberjaya',    left:'50%', top:'70%', demand:'Medium', drivers:5,  needed:6,  traffic:'Light',   color:'#F0A500', rec:'RM 2/trip, tech workers peak 6PM' },
-  { id:'serkem',  name:'Seri Kembangan',left:'55%', top:'58%', demand:'Medium', drivers:4,  needed:6,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, activate now' },
-  { id:'kajang',  name:'Kajang',        left:'68%', top:'62%', demand:'High',   drivers:3,  needed:7,  traffic:'Moderate',color:'#FF6D00', rec:'RM 3/trip, activate now' },
-  { id:'cheras',  name:'Cheras',        left:'60%', top:'46%', demand:'High',   drivers:4,  needed:9,  traffic:'Heavy',   color:'#FF6D00', rec:'RM 3/trip, activate now' },
-  { id:'ampang',  name:'Ampang',        left:'68%', top:'36%', demand:'Low',    drivers:8,  needed:5,  traffic:'Light',   color:'#00D26A', rec:null },
-  { id:'bb',      name:'Bukit Bintang', left:'52%', top:'30%', demand:'Medium', drivers:7,  needed:8,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, evening peak' },
-  { id:'pj',      name:'Petaling Jaya', left:'38%', top:'40%', demand:'High',   drivers:12, needed:10, traffic:'Heavy',   color:'#FF6D00', rec:'RM 4/trip, rain 6PM' },
-  { id:'damansara',name:'Damansara',    left:'42%', top:'28%', demand:'Medium', drivers:9,  needed:8,  traffic:'Moderate',color:'#F0A500', rec:null },
-  { id:'montkiara',name:'Mont Kiara',   left:'46%', top:'20%', demand:'Low',    drivers:10, needed:7,  traffic:'Light',   color:'#00D26A', rec:null },
-  { id:'sunway',  name:'Sunway',        left:'34%', top:'48%', demand:'Medium', drivers:8,  needed:9,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, mall crowd 7PM' },
-  { id:'subang',  name:'Subang',        left:'28%', top:'52%', demand:'Medium', drivers:9,  needed:7,  traffic:'Light',   color:'#F0A500', rec:null },
-  { id:'puchong', name:'Puchong',       left:'36%', top:'60%', demand:'High',   drivers:5,  needed:9,  traffic:'Heavy',   color:'#FF6D00', rec:'RM 3/trip, LDP congestion' },
-  { id:'shah',    name:'Shah Alam',     left:'22%', top:'42%', demand:'Medium', drivers:2,  needed:8,  traffic:'Moderate',color:'#F0A500', rec:'RM 2/trip, activate 5PM' },
-  { id:'klang',   name:'Klang',         left:'14%', top:'54%', demand:'Low',    drivers:11, needed:6,  traffic:'Light',   color:'#00D26A', rec:null },
-  { id:'batucaves',name:'Batu Caves',   left:'50%', top:'14%', demand:'Low',    drivers:6,  needed:4,  traffic:'Light',   color:'#00D26A', rec:null },
+// Map geometry is presentation-only (coordinates are not stored in the Sheet).
+// All zone DATA (present/needed/demand/gap/pickup/wait) comes from the
+// "Demand — Zone Demand" tab via /api/zone-demand.
+const ZONE_POS = {
+  'KLIA2':{left:'50%',top:'86%'}, 'KLIA1':{left:'44%',top:'80%'}, 'Sepang':{left:'58%',top:'88%'},
+  'Putrajaya':{left:'52%',top:'72%'}, 'Cyberjaya':{left:'46%',top:'68%'},
+  'Klang':{left:'12%',top:'52%'}, 'Shah Alam':{left:'22%',top:'46%'}, 'Subang':{left:'30%',top:'44%'},
+  'Petaling Jaya':{left:'40%',top:'44%'}, 'Puchong':{left:'40%',top:'60%'}, 'Bangsar':{left:'50%',top:'48%'},
+  'Damansara':{left:'40%',top:'30%'}, 'Mont Kiara':{left:'48%',top:'26%'}, 'Kepong':{left:'40%',top:'16%'},
+  'Setapak':{left:'58%',top:'26%'}, 'Wangsa Maju':{left:'64%',top:'20%'},
+  'Cheras':{left:'62%',top:'50%'}, 'Ampang':{left:'68%',top:'34%'}
+};
+const ZONE_CONN = [
+  ['KLIA2','KLIA1'],['KLIA1','Sepang'],['KLIA2','Cyberjaya'],['Cyberjaya','Putrajaya'],
+  ['Cyberjaya','Puchong'],['Puchong','Petaling Jaya'],['Petaling Jaya','Subang'],['Subang','Shah Alam'],
+  ['Shah Alam','Klang'],['Petaling Jaya','Bangsar'],['Bangsar','Cheras'],['Cheras','Ampang'],
+  ['Petaling Jaya','Damansara'],['Damansara','Mont Kiara'],['Mont Kiara','Kepong'],['Mont Kiara','Setapak'],
+  ['Setapak','Wangsa Maju'],['Wangsa Maju','Ampang'],['Bangsar','Mont Kiara']
 ];
-
-const sparkConnections = [
-  ['klia2','klia'],['klia2','cyberjaya'],['cyberjaya','putrajaya'],
-  ['cyberjaya','serkem'],['serkem','kajang'],['kajang','cheras'],
-  ['cheras','ampang'],['cheras','bb'],['bb','damansara'],
-  ['damansara','montkiara'],['damansara','pj'],['pj','sunway'],
-  ['sunway','subang'],['subang','shah'],['shah','klang'],
-  ['pj','puchong'],['puchong','cyberjaya'],['bb','ampang'],
-  ['montkiara','batucaves'],['klia','puchong']
-];
+const ZONE_DEMAND_COLOR = {Surge:'#E8002D',High:'#FF6D00',Medium:'#F0A500',Low:'#00D26A'};
+function zoneSlug(n){ return (n||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function zoneTraffic(d){ return (d==='Surge'||d==='High')?'Heavy':(d==='Medium')?'Moderate':'Light'; }
+function zoneRec(gap){
+  if(gap>=8) return 'RM 5/trip, critical shortage';
+  if(gap>=5) return 'RM 4/trip, activate now';
+  if(gap>=3) return 'RM 3/trip, activate now';
+  if(gap>=1) return 'RM 2/trip, watch';
+  return null;
+}
 
 const trafficColors = { Heavy:'#E8002D', Moderate:'#F0A500', Light:'#00D26A' };
 const ringSize = { Surge:44, High:36, Medium:30, Low:26 };
@@ -2524,11 +2652,23 @@ function updateActivationLog() {
   }).join('');
 }
 
-function loadSpark() {
+async function loadSpark() {
   const zonesEl = document.getElementById('spark-zones');
   const zoneListEl = document.getElementById('spark-zone-list');
   const recEl = document.getElementById('spark-recommendations');
   if(!zonesEl) return;
+
+  // Build zones live from "Demand — Zone Demand"
+  const rows = await fetch('/api/zone-demand').then(r=>r.json()).catch(()=>[]);
+  const sparkZones = rows.map(r => {
+    const name=r['Zone']; const demand=r['Demand Level']||'Medium';
+    const drivers=parseInt(r['Drivers Present']||0), needed=parseInt(r['Drivers Needed']||0);
+    const gap=parseInt((r['Gap']!==undefined&&r['Gap']!=='')?r['Gap']:(needed-drivers));
+    const pos=ZONE_POS[name]||{left:'50%',top:'50%'};
+    return {id:zoneSlug(name), name, left:pos.left, top:pos.top, demand, drivers, needed, gap,
+      traffic:zoneTraffic(demand), color:ZONE_DEMAND_COLOR[demand]||'#F0A500',
+      pickup:r['Top Pickup Point']||'', wait:r['Avg Wait Time Minutes']||'', rec:zoneRec(gap)};
+  });
 
   // Render zone nodes on HUD map
   zonesEl.innerHTML = sparkZones.map(z => {
@@ -2552,9 +2692,9 @@ function loadSpark() {
     canvas.height = parent.offsetHeight;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    sparkConnections.forEach(([a,b])=>{
-      const ea = zonesEl.querySelector(`[title="${sparkZones.find(z=>z.id===a)?.name}"]`);
-      const eb = zonesEl.querySelector(`[title="${sparkZones.find(z=>z.id===b)?.name}"]`);
+    ZONE_CONN.forEach(([a,b])=>{
+      const ea = zonesEl.querySelector(`[title="${a}"]`);
+      const eb = zonesEl.querySelector(`[title="${b}"]`);
       if(!ea||!eb) return;
       const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
       const pr = canvas.getBoundingClientRect();
@@ -2566,8 +2706,8 @@ function loadSpark() {
     });
   }, 100);
 
-  // Zone list
-  if(zoneListEl) zoneListEl.innerHTML = sparkZones.map(z => {
+  // Zone list (shortages first)
+  if(zoneListEl) zoneListEl.innerHTML = sparkZones.slice().sort((a,b)=>b.gap-a.gap).map(z => {
     const gap = z.needed - z.drivers;
     const surplus = z.drivers - z.needed;
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
@@ -2583,8 +2723,8 @@ function loadSpark() {
     </div>`;
   }).join('');
 
-  // Recommendations
-  const recs = sparkZones.filter(z=>z.rec);
+  // Recommendations (largest gaps first)
+  const recs = sparkZones.filter(z=>z.rec).sort((a,b)=>b.gap-a.gap);
   if(recEl) recEl.innerHTML = recs.map(z =>
     `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(232,0,45,0.08)" id="rec-row-${z.id}">
       <div>
@@ -2594,6 +2734,135 @@ function loadSpark() {
       <div id="rec-btn-${z.id}" onclick="activateIncentive('${z.id}','${z.name}','${z.rec}')" style="padding:6px 14px;background:rgba(232,0,45,0.1);border:1px solid rgba(232,0,45,0.2);border-radius:4px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer;white-space:nowrap;letter-spacing:0.5px;transition:all 0.3s">Activate</div>
     </div>`
   ).join('');
+}
+
+// ═══════════════ AIRPORT QUEUE (SPARK) ═══════════════
+const AQ_COLOR = {OK:'var(--green)', WATCH:'var(--amber)', HIGH:'#FF6D00', CRITICAL:'var(--red)'};
+const AQ_ROWCLASS = {CRITICAL:'aq-row-critical', HIGH:'aq-row-high', WATCH:'aq-row-watch', OK:''};
+const AQ_QDESC = {
+  priority: 'Dropped a passenger at KLIA/KLIA2 this session — auto-entered on dropoff.',
+  community: 'Hit last month’s KPI target — whitelisted, joins on airport entry.',
+  normal: 'All other active drivers entering the airport zone.'
+};
+
+async function loadAirport() {
+  let d;
+  try { d = await fetch('/api/airport-queue').then(r=>r.json()); }
+  catch(e){ return; }
+  if (!d || d.error) return;
+
+  // 1 · Header badge + timestamp
+  const badge = document.getElementById('aq-badge');
+  if (d.source === 'live'){ badge.className='aq-badge live'; badge.innerHTML='<span class="pdot"></span> LIVE'; }
+  else { badge.className='aq-badge sim'; badge.textContent='SIMULATED'; }
+  document.getElementById('aq-updated').textContent = 'Last updated '+(d.last_updated||'');
+
+  // 2 · Three queue cards
+  document.getElementById('aq-queue-cards').innerHTML = (d.queues||[]).map(q=>`
+    <div class="aq-qcard ${q.key}">
+      <div class="aq-alloc">${q.allocation_pct}%</div>
+      <div class="aq-qcount">${q.count}</div>
+      <div class="aq-qname">${q.label}</div>
+      <div class="aq-qdesc">${AQ_QDESC[q.key]||''}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px">${q.allocation_pct}% of airport bookings allocated here</div>
+    </div>`).join('');
+
+  // Per-queue gap (Now)
+  const qg = d.queue_gap||{};
+  document.getElementById('aq-queue-gap').innerHTML = ['priority','community','normal'].filter(k=>qg[k]).map(k=>{
+    const g = qg[k]; const col = AQ_COLOR[g.status]||'var(--text2)';
+    const gapTxt = g.gap>0 ? ('Gap: '+g.gap) : (g.gap<0 ? (Math.abs(g.gap)+' spare') : 'Balanced');
+    return `<div class="aq-gap-row">
+      <div><span style="font-size:12px;font-weight:600;color:var(--text)">${g.label}</span>
+        <span class="badge" style="margin-left:8px;background:${col}1a;color:${col};border:1px solid ${col}33">${g.status}</span></div>
+      <div style="text-align:right">
+        <span class="aq-gap-nums" style="color:var(--text2)">${g.needed} needed</span>
+        <span class="aq-gap-nums" style="color:var(--text3);margin:0 6px">/</span>
+        <span class="aq-gap-nums" style="color:var(--text)">${g.present} present</span>
+        <span class="aq-gap-nums" style="color:${col};margin-left:10px">${gapTxt}</span>
+      </div></div>`;
+  }).join('');
+
+  // 3 · Forecast timeline
+  document.getElementById('aq-forecast-body').innerHTML = (d.forecast||[]).map(r=>{
+    const col = AQ_COLOR[r.status]||'var(--text2)';
+    const gapStr = r.gap>0?('+'+r.gap):(''+r.gap);
+    return `<tr class="${AQ_ROWCLASS[r.status]||''}">
+      <td style="font-weight:700;color:var(--text)">${r.label}</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--text2)">${r.clock}</td>
+      <td>${r.flights}</td><td>${r.pax}</td><td>${r.aar}</td>
+      <td style="font-weight:700;color:var(--text)">${r.needed}</td><td>${r.present}</td>
+      <td style="font-family:'DM Mono',monospace;font-weight:700;color:${col}">${gapStr}</td>
+      <td><span class="badge" style="background:${col}1a;color:${col};border:1px solid ${col}33">${r.status}</span></td>
+    </tr>`;
+  }).join('');
+
+  // 4 · Flight-by-flight breakdown, grouped by forecast window
+  const byNo = {}; (d.flights||[]).forEach(f=>byNo[f.flight_number]=f);
+  let fhtml = '';
+  (d.forecast||[]).forEach(w=>{
+    if(!w.flight_numbers || !w.flight_numbers.length) return;
+    const col = AQ_COLOR[w.status]||'var(--text2)';
+    fhtml += `<div class="aq-win-head">${w.label} · ${w.clock} · ${w.flights} flight${w.flights>1?'s':''}
+      <span class="badge" style="background:${col}1a;color:${col};border:1px solid ${col}33">${w.status}</span></div>`;
+    w.flight_numbers.forEach(no=>{
+      const f = byNo[no]; if(!f) return;
+      const delayBadge = f.delay_minutes>0
+        ? `<span class="badge bg-red" style="font-size:9px">+${f.delay_minutes} min</span>`
+        : `<span class="badge bg-green" style="font-size:9px">On time</span>`;
+      const actual = f.actual_pax>0 ? `<div style="font-size:10px;color:var(--text3);margin-top:6px">Live data cross-check: ${f.actual_pax} pax on board</div>` : '';
+      fhtml += `<div class="aq-fcard">
+        <div class="aq-fhead">
+          <div><div class="aq-fno">${f.flight_number}</div>
+            <div class="aq-forigin">${f.origin_city} (${f.origin_code}) · ${f.airline||''}</div></div>
+          <div style="text-align:right">${delayBadge}
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-top:5px">${f.scheduled}${f.actual && f.actual!==f.scheduled?' → '+f.actual:''}</div></div>
+        </div>
+        <div style="font-size:11px;color:var(--text2)">Estimated passengers: <b style="color:var(--text)">${f.est_pax}</b>
+          <span style="color:var(--text3)">(${f.aircraft_type} · ${f.seats} seats × ${f.load_factor_pct}% load factor)</span></div>
+        <div class="aq-calc">
+          <div><b>${f.est_pax}</b> pax <span class="step">× 10%</span> AAR booking rate <span class="step">=</span> <span class="res">${f.aar_bookings}</span> expected AAR bookings</div>
+          <div style="border-top:1px solid var(--border);margin-top:5px;padding-top:5px">Expected AAR bookings: <span class="res">${f.aar_bookings}</span></div>
+        </div>${actual}
+      </div>`;
+    });
+  });
+  document.getElementById('aq-flights').innerHTML = fhtml || '<div style="color:var(--text3);font-size:12px">No arrivals in the next 2 hours.</div>';
+
+  // 5 · Deployment recommendation
+  const dep = d.deployment;
+  if (dep && dep.drivers && dep.drivers.length){
+    document.getElementById('aq-deploy').innerHTML = `
+      <div class="section-label mt-md">Deployment Recommendation</div>
+      <div class="panel" style="border:1px solid rgba(232,0,45,0.28)">
+        <div class="panel-head" style="background:rgba(232,0,45,0.04)">
+          <div><div class="panel-title" style="color:var(--red)">⚠ Priority Queue Gap — ${dep.total_gap} Driver${dep.total_gap>1?'s':''} Short</div>
+            <div class="panel-sub">Recommended incentive: <b style="color:var(--green)">RM ${dep.incentive_rm} per trip</b> · Drivers within ~30 min of KLIA2</div></div>
+        </div>
+        <div class="panel-body">
+          ${dep.drivers.map(dr=>`<div class="aq-deploy-driver">
+            <div><span style="font-size:12px;font-weight:600;color:var(--text)">${dr.name}</span>
+              <span class="badge bg-blue" style="margin-left:6px;font-size:9px">${dr.zone}</span>
+              <span style="font-size:11px;color:var(--text3);margin-left:6px">★ ${dr.rating} · ${dr.queue_type||''}</span></div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber)">${dr.eta_minutes} min away</span>
+              <button class="btn btn-red" onclick="deployAirportDriver(this)">Deploy</button>
+            </div></div>`).join('')}
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('aq-deploy').innerHTML = '';
+  }
+
+  // 6 · Assumptions (reflect live values)
+  const a = d.assumptions||{};
+  if(a.aar_booking_rate_pct) document.getElementById('aq-a-ride').textContent = a.aar_booking_rate_pct+'% of arriving passengers';
+  if(a.cycle_hours) document.getElementById('aq-a-cycle').textContent = a.cycle_hours+' hours per trip (1h trip + 1h return)';
+  if(a.load_factor_pct) document.getElementById('aq-a-load').textContent = a.load_factor_pct+'% of aircraft capacity';
+}
+
+function deployAirportDriver(btn){
+  btn.outerHTML = '<span class="badge bg-green" style="font-size:10px">✓ DEPLOYED</span>';
 }
 
 async function loadAll() {
@@ -2607,7 +2876,8 @@ async function loadAll() {
   else if (id === 'tab-driverteam-content') await loadDriverTeam();
   else if (id === 'tab-customer-content') await loadCustomerSupport();
   else if (id === 'tab-pricing-content') await loadPricing();
-  else if (id === 'tab-spark-content') loadSpark();
+  else if (id === 'tab-spark-content') await loadSpark();
+  else if (id === 'tab-airport-content') loadAirport();
 }
 
 function showTab(name) {
@@ -2617,6 +2887,122 @@ function showTab(name) {
   document.getElementById('tab-'+name).classList.add('active');
   loadAll();
 }
+
+// ═══════════════ "HOW THIS WORKS" DATA-FLOW PANELS + BIGQUERY NOTE ═══════════════
+const BQ_NOTE = "Demo uses Google Sheet as data source. In production each agent connects to AirAsia Ride’s BigQuery database via read-only service account access. The data team grants permission on the relevant dataset. Agents query BigQuery directly — no Looker Studio delay. Zero code change required — one environment variable update switches the data source from Sheet to BigQuery.";
+
+const TAB_FLOWS = {
+  nerve: {
+    source: {demo:"Google Sheet (Bookings, Drivers, WATI, Flights tabs)", prod:"BigQuery — aar_bookings, aar_drivers tables", updated:"every 5 minutes via Master Intelligence agent"},
+    agent: {name:"MASTER INTELLIGENCE", lines:["Reads all agent outputs simultaneously every 5 minutes.","Detects cross-table patterns.","Calculates KPIs: GMV, completion rate, avg fare.","Generates alerts when thresholds crossed."]},
+    output: ["Live KPI dashboard.","Master Intelligence alert panel.","Performance comparison week on week.","Morning email to management at 7AM."]
+  },
+  master: {
+    source: {demo:"Google Sheet (all tabs) + aar_master_alerts table", prod:"BigQuery across all aar_ datasets", updated:"every 5 minutes via Master Intelligence agent"},
+    agent: {name:"MASTER INTELLIGENCE", lines:["Reads every agent’s output together.","Correlates patterns across compliance, bookings, support and demand.","Scores each agent’s health and throughput.","Surfaces one prioritised, de-duplicated alert feed."]},
+    output: ["Cross-agent pattern cards.","Agent health monitor.","Unified alert feed filtered by priority.","Nerve-centre escalations."]
+  },
+  tower: {
+    source: {demo:"Google Sheet — Bookings tab (advance bookings only)", prod:"AAR Admin Portal API or BigQuery bookings table", updated:"every 10 minutes via TOWER agent"},
+    agent: {name:"TOWER", lines:["Reads all advance bookings for current shift.","Sets 45-minute reminder timer per booking.","Monitors driver response after reminder.","Flags no-response bookings as urgent after 10 minutes.","Detects premature No Show (pressed before pickup + 5 min).","Monitors B2B partner bookings separately."]},
+    output: ["Live booking board colour coded Green/Yellow/Red/Orange.","Urgent bookings surfaced at top with driver phone number.","Premature No Show log with timestamps.","Cancellation alerts with reason.","B2B partner completion rates."]
+  },
+  driver: {
+    source: {demo:"Google Sheet — Drivers tab", prod:"BigQuery — aar_drivers table", updated:"once daily at 12:01 AM via PULSE agent"},
+    agent: {name:"PULSE", lines:["Runs at 12:01 AM daily.","Checks each driver’s 4 documents: PSV, EVP, Insurance, PUSPAKOM.","Calculates days until expiry for each document.","Updates compliance status: Active, Lapsing, Lapsed.","Sends WATI reminder to drivers within 30 days of expiry.","Calculates BUDI95 tier based on monthly KM.","Generates APAD report on demand."]},
+    output: ["Driver compliance dashboard.","Lapsing drivers table sorted by urgency.","Lapsed drivers table with BLOCKED status.","BUDI95 tier counts with Download Report button.","APAD compliance report on button click."]
+  },
+  driverteam: {
+    source: {demo:"Google Sheet — Flights tab, Drivers tab", prod:"Malaysia Airports scraper for flights, BigQuery for driver data", updated:"every 30 minutes via SPARK agent"},
+    agent: {name:"SPARK", lines:["Scrapes KLIA2 arrivals every 30 minutes.","Calculates demand per zone using passenger counts.","Monitors events from Ticket2u and Eventbrite.","Identifies supply gaps per zone.","Generates incentive recommendations.","Sends Driver Team Lead positioning brief at 6AM."]},
+    output: ["Zone demand map with driver counts.","Airport demand by hour chart.","Active incentives table.","Driver performance table.","Supply gap alerts."]
+  },
+  customer: {
+    source: {demo:"Google Sheet — WATI Messages tab", prod:"WATI webhook (live incoming messages) + Salesforce email integration", updated:"every 15 minutes via RELAY agent"},
+    agent: {name:"RELAY", lines:["Reads all incoming WATI messages.","Classifies each: Driver Status Check, Refund, Reschedule, Driver Complaint, General Enquiry.","Auto-resolves straightforward cases.","Routes complex cases to the correct team with context.","Monitors the 24-hour chat expiry window.","Sends promo code on validated complaint."]},
+    output: ["WATI message feed with classification badges.","SLA expiry colour coding.","Salesforce escalation list with severity.","Refund workflow tracker (4-stage).","Safety incident panel.","Resolution rate KPI."]
+  },
+  pricing: {
+    source: {demo:"Google Sheet — Fare Intelligence + Flights tabs", prod:"BigQuery fare + trips tables, competitor feeds", updated:"every 15 minutes via Fare Intelligence agent"},
+    agent: {name:"FARE INTELLIGENCE", lines:["Monitors competitor pricing and demand elasticity.","Recommends fare multipliers per zone and time band.","Flags loss-making routes and fare leakage.","Aligns surge with live supply/demand from SPARK."]},
+    output: ["Zone fare recommendation board.","Surge multiplier panel.","Competitor comparison.","Margin and leakage alerts."]
+  },
+  spark: {
+    source: {demo:"Google Sheet — Flights + Drivers tabs", prod:"Malaysia Airports scraper + BigQuery driver locations", updated:"every 30 minutes via SPARK agent"},
+    agent: {name:"SPARK", lines:["Maps live driver supply vs demand across Klang Valley zones.","Factors weather, traffic and scheduled events.","Identifies surge and shortage zones.","Recommends targeted incentives per zone."]},
+    output: ["Klang Valley live demand map.","Zone status list (supply vs demand).","SPARK incentive recommendations.","Activation log."]
+  },
+  airport: {
+    source: {demo:"Malaysia Airports website scraper + Google Sheet Flights tab fallback", prod:"Malaysia Airports scraper + AviationStack API for passenger counts", updated:"every 30 minutes via SPARK agent"},
+    agent: {name:"SPARK", lines:["Scrapes KLIA2 arrivals.","Estimates passengers using 84% load factor × aircraft type.","Calculates AAR demand: passengers × 10% = expected AAR bookings.","Calculates drivers needed using 2-hour cycle logic.","Checks current driver supply per queue type.","Generates 2-hour forecast.","Triggers deployment recommendation when gap detected."]},
+    output: ["Three queue status cards with driver counts.","2-hour forecast timeline.","Flight-by-flight demand breakdown with visible logic.","Deployment recommendation panel.","Assumptions panel."]
+  },
+  companion: {
+    source: {demo:"Google Sheet — Drivers tab for driver context", prod:"BigQuery driver data + live WATI messages", updated:"real-time on driver message receipt"},
+    agent: {name:"DRIVER AI COMPANION", lines:["Layer 1: FAQ cache — 30 pre-loaded questions, zero API cost.","Layer 2: Response cache — repeated questions, zero API cost.","Layer 3: Claude API call — personalised questions only.","Driver memory updated nightly at midnight, injected into every Layer 3 response.","Supports Malay, English, Tamil."]},
+    output: ["Instant driver response via WhatsApp simulation.","Cache hit rate displayed (cost savings visible).","Conversation log per driver.","FAQ hit count per question."]
+  }
+};
+
+function toggleHowWorks(el){
+  const box = el.closest('.howworks');
+  const body = box.querySelector('.howworks-body');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  box.classList.toggle('open', !open);
+}
+
+function injectHowWorks(){
+  // one-time CSS
+  if(!document.getElementById('howworks-css')){
+    const s = document.createElement('style'); s.id='howworks-css';
+    s.textContent = `
+      .howworks{margin-bottom:16px;border:1px solid var(--border);border-radius:9px;background:var(--bg3);overflow:hidden}
+      .howworks-toggle{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);cursor:pointer;display:flex;align-items:center;gap:8px;user-select:none}
+      .howworks-toggle:hover{color:var(--text)}
+      .hw-caret{transition:transform 0.2s;font-size:10px}
+      .howworks.open .hw-caret{transform:rotate(90deg)}
+      .howworks-body{padding:0 16px 16px}
+      .hw-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch}
+      .hw-node{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+      .hw-source{border-top:3px solid var(--blue)} .hw-agent{border-top:3px solid var(--red)} .hw-output{border-top:3px solid var(--green)}
+      .hw-node-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+      .hw-source .hw-node-label{color:var(--blue)} .hw-agent .hw-node-label{color:var(--red)} .hw-output .hw-node-label{color:var(--green)}
+      .hw-node-body{font-size:11px;color:var(--text2);line-height:1.6}
+      .hw-node-body ul{margin:0;padding-left:15px} .hw-node-body li{margin-bottom:3px}
+      .hw-node-body b{color:var(--text)}
+      .hw-arrow{display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:18px;font-weight:700}
+      .bq-note{margin-top:14px;background:rgba(0,136,255,0.07);border-left:3px solid var(--blue);border-radius:0 6px 6px 0;padding:10px 14px}
+      .bq-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+      .bq-body{font-size:11px;color:var(--text2);line-height:1.6}
+      @media(max-width:768px){.hw-flow{grid-template-columns:1fr}.hw-arrow{transform:rotate(90deg);height:16px}}
+    `;
+    document.head.appendChild(s);
+  }
+  document.querySelectorAll('.tab-content').forEach(tc=>{
+    const m = (tc.id||'').match(/^tab-(.+)-content$/);
+    if(!m) return;
+    const flow = TAB_FLOWS[m[1]];
+    if(!flow || tc.querySelector('.howworks')) return;
+    const div = document.createElement('div');
+    div.className = 'howworks';
+    div.innerHTML = `
+      <div class="howworks-toggle" onclick="toggleHowWorks(this)">ⓘ How this works · data flow <span class="hw-caret">▸</span></div>
+      <div class="howworks-body" style="display:none">
+        <div class="hw-flow">
+          <div class="hw-node hw-source"><div class="hw-node-label">Data Source</div><div class="hw-node-body">
+            <b>Demo:</b> ${flow.source.demo}<br><b>Production:</b> ${flow.source.prod}<br><b>Updated:</b> ${flow.source.updated}</div></div>
+          <div class="hw-arrow">→</div>
+          <div class="hw-node hw-agent"><div class="hw-node-label">Agent — ${flow.agent.name}</div><div class="hw-node-body"><ul>${flow.agent.lines.map(l=>`<li>${l}</li>`).join('')}</ul></div></div>
+          <div class="hw-arrow">→</div>
+          <div class="hw-node hw-output"><div class="hw-node-label">Output</div><div class="hw-node-body"><ul>${flow.output.map(l=>`<li>${l}</li>`).join('')}</ul></div></div>
+        </div>
+        <div class="bq-note"><div class="bq-title">Production Data Connection</div><div class="bq-body">${BQ_NOTE}</div></div>
+      </div>`;
+    tc.insertBefore(div, tc.firstChild);
+  });
+}
+injectHowWorks();
 
 loadAll();
 setInterval(loadAll, 30000);

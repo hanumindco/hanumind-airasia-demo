@@ -1,15 +1,48 @@
 import os
 import psycopg2
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session, redirect, url_for
 from dotenv import load_dotenv
 from sheets.sheets_client import (
     get_drivers, get_bookings, get_wati_messages,
     get_flights, get_compliance_summary, read_all
 )
 from agents.driver_companion import ask
+from agents.spark import airport_intelligence
 
 load_dotenv('/Users/gowrishnambiar/hanumind_airasia_demo/.env')
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "hanumind-aar-demo-2026-secret-key")
+
+# ── LOGIN GATE ────────────────────────────────────────────────────────────────
+DASH_USER = os.getenv("DASH_USER", "gowrish")
+DASH_PASS = os.getenv("DASH_PASS", "airasia2026")
+PUBLIC_PATHS = {"/login", "/health", "/logout"}
+
+@app.before_request
+def require_login():
+    p = request.path
+    if p in PUBLIC_PATHS or p.startswith("/static"):
+        return None
+    if not session.get("authed"):
+        if p.startswith("/api/"):
+            return jsonify({"error": "unauthorized"}), 401
+        return redirect(url_for("login", next=p))
+    return None
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        if request.form.get("username", "") == DASH_USER and request.form.get("password", "") == DASH_PASS:
+            session["authed"] = True
+            return redirect(request.args.get("next") or request.form.get("next") or "/")
+        error = "Invalid username or password"
+    return render_template("login.html", error=error, next=request.args.get("next", "/"))
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 @app.route("/")
 def index():
@@ -43,9 +76,74 @@ def api_flights():
 def api_compliance():
     return jsonify(get_compliance_summary())
 
+@app.route("/api/zone-demand")
+def api_zone_demand():
+    return jsonify(read_all("Demand — Zone Demand"))
+
+@app.route("/api/agent-health")
+def api_agent_health():
+    return jsonify(read_all("System — Agent Health"))
+
+@app.route("/api/salesforce-escalations")
+def api_salesforce_escalations():
+    return jsonify(read_all("CS — Salesforce Escalations"))
+
+@app.route("/api/safety-incidents")
+def api_safety_incidents():
+    return jsonify(read_all("CS — Safety Incidents"))
+
+@app.route("/api/refunds")
+def api_refunds():
+    return jsonify(read_all("CS — Refunds"))
+
+@app.route("/api/driver-complaints")
+def api_driver_complaints():
+    return jsonify(read_all("CS — Driver Complaints"))
+
+@app.route("/api/airport-queue")
+def api_airport_queue():
+    try:
+        data = airport_intelligence()
+        _maybe_write_airport_alert(data)
+        return jsonify(data)
+    except Exception as e:
+        print(f"airport-queue error: {e}")
+        return jsonify({"error": str(e), "forecast": [], "queues": [], "flights": []})
+
+def _maybe_write_airport_alert(data):
+    """Write a single open SURGE/CRITICAL alert to aar_master_alerts (deduped)."""
+    crit = [r for r in data.get("forecast", []) if r.get("status") in ("CRITICAL", "HIGH")]
+    if not crit:
+        return
+    worst = max(crit, key=lambda r: r["gap"])
+    try:
+        conn = psycopg2.connect(os.getenv("HANUMIND_MEMORY_DB_URL"))
+        cur = conn.cursor()
+        # Dedup: at most one unresolved airport alert in any 6-hour window
+        cur.execute("""SELECT 1 FROM aar_master_alerts
+                       WHERE alert_type = 'Airport Queue Surge'
+                       AND (resolved = false OR resolved IS NULL)
+                       AND created_at > NOW() - INTERVAL '6 hours' LIMIT 1""")
+        if cur.fetchone():
+            cur.close(); conn.close(); return
+        title = f"KLIA2 {worst['status']}: {worst['gap']} driver gap at {worst['clock']}"
+        detail = (f"{worst['flights']} arrivals, {worst['pax']} pax, "
+                  f"{worst['aar']} AAR bookings expected — {worst['needed']} drivers needed "
+                  f"vs {worst['present']} present in queue.")
+        cur.execute("""INSERT INTO aar_master_alerts
+                       (alert_type, priority, title, detail, action_required, team,
+                        acknowledged, resolved)
+                       VALUES (%s,%s,%s,%s,%s,%s,false,false)""",
+                    ('Airport Queue Surge', 'High', title, detail,
+                     'Deploy drivers from PJ/Subang/Cheras with RM8/trip incentive',
+                     'driverteam'))
+        conn.commit(); cur.close(); conn.close()
+    except Exception as e:
+        print(f"airport alert write skipped: {e}")
+
 @app.route("/api/fare-intelligence")
 def api_fare_intelligence():
-    return jsonify(read_all("Fare Intelligence"))
+    return jsonify(read_all("Demand — Fare Intelligence"))
 
 @app.route("/api/stats")
 def api_stats():
@@ -128,18 +226,38 @@ def api_acknowledge_alert(alert_id):
 @app.route("/api/nerve-stats")
 def api_nerve_stats():
     drivers = get_drivers()
+    bookings = get_bookings()
+
+    # Active Drivers — live from Drivers tab Compliance Status (1b)
     active_drivers = len([d for d in drivers if d.get("Compliance Status") == "Active"])
 
-    # Realistic AirAsia Ride scale numbers
-    trips_today = 1847
-    avg_fare = 52.40
-    gmv_today = round(trips_today * avg_fare, 2)
-    completion_rate = 87.3
-    cancellation_rate = 7.8
-    weekly_trips = 12943
-    weekly_gmv = round(weekly_trips * avg_fare, 2)
-    monthly_trips = 55620
-    monthly_gmv = round(monthly_trips * avg_fare, 2)
+    def _num(v):
+        try:
+            return float(str(v).replace(",", "").strip() or 0)
+        except Exception:
+            return 0.0
+
+    # Trips / GMV / fares — live from Bookings tab Booking Status + Booking Value (RM) (1a)
+    completed = [b for b in bookings if b.get("Booking Status") == "Completed"]
+    cancelled = [b for b in bookings if b.get("Booking Status") == "Cancelled"]
+    noshow    = [b for b in bookings if b.get("Booking Status") == "No Show"]
+    total_bookings = len(bookings)
+    concluded = len(completed) + len(cancelled) + len(noshow)
+
+    trips_today = len(completed)
+    gmv_today = round(sum(_num(b.get("Booking Value (RM)")) for b in completed), 2)
+    avg_fare = round(gmv_today / trips_today, 2) if trips_today else 0.0
+    # Completion rate = completed of all concluded (completed + cancelled + no-show) trips.
+    completion_rate = round(len(completed) / concluded * 100, 1) if concluded else 0.0
+    # Cancellation rate = cancelled of all bookings today.
+    cancellation_rate = round(len(cancelled) / total_bookings * 100, 1) if total_bookings else 0.0
+
+    # NOTE: the Sheet holds only today's booking snapshot (no historical tab), so
+    # weekly/monthly are projections of the Sheet-derived today figures, not history.
+    weekly_trips  = trips_today * 7
+    weekly_gmv    = round(gmv_today * 7, 2)
+    monthly_trips = trips_today * 30
+    monthly_gmv   = round(gmv_today * 30, 2)
 
     return jsonify({
         "trips_today": trips_today,
@@ -161,7 +279,7 @@ def api_companion_driver(driver_id):
         idx = int(driver_id) - 1
         if 0 <= idx < len(drivers):
             d = drivers[idx]
-            earnings = read_all("Driver Earnings")
+            earnings = read_all("Driver — Earnings")
             earn = next((e for e in earnings if e.get("Driver ID") == d.get("Driver ID")), {})
             return jsonify({
                 "name": d.get("Driver Name","Driver"),
@@ -220,5 +338,5 @@ def api_resolve_alert(alert_id):
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port, debug=False)
