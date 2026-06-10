@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from flask import Flask, jsonify, render_template, request, session, redirect, url_for
+from flask import Flask, jsonify, render_template, request
 from dotenv import load_dotenv
 from sheets.sheets_client import (
     get_drivers, get_bookings, get_wati_messages,
@@ -11,38 +11,6 @@ from agents.spark import airport_intelligence
 
 load_dotenv('/Users/gowrishnambiar/hanumind_airasia_demo/.env')
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "hanumind-aar-demo-2026-secret-key")
-
-# ── LOGIN GATE ────────────────────────────────────────────────────────────────
-DASH_USER = os.getenv("DASH_USER", "gowrish")
-DASH_PASS = os.getenv("DASH_PASS", "airasia2026")
-PUBLIC_PATHS = {"/login", "/health", "/logout"}
-
-@app.before_request
-def require_login():
-    p = request.path
-    if p in PUBLIC_PATHS or p.startswith("/static"):
-        return None
-    if not session.get("authed"):
-        if p.startswith("/api/"):
-            return jsonify({"error": "unauthorized"}), 401
-        return redirect(url_for("login", next=p))
-    return None
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-    if request.method == "POST":
-        if request.form.get("username", "") == DASH_USER and request.form.get("password", "") == DASH_PASS:
-            session["authed"] = True
-            return redirect(request.args.get("next") or request.form.get("next") or "/")
-        error = "Invalid username or password"
-    return render_template("login.html", error=error, next=request.args.get("next", "/"))
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
 
 @app.route("/")
 def index():
