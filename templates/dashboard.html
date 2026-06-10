@@ -652,6 +652,12 @@ tr:hover td{background:var(--bg3)}
 
 
 
+  <!-- Complaints Escalated from CS -->
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(232,0,45,0.2)">
+    <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:16px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--red)">Complaints Escalated from Customer Support</div><div class="panel-sub" style="font-size:12px;margin-top:4px">CS has investigated. Driver Team to take action.</div></div></div>
+    <div class="panel-body" id="dt-complaints-panel"><div style="color:var(--text3);font-size:14px;padding:8px 0">No complaints escalated yet</div></div>
+  </div>
+
   <!-- Driver Performance -->
   <div class="panel" style="margin-bottom:16px">
     <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Performance</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Weekly trips, earnings, rating, completion rate by driver</div></div></div>
@@ -713,7 +719,7 @@ tr:hover td{background:var(--bg3)}
     </div>
     <div class="panel-body" style="padding:0 20px 16px">
       <div class="tbl-wrap"><table>
-        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Time</th><th style="font-size:12px;padding:12px 14px">Passenger</th><th style="font-size:12px;padding:12px 14px">Issue Type</th><th style="font-size:12px;padding:12px 14px">Message</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">SLA</th><th style="font-size:12px;padding:12px 14px">Action</th></tr></thead>
+        <thead><tr><th style="font-size:12px;padding:12px 14px">ID</th><th style="font-size:12px;padding:12px 14px">Time</th><th style="font-size:12px;padding:12px 14px">Passenger</th><th style="font-size:12px;padding:12px 14px">Issue Type</th><th style="font-size:12px;padding:12px 14px">Message</th><th style="font-size:12px;padding:12px 14px">Status</th><th style="font-size:12px;padding:12px 14px">SLA</th><th style="font-size:12px;padding:12px 14px">Next Action</th><th style="font-size:12px;padding:12px 14px">Resolve</th></tr></thead>
         <tbody id="cs-wati-body"></tbody>
       </table></div>
     </div>
@@ -738,7 +744,7 @@ tr:hover td{background:var(--bg3)}
 
   <!-- Driver Complaints -->
   <div class="panel" style="margin-bottom:16px">
-    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Complaints</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Passenger complaints about driver conduct. Investigate and log outcome.</div></div></div>
+    <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Complaints</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Investigate and escalate to Driver Team for action.</div></div></div>
     <div class="panel-body" id="cs-complaints-panel"></div>
   </div>
 
@@ -1809,6 +1815,130 @@ async function loadDriverTeam() {
 }
 
 // ── CUSTOMER SUPPORT ──────────────────────────────────────────────────────────
+function csEscalateComplaint(btn) {
+  const c = window._complaintsData[btn.getAttribute('data-id')];
+  if(!c) return;
+  const m = document.createElement('div');
+  m.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  m.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:440px;max-width:90vw">'
+    +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Escalate to Driver Team</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:16px">'+c.id+' — '+c.type+' — '+c.driverName+'</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">CS Findings:</div>'
+    +'<textarea id="esc-findings" placeholder="Summarise your investigation findings..." style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;margin-bottom:12px;box-sizing:border-box;height:80px;resize:none;font-family:DM Sans,sans-serif"></textarea>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Recommended Action:</div>'
+    +'<select id="esc-action" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;margin-bottom:20px;box-sizing:border-box">'
+    +'<option>Issue Warning</option><option>Suspend Driver</option><option>Dismiss Driver</option><option>No Action Required</option>'
+    +'</select>'
+    +'<div style="display:flex;gap:10px">'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:13px;cursor:pointer">Cancel</button>'
+    +'<button onclick="csConfirmEscalate(\''+c.id+'\',this)" style="flex:1;padding:10px;background:var(--cyan);border:none;border-radius:6px;color:#000;font-size:13px;font-weight:700;cursor:pointer">Send to Driver Team</button>'
+    +'</div></div>';
+  document.body.appendChild(m);
+}
+
+function csConfirmEscalate(id) {
+  if(!window._escalatedComplaints) window._escalatedComplaints = {};
+  const c = window._complaintsData[id];
+  if(!c) return;
+  const findings = document.getElementById('esc-findings').value || 'See complaint details.';
+  const action = document.getElementById('esc-action').value;
+  const time = new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true});
+  window._escalatedComplaints[id] = {findings, action, time, complaint:c};
+  const modal = document.getElementById('esc-confirm-btn');
+  if(modal) modal.closest('div').closest('div').closest('div').remove();
+  renderDtComplaints();
+  loadCustomerSupport();
+}
+
+function renderDtComplaints() {
+  const el = document.getElementById('dt-complaints-panel');
+  if(!el) return;
+  if(!window._escalatedComplaints) { el.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:8px 0">No complaints escalated yet</div>'; return; }
+  const items = Object.values(window._escalatedComplaints);
+  if(items.length===0) { el.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:8px 0">No complaints escalated yet</div>'; return; }
+  el.innerHTML = items.map(e => {
+    const c = e.complaint;
+    const actioned = window._dtActioned && window._dtActioned[c.id];
+    const sc = c.severity==='High'?'bg-red':c.severity==='Medium'?'bg-amber':'bg-grey';
+    const actionBtn = actioned
+      ? '<div style="font-size:12px;color:var(--green);font-weight:600">&#10003; '+actioned.outcome+'<br><span style="font-size:11px;color:var(--text3)">'+actioned.by+' at '+actioned.time+'</span></div>'
+      : '<button data-id="'+c.id+'" onclick="dtTakeAction(this)" style="padding:5px 12px;background:rgba(232,0,45,0.08);border:1px solid rgba(232,0,45,0.2);border-radius:4px;font-size:12px;font-weight:700;color:var(--red);cursor:pointer">Take Action</button>';
+    return '<div style="padding:14px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--text)">'+c.id+'</span>'
+      +'<div style="display:flex;gap:6px"><span class="badge '+sc+'">'+c.severity+'</span><span class="badge bg-amber">Awaiting Action</span></div></div>'
+      +'<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">'+c.type+' — '+c.driverName+'</div>'
+      +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">'+c.summary+'</div>'
+      +'<div style="padding:8px 12px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);border-radius:6px;margin-bottom:10px">'
+      +'<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">CS Findings</div>'
+      +'<div style="font-size:13px;color:var(--text2)">'+e.findings+'</div>'
+      +'<div style="font-size:12px;color:var(--cyan);margin-top:4px;font-weight:600">Recommended: '+e.action+'</div>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<span style="font-size:12px;color:var(--text3)">Escalated at '+e.time+'</span>'
+      +actionBtn+'</div></div>';
+  }).join('');
+}
+
+function dtTakeAction(btn) {
+  const id = btn.getAttribute('data-id');
+  const m = document.createElement('div');
+  m.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  m.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:400px;max-width:90vw">'
+    +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px">Log Action Taken</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Outcome:</div>'
+    +'<select id="dt-outcome" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;margin-bottom:12px;box-sizing:border-box">'
+    +'<option>Warning Issued</option><option>Driver Suspended</option><option>Driver Dismissed</option><option>No Action — Insufficient Evidence</option>'
+    +'</select>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Actioned by:</div>'
+    +'<input id="dt-action-by" placeholder="Your name" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;margin-bottom:20px;box-sizing:border-box">'
+    +'<div style="display:flex;gap:10px">'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:13px;cursor:pointer">Cancel</button>'
+    +'<button onclick="dtConfirmAction(\''+id+'\',this)" style="flex:1;padding:10px;background:var(--red);border:none;border-radius:6px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Confirm Action</button>'
+    +'</div></div>';
+  document.body.appendChild(m);
+}
+
+function dtConfirmAction(id, btn) {
+  if(!window._dtActioned) window._dtActioned = {};
+  const outcome = document.getElementById('dt-outcome').value;
+  const by = document.getElementById('dt-action-by').value.trim() || 'Driver Team';
+  const time = new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true});
+  window._dtActioned[id] = {outcome, by, time};
+  document.querySelector('div[style*="position:fixed"]').remove();
+  renderDtComplaints();
+}
+
+function csResolveModal(btn) {
+  const msgId = btn.getAttribute('data-id');
+  const m = document.createElement('div');
+  m.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;';
+  m.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:400px;max-width:90vw">'
+    +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px">Mark as Resolved</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Resolved by:</div>'
+    +'<input id="cs-resolve-by" placeholder="Your name" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;margin-bottom:12px;box-sizing:border-box">'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Note (optional):</div>'
+    +'<input id="cs-resolve-note" placeholder="How was this resolved?" style="width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;margin-bottom:20px;box-sizing:border-box">'
+    +'<div style="display:flex;gap:10px">'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:13px;cursor:pointer">Cancel</button>'
+    +'<button onclick="csConfirmResolve(\''+msgId+'\',this)" style="flex:1;padding:10px;background:var(--green);border:none;border-radius:6px;color:#000;font-size:13px;font-weight:700;cursor:pointer">Confirm</button>'
+    +'</div></div>';
+  document.body.appendChild(m);
+}
+
+function csConfirmResolve(msgId, btn) {
+  if(!window._csResolved) window._csResolved = {};
+  const by = document.getElementById('cs-resolve-by').value.trim() || 'CS Team';
+  const time = new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true});
+  window._csResolved[msgId] = {by, time};
+  document.querySelector('div[style*="position:fixed"]').remove();
+  const resolvedEl = document.getElementById('cs-resolved');
+  if(resolvedEl) resolvedEl.textContent = parseInt(resolvedEl.textContent||0)+1;
+  const pendingEl = document.getElementById('cs-pending');
+  if(pendingEl) pendingEl.textContent = Math.max(0,parseInt(pendingEl.textContent||0)-1);
+  loadCustomerSupport();
+}
+
 async function loadCustomerSupport() {
   const [wati, alerts] = await Promise.all([
     fetch('/api/wati').then(r=>r.json()).catch(()=>[]),
@@ -1891,9 +2021,10 @@ async function loadCustomerSupport() {
   // WATI messages
   const watiCount = g('cs-wati-count');
   if(watiCount) watiCount.textContent = customerWati.length + ' messages today';
+  if(!window._csResolved) window._csResolved = {};
   const watiBody = g('cs-wati-body');
   if(watiBody) watiBody.innerHTML = customerWati.length===0
-    ? '<tr><td colspan="8" style="padding:16px;color:var(--text3);font-size:14px">No direct passenger messages today</td></tr>'
+    ? '<tr><td colspan="9" style="padding:16px;color:var(--text3);font-size:14px">No direct passenger messages today</td></tr>'
     : customerWati.map(m => {
         const hrs = parseFloat(m['Hours Until Expiry']||99);
         const sc = hrs<2?'var(--red)':hrs<6?'var(--amber)':'var(--text3)';
@@ -1902,15 +2033,21 @@ async function loadCustomerSupport() {
           : hrs<6
           ? '<span style="font-size:12px;font-weight:700;color:var(--amber)">Email Today</span>'
           : '<span style="font-size:12px;color:var(--text3)">Monitor</span>';
-        return '<tr>'
+        const res = window._csResolved[m['Message ID']];
+        const isRes = res || m['Resolution Status']==='Resolved';
+        const resolveCell = isRes
+          ? '<div style="font-size:12px;color:var(--green);font-weight:600">&#10003; '+(res?res.by:'Resolved')+'<br><span style="font-size:11px;color:var(--text3)">'+(res?res.time:'')+'</span></div>'
+          : '<button data-id="'+m['Message ID']+'" onclick="csResolveModal(this)" style="padding:5px 12px;background:rgba(0,210,106,0.08);border:1px solid rgba(0,210,106,0.2);border-radius:4px;font-size:12px;font-weight:700;color:var(--green);cursor:pointer">Mark Resolved</button>';
+        return '<tr style="'+(isRes?'opacity:0.55':'')+'">'
           +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;font-weight:700;color:var(--text)">'+m['Message ID']+'</td>'
           +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:12px 14px">'+((m['Timestamp']||'').substring(11,16))+'</td>'
           +'<td style="font-size:14px;padding:12px 14px;font-weight:500;color:var(--text)">'+m['Sender Name']+'</td>'
           +'<td style="padding:12px 14px">'+watiTypeBadge(m['Classified Type'])+'</td>'
           +'<td style="font-size:13px;padding:12px 14px;max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--text2)">'+m['Message Content']+'</td>'
-          +'<td style="padding:12px 14px"><span class="badge '+(m['Resolution Status']==='Resolved'?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey')+'">'+m['Resolution Status']+'</span></td>'
+          +'<td style="padding:12px 14px"><span class="badge '+(isRes?'bg-green':m['Resolution Status']==='Escalated'?'bg-amber':'bg-grey')+'">'+(isRes?'Resolved':m['Resolution Status'])+'</span></td>'
           +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:12px 14px;color:'+sc+'">'+hrs+'h</td>'
           +'<td style="padding:12px 14px">'+action+'</td>'
+          +'<td style="padding:12px 14px">'+resolveCell+'</td>'
           +'</tr>';
       }).join('');
 
@@ -1968,24 +2105,31 @@ async function loadCustomerSupport() {
   ).join('');
 
   // Driver complaints
-  const complaints = [
-    {id:'DC-001', passenger:'Norzahra a/l Rajan', driver:'DRV045 Hafiz bin Hassan', type:'Rude Behaviour', summary:'Driver was rude and refused to help with luggage.', severity:'Medium', status:'Warning Issued', time:'09:10'},
-    {id:'DC-002', passenger:'Suraya binti Zainudin', driver:'DRV023 Suresh binti Salleh', type:'Wrong Route', summary:'Driver took a longer route. Passenger suspects intentional.', severity:'Low', status:'Dismissed', time:'08:45'},
-    {id:'DC-003', passenger:'Meena a/l Kumar', driver:'DRV067 Rajan Muthu', type:'Asked Extra Payment', summary:'Driver demanded RM 10 cash on top of app fare.', severity:'High', status:'Under Investigation', time:'07:30'},
-  ];
+  if(!window._escalatedComplaints) window._escalatedComplaints = {};
+  window._complaintsData = {
+    'DC-001': {id:'DC-001', passenger:'Norzahra a/l Rajan', driver:'DRV045 Hafiz bin Hassan', driverName:'Hafiz bin Hassan', type:'Rude Behaviour', summary:'Driver was rude and refused to help with luggage.', severity:'Medium', status:'Warning Issued', time:'09:10'},
+    'DC-002': {id:'DC-002', passenger:'Suraya binti Zainudin', driver:'DRV023 Suresh binti Salleh', driverName:'Suresh binti Salleh', type:'Wrong Route', summary:'Driver took a longer route. Passenger suspects intentional.', severity:'Low', status:'Dismissed', time:'08:45'},
+    'DC-003': {id:'DC-003', passenger:'Meena a/l Kumar', driver:'DRV067 Rajan Muthu', driverName:'Rajan Muthu', type:'Asked Extra Payment', summary:'Driver demanded RM 10 cash on top of app fare.', severity:'High', status:'Under Investigation', time:'07:30'},
+  };
+  const complaints = Object.values(window._complaintsData);
   const compEl = g('cs-complaints-panel');
   if(compEl) compEl.innerHTML = complaints.map(c => {
     const sc = c.severity==='High'?'bg-red':c.severity==='Medium'?'bg-amber':'bg-grey';
     const stc = c.status==='Warning Issued'?'bg-amber':c.status==='Dismissed'?'bg-grey':c.status==='Under Investigation'?'bg-red':'bg-green';
+    const escalated = window._escalatedComplaints[c.id];
+    const escBtn = escalated
+      ? '<div style="font-size:12px;color:var(--cyan);font-weight:600">&#10003; Sent to Driver Team<br><span style="font-size:11px;color:var(--text3)">'+escalated.time+'</span></div>'
+      : '<button data-id="'+c.id+'" onclick="csEscalateComplaint(this)" style="padding:5px 12px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:4px;font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer">Escalate to Driver Team</button>';
     return '<div style="padding:14px 0;border-bottom:1px solid var(--border)">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
       +'<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--text)">'+c.id+'</span>'
       +'<div style="display:flex;gap:6px"><span class="badge '+sc+'">'+c.severity+'</span><span class="badge '+stc+'">'+c.status+'</span></div></div>'
       +'<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">'+c.type+'</div>'
-      +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">'+c.summary+'</div>'
-      +'<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3)">'
-      +'<span>Passenger: '+c.passenger+'</span><span>Driver: '+c.driver+'</span><span>'+c.time+'</span></div>'
-      +'</div>';
+      +'<div style="font-size:13px;color:var(--text2);margin-bottom:8px">'+c.summary+'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div style="font-size:12px;color:var(--text3)"><span>Passenger: '+c.passenger+'</span> &nbsp; <span>Driver: '+c.driver+'</span> &nbsp; <span>'+c.time+'</span></div>'
+      +escBtn
+      +'</div></div>';
   }).join('');
 }
 
