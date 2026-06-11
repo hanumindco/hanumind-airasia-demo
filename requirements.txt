@@ -7,3 +7,4 @@ beautifulsoup4
 apscheduler
 psycopg2-binary
 python-dotenv
+google-play-scraper

@@ -290,7 +290,22 @@ function addMessage(text, role, source, tokens) {
     ${metaHtml}
   `;
   chat.appendChild(wrap);
+  collapseChat();
   chat.scrollTop = chat.scrollHeight;
+}
+
+// 10-message limit on the conversation log. A chat shows the most recent 10 with
+// a "Show earlier messages" toggle (hiding the newest would break a live chat).
+function collapseChat(){
+  const chat = document.getElementById('chat-area');
+  const msgs = Array.from(chat.querySelectorAll('.msg-wrap'));
+  let btn = document.getElementById('chat-showmore');
+  if(msgs.length <= 10){ if(btn) btn.remove(); msgs.forEach(m=>m.style.display=''); return; }
+  const expanded = window._chatExpanded;
+  msgs.forEach((m,i)=>{ m.style.display = (expanded || i >= msgs.length-10) ? '' : 'none'; });
+  if(!btn){ btn=document.createElement('div'); btn.id='chat-showmore'; btn.style.cssText='text-align:center;padding:6px 0';
+    chat.insertBefore(btn, chat.firstChild); }
+  btn.innerHTML = '<button onclick="window._chatExpanded=!window._chatExpanded;collapseChat()" style="padding:5px 14px;border-radius:6px;font-size:11px;font-weight:400;letter-spacing:0.5px;border:1px solid #1E2A45;background:transparent;color:#7A8AA5;cursor:pointer">'+(expanded?'Show less':'Show earlier messages')+'</button>';
 }
 
 function showTyping() {

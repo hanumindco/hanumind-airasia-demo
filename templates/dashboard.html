@@ -236,6 +236,7 @@ tr:hover td{background:var(--bg3)}
   .grid-2{grid-template-columns:1fr!important;gap:12px}
   .kpi-grid.kpi-4{grid-template-columns:repeat(2,1fr)!important}
   .kpi-grid.kpi-6{grid-template-columns:repeat(2,1fr)!important}
+  .kpi-grid.kpi-8{grid-template-columns:repeat(2,1fr)!important}
   .panel-head{flex-direction:column;align-items:flex-start;gap:8px}
   .tbl-wrap{overflow-x:auto}
   table{min-width:600px}
@@ -280,6 +281,7 @@ tr:hover td{background:var(--bg3)}
   <button class="tab-btn" onclick="showTab('tower')" id="tab-tower"><span class="tab-icon">🗼</span>Control Tower</button>
   <button class="tab-btn" onclick="showTab('driver')" id="tab-driver"><span class="tab-icon">🚗</span>Driver Backend</button>
   <button class="tab-btn" onclick="showTab('driverteam')" id="tab-driverteam"><span class="tab-icon">👥</span>Driver Team</button>
+  <button class="tab-btn" onclick="showTab('incentive')" id="tab-incentive"><span class="tab-icon">🛡️</span>Incentive &amp; Fraud</button>
   <button class="tab-btn" onclick="showTab('customer')" id="tab-customer"><span class="tab-icon">💬</span>Customer Support</button>
   <button class="tab-btn" onclick="showTab('pricing')" id="tab-pricing"><span class="tab-icon">💰</span>Pricing</button>
   <button class="tab-btn" onclick="showTab('spark')" id="tab-spark"><span class="tab-icon">📡</span>Demand Map</button>
@@ -336,6 +338,18 @@ tr:hover td{background:var(--bg3)}
       <div class="kpi-label">Driver Utilisation</div>
       
     </div>
+  </div>
+
+  <div class="section-label mt-md">Operations Intelligence</div>
+  <div class="kpi-grid kpi-8" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-evp">--</div><div class="kpi-label">EVP Quota Used</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="oi-evp-sub"></div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-onboard">--</div><div class="kpi-label">Onboarding Pipeline</div><div style="font-size:10px;color:var(--amber);margin-top:4px" id="oi-onboard-sub"></div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-fraud">--</div><div class="kpi-label">Active Fraud Alerts</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="oi-fraud-sub"></div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-escal">--</div><div class="kpi-label">Open Escalations</div><div style="font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:1px">Customer Support</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="oi-escal-sub"></div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-incentive">--</div><div class="kpi-label">Weekly Incentive Pool</div><div style="font-size:10px;color:var(--red);margin-top:4px" id="oi-incentive-sub"></div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-delayed">--</div><div class="kpi-label">Delayed Flights</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="oi-delayed-sub"></div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-ridecomplaints">--</div><div class="kpi-label">Ride Complaints (Passenger App)</div><div style="font-size:10px;color:var(--text3);margin-top:4px">AirAsia MOVE App — ride mentions only</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="oi-driverrating">--</div><div class="kpi-label">Driver App Rating</div><div style="font-size:10px;color:var(--text3);margin-top:4px" id="oi-driverrating-sub"></div></div>
   </div>
 
   <div class="section-label mt-md">Operations Health</div>
@@ -571,6 +585,17 @@ tr:hover td{background:var(--bg3)}
     <div class="panel-body" id="ct-alerts-list"></div>
   </div>
 
+  <!-- FLIGHT DELAY MANAGEMENT -->
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(255,109,0,0.25)">
+    <div class="panel-head" style="background:rgba(255,109,0,0.05);padding:16px 20px">
+      <div><div class="panel-title" style="font-size:13px;color:#FF6D00">✈ Flight Delay Management</div>
+        <div class="panel-sub" style="font-size:12px;margin-top:4px">Live KLIA2 arrival delays → affected bookings → driver notifications</div></div>
+      <span id="ct-delay-count" style="font-size:12px;color:var(--text3)"></span>
+    </div>
+    <div class="panel-body" id="ct-delay-panel"><div style="color:var(--text3);font-size:14px;padding:12px 0">Loading…</div></div>
+    <div style="font-size:10px;color:var(--text3);padding:0 20px 14px;line-height:1.6">Data flow: Malaysia Airports scraper (live) → SPARK reads delay data every 30 min → Control Tower shows affected bookings → notifies drivers → manages reassignments. Production: connects to Malaysia Airports live feed or AirAsia internal flight data for zero-delay updates.</div>
+  </div>
+
   <div class="panel" style="margin-bottom:16px">
     <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Advance Booking Board</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Advance bookings only. Urgent sorted to top. Refreshes every 30 seconds.</div></div></div>
     <div class="panel-body" style="padding:0 20px 16px">
@@ -676,6 +701,49 @@ tr:hover td{background:var(--bg3)}
     </div>
   </div>
 
+  <!-- ═══════════ EVP MANAGEMENT ═══════════ -->
+  <div class="section-label mt-md">EVP Management</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:14px">
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="evp-total">--</div><div class="kpi-label">Total EVP Quota</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" style="color:var(--green)" id="evp-active">--</div><div class="kpi-label">Assigned Active</div></div>
+    <div class="kpi-card kpi-warn"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="evp-inactive">--</div><div class="kpi-label">Assigned Inactive</div></div>
+    <div class="kpi-card"><div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div><div class="kpi-val" id="evp-available">--</div><div class="kpi-label">Available Unassigned</div></div>
+  </div>
+  <div id="evp-reco"></div>
+  <div class="panel">
+    <div class="panel-head" style="padding:14px 20px;flex-wrap:wrap;gap:8px">
+      <div><div class="panel-title" style="font-size:13px">EVP Status</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Electronic Vehicle Permit per driver</div></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="evp-filters">
+        <button class="date-btn active" onclick="evpFilter('all',this)">All</button>
+        <button class="date-btn" onclick="evpFilter('active',this)">Active</button>
+        <button class="date-btn" onclick="evpFilter('lapsing',this)">Lapsing</button>
+        <button class="date-btn" onclick="evpFilter('inactive',this)">Inactive</button>
+        <button class="date-btn" onclick="evpFilter('cancelled',this)">Cancelled</button>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:0 20px 16px">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:10px 12px">Driver ID</th><th style="font-size:12px;padding:10px 12px">Driver Name</th><th style="font-size:12px;padding:10px 12px">EVP Number</th><th style="font-size:12px;padding:10px 12px">EVP Expiry</th><th style="font-size:12px;padding:10px 12px">Days Left</th><th style="font-size:12px;padding:10px 12px">Driver Status</th><th style="font-size:12px;padding:10px 12px">EVP Status</th></tr></thead>
+        <tbody id="evp-table-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DRIVER ONBOARDING PIPELINE ═══════════ -->
+  <div class="section-label mt-md">Driver Onboarding Pipeline</div>
+  <div class="panel"><div class="panel-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px;color:var(--text2)">Total in pipeline: <b style="font-family:Syne,sans-serif;font-size:22px;color:var(--text)" id="onb-total">--</b></div>
+      <div style="font-size:12px;color:var(--amber)"><b id="onb-flagged-count">--</b> flagged applicants</div>
+    </div>
+    <div id="onb-funnel" style="display:flex;align-items:stretch;gap:4px;overflow-x:auto"></div>
+  </div></div>
+  <div class="panel">
+    <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--amber)">Flagged Applicants</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Stuck beyond SLA — action required</div></div></div>
+    <div class="panel-body" id="onb-flagged"></div>
+  </div>
+  <div style="font-size:10px;color:var(--text3);line-height:1.6;margin-top:-8px;margin-bottom:8px">Data flow: Driver Onboarding Sheet → Document Agent checks stage SLAs daily → flags stuck applicants → sends automated reminders → Driver Backend team reviews and actions.</div>
+
 </div>
 <!-- ══════════════════════════════════════════════════════ -->
 <!-- DRIVER TEAM -->
@@ -742,6 +810,100 @@ tr:hover td{background:var(--bg3)}
         </tr></thead>
         <tbody id="dt-performance-body"></tbody>
       </table></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- INCENTIVE & FRAUD -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-incentive-content">
+
+  <!-- WORKFLOW HEADER (always visible) -->
+  <div class="panel" style="border:1px solid rgba(0,212,255,0.2);margin-bottom:18px">
+    <div class="panel-head" style="padding:14px 20px"><div class="panel-title" style="font-size:13px;color:var(--cyan)">⚙ How the Incentive &amp; Fraud Agent works</div></div>
+    <div class="panel-body" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-size:10px;color:var(--cyan);font-weight:700;letter-spacing:1px;margin-bottom:5px">STEP 1</div><div style="font-size:12px;color:var(--text2);line-height:1.5">Agent calculates weekly incentive per driver</div></div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-size:10px;color:var(--cyan);font-weight:700;letter-spacing:1px;margin-bottom:5px">STEP 2</div><div style="font-size:12px;color:var(--text2);line-height:1.5">Cross-checks each driver against fraud alerts</div></div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-size:10px;color:var(--red);font-weight:700;letter-spacing:1px;margin-bottom:5px">STEP 3</div><div style="font-size:12px;color:var(--text2);line-height:1.5">Any fraud-flagged driver is auto-disqualified from incentives &amp; referrals</div></div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:1px;margin-bottom:5px">STEP 4</div><div style="font-size:12px;color:var(--text2);line-height:1.5">Clean drivers appear on approved payout list</div></div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px"><div style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:1px;margin-bottom:5px">STEP 5</div><div style="font-size:12px;color:var(--text2);line-height:1.5">Flagged drivers shown with disqualification reason</div></div>
+    </div>
+  </div>
+
+  <!-- SECTION A — INCENTIVE TIERS -->
+  <div class="section-label">Incentive Tiers</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:18px">
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--text2)">RM 50</div><div class="kpi-label">Tier 1 — 50 trips/week</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--amber)">RM 150</div><div class="kpi-label">Tier 2 — 100 trips/week</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)">RM 350</div><div class="kpi-label">Tier 3 — 200 trips/week</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--cyan)">RM 150</div><div class="kpi-label">Referral Bonus (per successful referral)</div></div>
+  </div>
+  <div style="font-size:11px;color:var(--text3);margin:-8px 0 16px;font-style:italic">Successful referral = referred driver completes their first 10 trips.</div>
+
+  <!-- SECTION B — WEEKLY INCENTIVE FORECAST -->
+  <div class="section-label mt-md">Weekly Incentive Forecast</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:14px">
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="if-eligible">--</div><div class="kpi-label">Eligible Drivers</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="if-payout">--</div><div class="kpi-label">Total Payout This Week</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="if-disq">--</div><div class="kpi-label">Disqualified (Fraud)</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="if-paid">--</div><div class="kpi-label">Paid This Week</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px">Approved Payout List</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Clean drivers only · sorted by tier</div></div></div>
+      <div class="panel-body" style="padding:0 20px 16px"><div class="tbl-wrap"><table>
+        <thead><tr><th style="font-size:12px;padding:9px 12px">Driver</th><th style="font-size:12px;padding:9px 12px">Trips</th><th style="font-size:12px;padding:9px 12px">Tier</th><th style="font-size:12px;padding:9px 12px">Bonus</th><th style="font-size:12px;padding:9px 12px">Status</th></tr></thead>
+        <tbody id="if-payout-body"></tbody>
+      </table></div></div>
+    </div>
+    <div class="panel" style="margin-bottom:16px;border:1px solid rgba(232,0,45,0.25)">
+      <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:14px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--red)">Disqualified Drivers</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Fraud-flagged · removed from payout</div></div></div>
+      <div class="panel-body" id="if-disq-panel" style="padding:6px 20px 14px"></div>
+    </div>
+  </div>
+
+  <!-- SECTION C — REFERRAL PROGRAMME -->
+  <div class="section-label mt-md">Referral Programme</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:14px">
+    <div class="kpi-card"><div class="kpi-val" id="rf-total">--</div><div class="kpi-label">Total Referrals</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)" id="rf-paid">--</div><div class="kpi-label">Successful (Paid)</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--amber)" id="rf-pending">--</div><div class="kpi-label">Pending</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="rf-disq">--</div><div class="kpi-label">Disqualified (Fraud)</div></div>
+  </div>
+  <div class="panel" style="margin-bottom:16px">
+    <div class="panel-body" style="padding:0 20px 16px"><div class="tbl-wrap"><table>
+      <thead><tr><th style="font-size:12px;padding:9px 12px">Referring Driver</th><th style="font-size:12px;padding:9px 12px">Referred Driver</th><th style="font-size:12px;padding:9px 12px">Date</th><th style="font-size:12px;padding:9px 12px">Status</th><th style="font-size:12px;padding:9px 12px">Trips</th><th style="font-size:12px;padding:9px 12px">Bonus</th><th style="font-size:12px;padding:9px 12px">Payment</th></tr></thead>
+      <tbody id="rf-body"></tbody>
+    </table></div></div>
+  </div>
+
+  <!-- SECTION D — FRAUD DETECTION -->
+  <div class="section-label mt-md">Fraud Detection</div>
+  <div class="kpi-grid kpi-4" style="margin-bottom:14px">
+    <div class="kpi-card kpi-critical"><div class="kpi-val flash" id="fr-gps">--</div><div class="kpi-label">GPS Fraud Active</div></div>
+    <div class="kpi-card kpi-warn"><div class="kpi-val" id="fr-inc">--</div><div class="kpi-label">Incentive Fraud Investigating</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="fr-early">--</div><div class="kpi-label">Early No Show Pattern</div></div>
+    <div class="kpi-card kpi-critical"><div class="kpi-val" id="fr-disqrm">--</div><div class="kpi-label">Total Incentive Disqualified</div></div>
+  </div>
+  <div class="panel" style="margin-bottom:16px;border:1px solid rgba(232,0,45,0.25)">
+    <div class="panel-head" style="background:rgba(232,0,45,0.04);padding:14px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--red)">GPS Location Fraud</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Holding airport queue position while GPS shows &gt;3km from KLIA2</div></div></div>
+    <div class="panel-body" style="padding:8px 20px 4px"><div style="font-size:11px;color:var(--text3);font-style:italic;margin-bottom:8px">Drivers fake GPS to hold queue position while completing city jobs. When their queue number becomes small they return to airport to collect the job — unfair queue advantage and longer waits for legitimate drivers.</div></div>
+    <div class="panel-body" style="padding:0 20px 16px"><div class="tbl-wrap"><table>
+      <thead><tr><th style="font-size:12px;padding:9px 12px">Driver</th><th style="font-size:12px;padding:9px 12px">Queue Held</th><th style="font-size:12px;padding:9px 12px">GPS Claimed</th><th style="font-size:12px;padding:9px 12px">GPS Actual</th><th style="font-size:12px;padding:9px 12px">Distance</th><th style="font-size:12px;padding:9px 12px">Action</th></tr></thead>
+      <tbody id="fr-gps-body"></tbody>
+    </table></div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel" style="margin-bottom:16px;border:1px solid rgba(240,165,0,0.22)">
+      <div class="panel-head" style="background:rgba(240,165,0,0.04);padding:14px 20px"><div><div class="panel-title" style="font-size:13px;color:var(--amber)">Incentive Fraud</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Suspicious trip patterns — fake bookings to hit targets</div></div></div>
+      <div class="panel-body" id="fr-inc-panel" style="padding:6px 20px 14px"></div>
+      <div style="font-size:10px;color:var(--text3);padding:0 20px 12px;font-style:italic">Previous AAR enforcement: driver accounts suspended, investigations conducted, syndicate management personnel actioned.</div>
+    </div>
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px">Early No Show</div><div class="panel-sub" style="font-size:12px;margin-top:4px">No Show pressed before pickup + 5 min · flagged at &gt;2/month</div></div></div>
+      <div class="panel-body" id="fr-early-panel" style="padding:6px 20px 14px"></div>
     </div>
   </div>
 
@@ -816,6 +978,38 @@ tr:hover td{background:var(--bg3)}
     <div class="panel-head" style="padding:16px 20px"><div><div class="panel-title" style="font-size:13px">Driver Complaints</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Investigate and escalate to Driver Team for action.</div></div></div>
     <div class="panel-body" id="cs-complaints-panel"></div>
   </div>
+
+  <!-- ═══════════ REPUTATION INTELLIGENCE ═══════════ -->
+  <div class="section-label mt-md">Reputation Intelligence</div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <!-- PANEL 1 — Social Media Monitoring -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px">Social Media Flags</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Negative mentions across platforms</div></div></div>
+      <div class="panel-body" id="rep-social"></div>
+      <div style="font-size:10px;color:var(--text3);padding:0 20px 14px;line-height:1.6;font-style:italic">In production this panel connects to a social listening API (e.g. Mention, Brandwatch) that monitors AirAsia Ride mentions across all platforms automatically.</div>
+    </div>
+    <!-- PANEL 2 — Google Reviews (fictional) -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px">Google Reviews</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Live rating &amp; recent negative reviews</div></div><span id="rep-google-rating" style="font-size:13px;color:var(--amber);font-weight:700"></span></div>
+      <div class="panel-body" id="rep-google"></div>
+      <div style="font-size:10px;color:var(--text3);padding:0 20px 14px;line-height:1.6;font-style:italic">In production connects to Google Places API for live review monitoring. Zero additional setup required after API access is granted.</div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <!-- PANEL 3 — Passenger App Reviews (real, Google Play) -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px">Passenger Reviews — AirAsia MOVE App (Google Play)</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Live reviews, filtered for ride-related keywords</div></div><span id="rep-passenger-meta" style="font-size:12px;color:var(--amber);font-weight:700"></span></div>
+      <div class="panel-body" id="rep-passenger"></div>
+      <div style="font-size:10px;color:var(--text3);padding:0 20px 14px;line-height:1.6;font-style:italic">Live reviews scraped from Google Play Store. Free. No API key required. Filtered for ride-related keywords only. Refreshes every 60 minutes.</div>
+    </div>
+    <!-- PANEL 4 — Driver App Reviews (real, Google Play) -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head" style="padding:14px 20px"><div><div class="panel-title" style="font-size:13px">Driver App Reviews — AirAsia Ride Driver App (Google Play)</div><div class="panel-sub" style="font-size:12px;margin-top:4px">Live reviews from the driver community</div></div><span id="rep-driver-meta" style="font-size:12px;color:var(--amber);font-weight:700"></span></div>
+      <div class="panel-body" id="rep-driver"></div>
+      <div style="font-size:10px;color:var(--text3);padding:0 20px 14px;line-height:1.6;font-style:italic">Live reviews scraped from Google Play Store. Free. No API key required. Refreshes every 60 minutes.</div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--text3);line-height:1.6;margin-bottom:8px">Data flow: Social listening API (prod) + Google Places API (prod) + live Google Play Store reviews → monitored for sentiment and ride/driver issues → Customer Support team actions via this dashboard.</div>
 
 </div>
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1024,6 +1218,7 @@ tr:hover td{background:var(--bg3)}
     <div>
       <div class="aq-title">✈️ KLIA2 Airport Queue Intelligence</div>
       <div class="aq-sub">Powered by SPARK Agent</div>
+      <div id="aq-livefeed" style="font-size:11px;color:var(--green);margin-top:6px;display:flex;align-items:center;gap:6px"></div>
     </div>
     <div>
       <span id="aq-badge" class="aq-badge sim">SIMULATED</span>
@@ -1052,6 +1247,7 @@ tr:hover td{background:var(--bg3)}
   <!-- 4 · FLIGHT-BY-FLIGHT BREAKDOWN -->
   <div class="section-label mt-md">How We Calculate Demand — Flight by Flight</div>
   <div id="aq-flights" class="aq-flight-grid"></div>
+  <div style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6;font-style:italic">Advance Booking flight number field is being added to the AAR booking page. When live, confirmed demand will include all AAR advance bookings automatically.</div>
 
   <!-- 5 · DEPLOYMENT RECOMMENDATION (conditional) -->
   <div id="aq-deploy"></div>
@@ -1062,7 +1258,8 @@ tr:hover td{background:var(--bg3)}
     <div class="aq-assume-grid">
       <div class="aq-assume"><div class="k">AAR booking rate at KLIA2</div><div class="v" id="aq-a-ride">10% of arriving passengers</div></div>
       <div class="aq-assume"><div class="k">Driver cycle time</div><div class="v" id="aq-a-cycle">2 hours per trip (1h trip + 1h return)</div></div>
-      <div class="aq-assume"><div class="k">Load factor</div><div class="v" id="aq-a-load">84% of aircraft capacity</div></div>
+      <div class="aq-assume"><div class="k">Load factor</div><div class="v" id="aq-a-load">84% of aircraft capacity when pax count unavailable</div></div>
+      <div class="aq-assume"><div class="k">GPS fraud threshold</div><div class="v" id="aq-a-gps">3km radius from KLIA2</div></div>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6">Note: These figures are estimates based on IATA averages and AAR planning assumptions. They update automatically when live AAR booking data is connected in production.</div>
   </div></div>
@@ -1561,6 +1758,57 @@ async function loadNerve() {
       ${demandBadge(lvl)}
     </div>`;
   }).join('');
+
+  loadOpsIntel(bookings, flights);
+}
+
+// ─── Operations Intelligence KPI row (Nerve Centre) ───
+async function loadOpsIntel(bookings, flights){
+  const g=id=>document.getElementById(id);
+  const [evp,onb,fraud,esc,inc,appr]=await Promise.all([
+    fetch('/api/evp').then(r=>r.json()).catch(()=>null),
+    fetch('/api/onboarding').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/fraud').then(r=>r.json()).catch(()=>null),
+    fetch('/api/salesforce-escalations').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/incentives').then(r=>r.json()).catch(()=>null),
+    fetch('/api/app-reviews').then(r=>r.json()).catch(()=>null)
+  ]);
+  if(evp){
+    const pct=evp.quota_total?Math.round(evp.assigned_active/evp.quota_total*1000)/10:0;
+    if(g('oi-evp')) g('oi-evp').textContent=pct+'%';
+    if(g('oi-evp-sub')) g('oi-evp-sub').textContent=evp.assigned_active+' / '+(evp.quota_total||0).toLocaleString()+' active';
+  }
+  const inPipe=(onb||[]).filter(r=>r['Current Stage']!=='Activated');
+  const flagged=(onb||[]).filter(r=>r['Flagged']==='Yes');
+  if(g('oi-onboard')) g('oi-onboard').textContent=inPipe.length;
+  if(g('oi-onboard-sub')) g('oi-onboard-sub').textContent=flagged.length+' flagged';
+  if(fraud){
+    const active=fraud.gps_count+fraud.incentive_count;
+    if(g('oi-fraud')){ g('oi-fraud').textContent=active; g('oi-fraud').style.color=active>0?'var(--red)':'var(--green)'; }
+    if(g('oi-fraud-sub')) g('oi-fraud-sub').textContent=fraud.gps_count+' GPS · '+fraud.incentive_count+' incentive';
+  }
+  const openEsc=(esc||[]).filter(e=>['Open','In Progress'].includes(e['Status']));
+  if(g('oi-escal')) g('oi-escal').textContent=openEsc.length;
+  const hi=openEsc.filter(e=>e['Severity']==='High').length, med=openEsc.filter(e=>e['Severity']==='Medium').length;
+  if(g('oi-escal-sub')) g('oi-escal-sub').textContent='High '+hi+' / Medium '+med;
+  if(inc){
+    if(g('oi-incentive')) g('oi-incentive').textContent='RM '+(inc.total_payout||0).toLocaleString();
+    if(g('oi-incentive-sub')) g('oi-incentive-sub').textContent='RM '+(inc.disqualified_amount||0).toLocaleString()+' withheld (fraud)';
+  }
+  const delayed=(flights||[]).filter(f=>parseInt(f['Delay (minutes)']||0)>0);
+  const delayedFns=new Set(delayed.map(f=>(f['Flight Number']||'').trim()));
+  const affected=(bookings||[]).filter(b=>delayedFns.has((b['Flight Number']||'').trim()) && !['Cancelled','No Show'].includes(b['Booking Status']));
+  if(g('oi-delayed')){ g('oi-delayed').textContent=delayed.length; g('oi-delayed').style.color=delayed.length>0?'var(--amber)':'var(--green)'; }
+  if(g('oi-delayed-sub')) g('oi-delayed-sub').textContent=delayed.length>0?(affected.length+' bookings affected'):'All flights on schedule';
+  if(appr){
+    // Card — Ride Complaints (Passenger App): ride-filtered negative reviews, last 7 days
+    const rc=(appr.passenger&&appr.passenger.ride_negative_7d)||0;
+    if(g('oi-ridecomplaints')){ g('oi-ridecomplaints').textContent=rc; g('oi-ridecomplaints').style.color=rc===0?'var(--green)':(rc<=5?'var(--amber)':'var(--red)'); }
+    // Card — Driver App Rating: overall com.dacsee rating
+    const dr=(appr.driver)||{}; const rating=dr.rating||0;
+    if(g('oi-driverrating')){ g('oi-driverrating').textContent=Number(rating).toFixed(1)+'★'; g('oi-driverrating').style.color=rating>4.0?'var(--green)':(rating>=3.0?'var(--amber)':'var(--red)'); }
+    if(g('oi-driverrating-sub')) g('oi-driverrating-sub').textContent=(dr.negative_7d||0)+' negative reviews this week';
+  }
 }
 
 async function acknowledgeAlert(id, e) {
@@ -1727,12 +1975,32 @@ function renderMiAlerts() {
 }
 
 // ── CONTROL TOWER ─────────────────────────────────────────────────────────────
+function ctNotifyDriver(btn, driverName, flightNo, delay, newTime){
+  const m=document.createElement('div');
+  m.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center';
+  m.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:28px;width:440px;max-width:90vw">'
+    +'<div style="font-family:Syne,sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">WATI Message Sent</div>'
+    +'<div style="padding:12px 14px;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.18);border-radius:8px;font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">Message sent to <strong style="color:var(--text)">'+driverName+'</strong>: Flight <strong>'+flightNo+'</strong> delayed by <strong>'+delay+' min</strong>. New pickup time <strong style="color:var(--cyan)">'+newTime+'</strong>. Please confirm.</div>'
+    +'<div style="padding:9px 12px;background:rgba(0,210,106,0.06);border:1px solid rgba(0,210,106,0.2);border-radius:6px;font-size:12px;color:var(--green);margin-bottom:16px">Delivered via WATI at '+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true})+'</div>'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;padding:10px;background:var(--green);border:none;border-radius:6px;color:#000;font-size:13px;font-weight:700;cursor:pointer">Done</button></div>';
+  document.body.appendChild(m);
+  if(btn){ btn.textContent='Notified'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(0,210,106,0.3)'; btn.disabled=true; }
+}
+
+function ctFlagReassign(btn, bookingId){
+  if(!window._atRisk) window._atRisk={};
+  const info=(window._delayNew||{})[bookingId]||{};
+  window._atRisk[bookingId]={flight:info.flight||'', newPickup:info.newPickup||''};
+  loadTower();   // re-render: row shows At Risk + booking surfaces in Urgent panel (orange)
+}
+
 async function loadTower() {
-  const [bookings, stats, alerts, drivers] = await Promise.all([
+  const [bookings, stats, alerts, drivers, flights] = await Promise.all([
     fetch('/api/bookings').then(r=>r.json()),
     fetch('/api/stats').then(r=>r.json()),
     fetch('/api/master-alerts?team=control_tower').then(r=>r.json()).catch(()=>[]),
-    fetch('/api/drivers').then(r=>r.json()).catch(()=>[])
+    fetch('/api/drivers').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/flights').then(r=>r.json()).catch(()=>[])
   ]);
   const driverMap = {};
   drivers.forEach(d => { driverMap[d['Driver ID']] = d; });
@@ -1749,24 +2017,76 @@ async function loadTower() {
   if(g('ct-cancelled')) g('ct-cancelled').textContent = cancelled.length;
   renderAlerts(alerts, 'ct-alerts-list', false);
   const urgentEl = g('ct-urgent-list');
-  if(urgentEl) urgentEl.innerHTML = urgent.length===0
-    ? '<div style="color:var(--text3);font-size:14px;padding:16px 0">No urgent bookings right now</div>'
-    : urgent.map(b => {
-        const drv = driverMap[b['Assigned Driver ID']];
-        const phone = drv ? drv['Phone Number'] : null;
-        const phoneHtml = phone ? '<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--cyan);margin-left:10px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);padding:3px 12px;border-radius:4px">Tel: ' + phone + '</span>' : '';
-        return '<div style="padding:18px 0;border-bottom:1px solid var(--border)">'
-          + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-          + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:var(--red)">' + b['Booking ID'] + '</span>'
-          + srcBadge(b['Source'])
-          + '<span style="font-family:DM Mono,monospace;font-size:15px;color:var(--amber);font-weight:700">' + (b['Pickup Time']||'') + '</span>'
-          + '</div>'
-          + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">' + (b['Customer Name']||'') + ' - ' + (b['Pickup Location']||'') + '</div>'
-          + '<div style="font-size:14px;color:var(--text2);line-height:1.8">Driver: <strong style="color:var(--red)">' + (b['Driver Name']||'Unassigned') + '</strong>'
-          + phoneHtml
-          + '<span style="color:var(--text3);margin-left:8px">Reminder sent, no response. Call now.</span>'
-          + '</div></div>';
-      }).join('');
+  if(!window._atRisk) window._atRisk = {};
+  function urgentRow(b, atrisk){
+    const drv = driverMap[b['Assigned Driver ID']];
+    const phone = drv ? drv['Phone Number'] : null;
+    const phoneHtml = phone ? '<span style="font-family:DM Mono,monospace;font-size:14px;font-weight:700;color:var(--cyan);margin-left:10px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);padding:3px 12px;border-radius:4px">Tel: ' + phone + '</span>' : '';
+    const idc = atrisk ? '#FF6D00' : 'var(--red)';
+    const tag = atrisk ? '<span class="badge bg-orange" style="margin-left:8px">At Risk — Flight Delay</span>' : '';
+    const note = atrisk
+      ? '<span style="color:#FF6D00;margin-left:8px">Flagged for reassignment. New pickup ' + (window._atRisk[b['Booking ID']]||{}).newPickup + '.</span>'
+      : '<span style="color:var(--text3);margin-left:8px">Reminder sent, no response. Call now.</span>';
+    return '<div style="padding:18px 0;border-bottom:1px solid var(--border)' + (atrisk?';background:rgba(255,109,0,0.04)':'') + '">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      + '<span style="font-weight:700;font-family:DM Mono,monospace;font-size:15px;color:' + idc + '">' + b['Booking ID'] + '</span>'
+      + srcBadge(b['Source']) + tag
+      + '<span style="font-family:DM Mono,monospace;font-size:15px;color:var(--amber);font-weight:700">' + (b['Pickup Time']||'') + '</span>'
+      + '</div>'
+      + '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px">' + (b['Customer Name']||'') + ' - ' + (b['Pickup Location']||'') + '</div>'
+      + '<div style="font-size:14px;color:var(--text2);line-height:1.8">Driver: <strong style="color:' + idc + '">' + (b['Driver Name']||'Unassigned') + '</strong>'
+      + phoneHtml + note + '</div></div>';
+  }
+  const atRiskBookings = Object.keys(window._atRisk).map(id => bookings.find(b=>b['Booking ID']===id)).filter(Boolean);
+  const urgentHtml = atRiskBookings.map(b=>urgentRow(b,true)).join('') + urgent.map(b=>urgentRow(b,false)).join('');
+  if(urgentEl) urgentEl.innerHTML = urgentHtml || '<div style="color:var(--text3);font-size:14px;padding:16px 0">No urgent bookings right now</div>';
+
+  // ---- Flight Delay Management (live KLIA2 delays → affected bookings) ----
+  const ctAddMin = (t,m)=>{ const p=(t||'00:00').split(':'); let tot=(parseInt(p[0])||0)*60+(parseInt(p[1])||0)+m; return String(Math.floor(tot/60)%24).padStart(2,'0')+':'+String(tot%60).padStart(2,'0'); };
+  const activeBk = bookings.filter(b=>!['Cancelled','No Show'].includes(b['Booking Status']));
+  const delayedFlights = (flights||[]).filter(f=>parseInt(f['Delay (minutes)']||0)>0);
+  let dhtml=''; let totalAffected=0;
+  delayedFlights.forEach(f=>{
+    const fn=(f['Flight Number']||'').trim();
+    const delay=parseInt(f['Delay (minutes)']||0);
+    const affected=activeBk.filter(b=>(b['Flight Number']||'').trim()===fn);
+    if(affected.length===0) return;
+    totalAffected += affected.length;
+    const newEta=ctAddMin(f['Scheduled Arrival Time'], delay);
+    const rowsHtml = affected.map(b=>{
+      const drv=driverMap[b['Assigned Driver ID']];
+      const phone=drv?drv['Phone Number']:'—';
+      const newPickup=ctAddMin(b['Pickup Time'], delay);
+      const flagged=window._atRisk[b['Booking ID']];
+      const actionCell = flagged
+        ? '<span class="badge bg-orange">✓ At Risk — flagged</span>'
+        : '<button onclick="ctNotifyDriver(this,\''+(b['Driver Name']||'').replace(/\x27/g,'')+'\',\''+fn+'\','+delay+',\''+newPickup+'\')" style="padding:5px 10px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:4px;font-size:11px;font-weight:700;color:var(--cyan);cursor:pointer;margin-right:6px">Notify Driver</button>'
+          + '<button onclick="ctFlagReassign(this,\''+b['Booking ID']+'\')" style="padding:5px 10px;background:rgba(255,109,0,0.1);border:1px solid rgba(255,109,0,0.25);border-radius:4px;font-size:11px;font-weight:700;color:#FF6D00;cursor:pointer">Flag for Reassignment</button>';
+      window._delayNew = window._delayNew||{}; window._delayNew[b['Booking ID']]={flight:fn,newPickup:newPickup};
+      return '<tr>'
+        +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:10px 12px;font-weight:700;color:var(--text)">'+b['Booking ID']+'</td>'
+        +'<td style="font-size:13px;padding:10px 12px">'+(b['Customer Name']||'')+'</td>'
+        +'<td style="font-size:13px;padding:10px 12px">'+(b['Driver Name']||'Unassigned')+'</td>'
+        +'<td style="padding:10px 12px"><span style="font-family:DM Mono,monospace;font-size:13px;font-weight:700;color:var(--cyan);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);padding:2px 10px;border-radius:4px">'+phone+'</span></td>'
+        +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:10px 12px;color:var(--text3)">'+(b['Pickup Time']||'')+'</td>'
+        +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:10px 12px;font-weight:700;color:#FF6D00">'+newPickup+'</td>'
+        +'<td style="padding:10px 12px;white-space:nowrap">'+actionCell+'</td>'
+        +'</tr>';
+    }).join('');
+    dhtml += '<div style="margin-bottom:16px;background:var(--bg3);border:1px solid rgba(255,109,0,0.2);border-radius:8px;overflow:hidden">'
+      +'<div style="padding:14px 16px;background:rgba(255,109,0,0.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+      +'<div><span style="font-family:Syne,sans-serif;font-size:16px;font-weight:800;color:var(--red)">'+fn+'</span>'
+      +'<span style="font-size:13px;color:var(--text2);margin-left:10px">from '+(f['Origin City']||'')+'</span></div>'
+      +'<div style="font-size:12px;color:var(--text2)">Scheduled <b style="color:var(--text)">'+(f['Scheduled Arrival Time']||'')+'</b> → New ETA <b style="color:#FF6D00">'+newEta+'</b> '
+      +'<span class="badge bg-orange" style="margin-left:6px">+'+delay+' min</span> · Affected bookings: <b>'+affected.length+'</b></div></div>'
+      +'<div class="tbl-wrap"><table><thead><tr>'
+      +'<th style="font-size:11px;padding:8px 12px">Booking</th><th style="font-size:11px;padding:8px 12px">Passenger</th><th style="font-size:11px;padding:8px 12px">Driver</th><th style="font-size:11px;padding:8px 12px">Phone</th><th style="font-size:11px;padding:8px 12px">Original Pickup</th><th style="font-size:11px;padding:8px 12px">New Pickup</th><th style="font-size:11px;padding:8px 12px">Action</th>'
+      +'</tr></thead><tbody>'+rowsHtml+'</tbody></table></div></div>';
+  });
+  const delayPanel=g('ct-delay-panel'); const delayCount=g('ct-delay-count');
+  if(delayCount) delayCount.textContent = totalAffected>0 ? (delayedFlights.length+' delayed · '+totalAffected+' bookings affected') : '';
+  if(delayPanel) delayPanel.innerHTML = dhtml ||
+    '<div style="padding:16px;background:rgba(0,210,106,0.05);border:1px solid rgba(0,210,106,0.2);border-radius:8px;color:var(--green);font-size:14px;font-weight:600">✓ All monitored flights on schedule. No reassignments needed.</div>';
   // No Show log — live from Bookings tab (Booking Status = No Show)
   const noShowBookings = bookings.filter(b => b['Booking Status']==='No Show');
   const noshowListEl = g('ct-noshow-list');
@@ -1939,7 +2259,84 @@ async function loadDriverSupport() {
     +'<div style="font-size:12px;color:var(--text3);margin-top:4px">Above 2,000 km/month</div>'
     +'<div style="font-size:13px;color:var(--text2);margin-top:6px;font-weight:600">RM 80 subsidy/month</div></div></div>'
     +'<div style="font-size:13px;color:var(--text3)">Next BUDI95 submission: 1st of next month at 9:00 AM.</div>';
+  loadEvp();
+  loadOnboarding();
 }
+
+// ─── EVP MANAGEMENT ───
+let _evpData=[], _evpFilter='all';
+async function loadEvp(){
+  const d=await fetch('/api/evp').then(r=>r.json()).catch(()=>null);
+  if(!d) return;
+  _evpData=d.drivers||[];
+  const g=id=>document.getElementById(id);
+  if(g('evp-total')) g('evp-total').textContent=(d.quota_total||0).toLocaleString();
+  if(g('evp-active')) g('evp-active').textContent=d.assigned_active;
+  if(g('evp-inactive')) g('evp-inactive').textContent=d.assigned_inactive;
+  if(g('evp-available')) g('evp-available').textContent=(d.available||0).toLocaleString();
+  let reco='';
+  const card=(c,t)=>{const col=c==='red'?'var(--red)':'var(--amber)';return '<div style="background:'+(c==='red'?'rgba(232,0,45,0.05)':'rgba(240,165,0,0.05)')+';border-left:3px solid '+col+';border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--text2)"><b style="color:'+col+'">Recommendation:</b> '+t+'</div>';};
+  if(d.assigned_inactive>0) reco+=card('red',d.assigned_inactive+' EVPs are assigned to inactive drivers. Reclaim and reassign to new driver pipeline. Estimated quota freed: '+d.assigned_inactive);
+  if(d.available<50) reco+=card('amber','EVP quota running low. Consider purchasing new batch from APAD. Recommended: purchase 60 days before current batch expiry.');
+  if(g('evp-reco')) g('evp-reco').innerHTML=reco;
+  renderEvpTable();
+}
+function evpFilter(f,btn){ _evpFilter=f; document.querySelectorAll('#evp-filters .date-btn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderEvpTable(); }
+function renderEvpTable(){
+  const body=document.getElementById('evp-table-body'); if(!body) return;
+  const f=_evpFilter;
+  const rows=_evpData.filter(d=>{
+    if(f==='active') return d.evp_status==='Active' && d.driver_status==='Active';
+    if(f==='lapsing') return d.evp_status==='Expiring';
+    if(f==='inactive') return d.driver_status==='Inactive';
+    if(f==='cancelled') return d.evp_status==='Expired';
+    return true;
+  });
+  const cmap={green:'var(--green)',amber:'var(--amber)',red:'var(--red)'};
+  body.innerHTML=rows.slice(0,60).map(d=>{
+    const col=cmap[d.colour]||'var(--text2)';
+    return '<tr>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:9px 12px;color:var(--text2)">'+d.driver_id+'</td>'
+      +'<td style="font-size:13px;padding:9px 12px;font-weight:600;color:var(--text)">'+d.name+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:9px 12px;color:var(--text2)">'+d.evp_number+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:9px 12px">'+d.evp_expiry+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:9px 12px;font-weight:700;color:'+col+'">'+(d.days_until_expiry!=null?d.days_until_expiry+'d':'—')+'</td>'
+      +'<td style="padding:9px 12px"><span class="badge '+(d.driver_status==='Active'?'bg-green':'bg-red')+'">'+d.driver_status+'</span></td>'
+      +'<td style="padding:9px 12px"><span class="badge" style="background:'+col+'1a;color:'+col+';border:1px solid '+col+'33">'+d.evp_status+'</span></td>'
+      +'</tr>';
+  }).join('') || '<tr><td colspan="7" style="padding:14px;color:var(--text3)">No drivers in this filter</td></tr>';
+}
+
+// ─── DRIVER ONBOARDING PIPELINE ───
+const ONB_STAGES=['App Registration','Application Under Review','JoyClass Pending','Account Activation Pending','Activated'];
+async function loadOnboarding(){
+  const rows=await fetch('/api/onboarding').then(r=>r.json()).catch(()=>[]);
+  const g=id=>document.getElementById(id);
+  const inPipeline=rows.filter(r=>r['Current Stage']!=='Activated');
+  if(g('onb-total')) g('onb-total').textContent=inPipeline.length;
+  const flagged=rows.filter(r=>r['Flagged']==='Yes');
+  if(g('onb-flagged-count')) g('onb-flagged-count').textContent=flagged.length;
+  const byStage={}; ONB_STAGES.forEach(s=>byStage[s]={total:0,flag:0});
+  rows.forEach(r=>{ const s=r['Current Stage']; if(byStage[s]){byStage[s].total++; if(r['Flagged']==='Yes') byStage[s].flag++;} });
+  const fEl=g('onb-funnel');
+  if(fEl) fEl.innerHTML=ONB_STAGES.map((s,i)=>{
+    const c=byStage[s]; const fl=c.flag>0;
+    return '<div style="flex:1;min-width:118px;background:var(--bg3);border:1px solid '+(fl?'rgba(240,165,0,0.3)':'var(--border)')+';border-radius:8px;padding:14px 10px;text-align:center">'
+      +'<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stage '+(i+1)+'</div>'
+      +'<div style="font-family:Syne,sans-serif;font-size:26px;font-weight:800;color:var(--text)">'+c.total+'</div>'
+      +'<div style="font-size:11px;color:var(--text2);margin-top:4px;line-height:1.3">'+s+'</div>'
+      +(c.flag>0?'<div style="font-size:11px;color:var(--amber);font-weight:700;margin-top:6px">⚑ '+c.flag+' flagged</div>':'')
+      +'</div>'+(i<ONB_STAGES.length-1?'<div style="display:flex;align-items:center;color:var(--text3);font-size:18px;padding:0 2px">→</div>':'');
+  }).join('');
+  const fpe=g('onb-flagged');
+  if(fpe) fpe.innerHTML=flagged.length===0?'<div style="color:var(--text3);font-size:14px;padding:8px 0">No flagged applicants</div>'
+    :flagged.map(r=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap">'
+      +'<div><span style="font-size:14px;font-weight:600;color:var(--text)">'+r['Full Name']+'</span> <span style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+r['Applicant ID']+'</span>'
+      +'<div style="font-size:12px;color:var(--text3);margin-top:3px">Stage: '+r['Current Stage']+' · '+r['Days in Stage']+' days stuck · '+(r['Flag Reason']||'')+'</div></div>'
+      +'<button onclick="onbReminder(this)" style="padding:5px 12px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:4px;font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer">Send Reminder</button>'
+      +'</div>').join('');
+}
+function onbReminder(btn){ btn.textContent='Reminder Sent'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(0,210,106,0.3)'; btn.disabled=true; }
 
 function watiModal(btn) {
   const name = btn.getAttribute('data-name');
@@ -2489,7 +2886,166 @@ async function loadCustomerSupport() {
       +escBtn
       +'</div></div>';
   }).join('');
+
+  renderReputation(sfRows);
 }
+
+// ─── REPUTATION INTELLIGENCE ───
+function repStars(n){ let s=''; for(let i=1;i<=5;i++) s+=(i<=n?'★':'☆'); return s; }
+function renderReputation(sfRows){
+  const g=id=>document.getElementById(id);
+  // Panel 1 — Social media monitoring (fictional; prod = social listening API)
+  const social=[
+    {platform:'Facebook',date:'2026-06-11',issue:'Driver cancelled last minute, no refund. Worst service.',sentiment:'Very Negative',status:'Responded'},
+    {platform:'Twitter',date:'2026-06-11',issue:'@AirAsiaRide surge pricing during rain is daylight robbery.',sentiment:'Negative',status:'Monitoring'},
+    {platform:'Instagram',date:'2026-06-10',issue:'Booked airport pickup, driver never showed. 40 min wait.',sentiment:'Very Negative',status:'Responded'},
+    {platform:'Twitter',date:'2026-06-10',issue:'Rude driver at KLIA2. Reported to support, still waiting.',sentiment:'Negative',status:'Monitoring'},
+    {platform:'Facebook',date:'2026-06-09',issue:'App charged me twice for one trip. Need refund ASAP.',sentiment:'Negative',status:'Resolved'},
+  ];
+  const sentC=s=>s==='Very Negative'?'bg-red':'bg-amber';
+  const statC=s=>s==='Resolved'?'bg-green':s==='Responded'?'bg-blue':'bg-grey';
+  if(g('rep-social')) g('rep-social').innerHTML = social.map(s=>
+    '<div style="padding:11px 0;border-bottom:1px solid var(--border)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+    +'<span style="font-size:12px;font-weight:700;color:var(--text)">'+s.platform+'</span>'
+    +'<span style="font-size:11px;color:var(--text3);font-family:DM Mono,monospace">'+s.date+'</span></div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:6px">'+s.issue+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;gap:5px">'
+    +'<span class="badge '+sentC(s.sentiment)+'">'+s.sentiment+'</span><span class="badge '+statC(s.status)+'">'+s.status+'</span></div>'
+    +'<button onclick="repAction(this)" style="padding:4px 11px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:4px;font-size:11px;font-weight:700;color:var(--cyan);cursor:pointer">Action</button>'
+    +'</div></div>').join('');
+
+  // Panel 3 — Google reviews (fictional; prod = Google Business API)
+  if(g('rep-google-rating')) g('rep-google-rating').innerHTML='<span style="color:var(--amber)">'+repStars(4)+'</span> 4.1';
+  const reviews=[
+    {name:'Lim Chee Keong',stars:1,date:'2026-06-11',summary:'Driver took longer route, fare was double. Avoid.',status:'Pending Response'},
+    {name:'Nurul Huda',stars:2,date:'2026-06-10',summary:'Long wait at airport, driver hard to find.',status:'Responded'},
+    {name:'Ramesh Pillai',stars:1,date:'2026-06-10',summary:'Cancelled on me twice. Unreliable for airport runs.',status:'Pending Response'},
+    {name:'Tan Siew Ling',stars:2,date:'2026-06-09',summary:'Car was not clean, aircon weak. Driver polite though.',status:'Responded'},
+  ];
+  if(g('rep-google')) g('rep-google').innerHTML = reviews.map(r=>
+    '<div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">'
+    +'<div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">'
+    +'<span style="font-size:13px;font-weight:600;color:var(--text)">'+r.name+'</span>'
+    +'<span style="color:var(--amber);font-size:13px">'+repStars(r.stars)+'</span>'
+    +'<span style="font-size:11px;color:var(--text3)">'+r.date+'</span></div>'
+    +'<div style="font-size:13px;color:var(--text2)">'+r.summary+'</div></div>'
+    +'<div style="text-align:right">'+(r.status==='Responded'
+      ?'<span class="badge bg-green">Responded</span>'
+      :'<span class="badge bg-amber" style="margin-bottom:6px;display:inline-block">Pending Response</span><br><button onclick="repRespond(this)" style="padding:4px 11px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:4px;font-size:11px;font-weight:700;color:var(--cyan);cursor:pointer">Respond</button>')
+    +'</div></div>').join('');
+
+  renderAppReviews();
+}
+
+// Panels 3 & 4 — real Google Play reviews (passenger + driver apps)
+function repEsc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+async function renderAppReviews(){
+  const d=await fetch('/api/app-reviews').then(r=>r.json()).catch(()=>null);
+  if(!d) return;
+  const g=id=>document.getElementById(id);
+  const stars=n=>{ let s=''; const v=Math.round(n||0); for(let i=1;i<=5;i++) s+=(i<=v?'★':'☆'); return s; };
+  function render(listEl, metaEl, data){
+    data=data||{};
+    if(metaEl) metaEl.innerHTML='<span style="color:var(--amber)">'+stars(data.rating)+'</span> '+(data.rating||'—')+' · '+Number(data.total||0).toLocaleString()+' reviews';
+    if(!listEl) return;
+    const revs=data.reviews||[];
+    listEl.innerHTML = revs.length===0
+      ? '<div style="color:var(--text3);font-size:13px;padding:8px 0">No reviews available</div>'
+      : revs.map(r=>{
+        const sc=r.score<=2?'var(--red)':(r.score==3?'var(--amber)':'var(--green)');
+        return '<div style="padding:11px 0;border-bottom:1px solid var(--border)">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px">'
+          +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="color:'+sc+';font-size:13px">'+stars(r.score)+'</span>'
+          +'<span style="font-size:12px;font-weight:600;color:var(--text)">'+repEsc(r.user)+'</span>'
+          +'<span style="font-size:11px;color:var(--text3)">'+(r.date||'')+'</span></div>'
+          +'<span class="badge bg-grey" style="font-size:9px;white-space:nowrap">Google Play</span></div>'
+          +'<div style="font-size:13px;color:var(--text2);line-height:1.5">'+repEsc(r.text)+'</div></div>';
+      }).join('');
+  }
+  render(g('rep-passenger'), g('rep-passenger-meta'), d.passenger);
+  render(g('rep-driver'), g('rep-driver-meta'), d.driver);
+}
+function repAction(btn){ btn.textContent='Actioned'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(0,210,106,0.3)'; btn.disabled=true; }
+function repRespond(btn){ btn.textContent='Response Sent'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(0,210,106,0.3)'; btn.disabled=true; }
+
+// ── INCENTIVE & FRAUD ───────────────────────────────────────────────────────
+async function loadIncentiveFraud(){
+  const [inc, ref, fraud] = await Promise.all([
+    fetch('/api/incentives').then(r=>r.json()).catch(()=>null),
+    fetch('/api/referrals').then(r=>r.json()).catch(()=>null),
+    fetch('/api/fraud').then(r=>r.json()).catch(()=>null)
+  ]);
+  const g=id=>document.getElementById(id);
+  if(inc){
+    if(g('if-eligible')) g('if-eligible').textContent=inc.eligible_count;
+    if(g('if-payout')) g('if-payout').textContent='RM '+(inc.total_payout||0).toLocaleString();
+    if(g('if-disq')) g('if-disq').textContent=inc.disqualified_count;
+    if(g('if-paid')) g('if-paid').textContent=inc.paid_count;
+    const tierRank={'Tier 3':3,'Tier 2':2,'Tier 1':1};
+    const approved=inc.rows.filter(r=>['Eligible','Paid','Pending'].includes(r['Incentive Status']))
+      .sort((a,b)=>(tierRank[b['Tier Achieved']]||0)-(tierRank[a['Tier Achieved']]||0) || (parseInt(b['Trips This Week'])||0)-(parseInt(a['Trips This Week'])||0));
+    const stc=s=>s==='Paid'?'bg-green':s==='Pending'?'bg-amber':'bg-blue';
+    if(g('if-payout-body')) g('if-payout-body').innerHTML=approved.slice(0,60).map(r=>
+      '<tr><td style="font-size:13px;padding:8px 12px;font-weight:600;color:var(--text)">'+r['Driver Name']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:8px 12px">'+r['Trips This Week']+'</td>'
+      +'<td style="font-size:13px;padding:8px 12px">'+r['Tier Achieved']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:8px 12px;font-weight:700;color:var(--green)">RM '+r['Bonus Amount RM']+'</td>'
+      +'<td style="padding:8px 12px"><span class="badge '+stc(r['Incentive Status'])+'">'+r['Incentive Status']+'</span></td></tr>').join('');
+    const disq=inc.rows.filter(r=>r['Incentive Status']==='Disqualified');
+    if(g('if-disq-panel')) g('if-disq-panel').innerHTML=disq.map(r=>
+      '<div style="padding:11px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600;color:var(--text)">'+r['Driver Name']+'</span>'
+      +'<span style="font-family:DM Mono,monospace;font-size:13px;color:var(--red);text-decoration:line-through">RM '+r['Bonus Amount RM']+'</span></div>'
+      +'<div style="font-size:12px;color:var(--text3);margin-top:3px"><span class="badge bg-red" style="font-size:9px">'+(r['Fraud Type']||'Fraud')+'</span> '+(r['Disqualification Reason']||'')+'</div></div>').join('');
+  }
+  if(ref){
+    if(g('rf-total')) g('rf-total').textContent=ref.total;
+    if(g('rf-paid')) g('rf-paid').textContent=ref.paid;
+    if(g('rf-pending')) g('rf-pending').textContent=ref.pending;
+    if(g('rf-disq')) g('rf-disq').textContent=ref.disqualified;
+    const pst=s=>s==='Paid'?'bg-green':s==='Pending'?'bg-amber':'bg-red';
+    if(g('rf-body')) g('rf-body').innerHTML=ref.rows.map(r=>
+      '<tr><td style="font-size:13px;padding:8px 12px;color:var(--text)">'+r['Referring Driver Name']+'</td>'
+      +'<td style="font-size:13px;padding:8px 12px">'+r['Referred Driver Name']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:8px 12px;color:var(--text3)">'+r['Referral Date']+'</td>'
+      +'<td style="font-size:12px;padding:8px 12px">'+r['Referred Driver Status']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:8px 12px">'+r['Trips Completed by Referred']+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:8px 12px;font-weight:700;color:'+(r['Bonus Eligible']==='Yes'?'var(--green)':'var(--text3)')+'">RM '+r['Bonus Amount RM']+'</td>'
+      +'<td style="padding:8px 12px"><span class="badge '+pst(r['Payment Status'])+'">'+r['Payment Status']+'</span></td></tr>').join('');
+  }
+  if(fraud){
+    if(g('fr-gps')) g('fr-gps').textContent=fraud.gps_count;
+    if(g('fr-inc')) g('fr-inc').textContent=fraud.incentive_count;
+    if(g('fr-early')) g('fr-early').textContent=fraud.early_count;
+    if(g('fr-disqrm')) g('fr-disqrm').textContent='RM '+(fraud.total_disqualified_rm||0).toLocaleString();
+    if(g('fr-gps-body')) g('fr-gps-body').innerHTML=fraud.gps_fraud.map(x=>
+      '<tr><td style="font-size:13px;padding:8px 12px;font-weight:600;color:var(--text)">'+x.name+' <span style="color:var(--text3);font-family:DM Mono,monospace;font-size:11px">'+x.driver_id+'</span></td>'
+      +'<td style="font-size:12px;padding:8px 12px">'+(x.queue_type||'')+'</td>'
+      +'<td style="font-size:12px;padding:8px 12px;color:var(--cyan)">Airport Queue KLIA2</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:12px;padding:8px 12px;color:var(--red)">'+x.gps_lat+', '+x.gps_lng+'</td>'
+      +'<td style="font-family:DM Mono,monospace;font-size:13px;padding:8px 12px;font-weight:700;color:var(--red)">'+x.distance_km+' km</td>'
+      +'<td style="padding:8px 12px"><button onclick="frInvestigate(this)" style="padding:4px 11px;background:rgba(232,0,45,0.1);border:1px solid rgba(232,0,45,0.25);border-radius:4px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer">Investigate</button></td></tr>').join('');
+    if(g('fr-inc-panel')) g('fr-inc-panel').innerHTML=fraud.incentive_fraud.map(x=>
+      '<div style="padding:11px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-weight:600;color:var(--text)">'+x['Driver Name']+'</span>'
+      +'<span style="font-family:DM Mono,monospace;font-size:13px;color:var(--amber)">RM '+x['Incentive Impact RM']+'</span></div>'
+      +'<div style="font-size:12px;color:var(--text2);margin-top:4px">'+x['Description']+'</div>'
+      +'<div style="font-size:11px;color:var(--text3);margin-top:4px"><span class="badge bg-amber" style="font-size:9px">'+x['Status']+'</span> '+x['Action Taken']+'</div></div>').join('');
+    const earlyEl=g('fr-early-panel');
+    if(earlyEl){
+      earlyEl.innerHTML=(fraud.noshow_incidents.length===0)
+        ? '<div style="color:var(--text3);font-size:13px;padding:8px 0">No no-show incidents this month</div>'
+        : fraud.noshow_incidents.map(x=>
+          '<div style="padding:10px 0;border-bottom:1px solid var(--border)">'
+          +'<div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:600;color:var(--text)">'+x.driver+'</span>'
+          +'<span class="badge '+(x.count>2?'bg-red':'bg-grey')+'">'+x.count+' this month'+(x.count>2?' — FLAGGED':'')+'</span></div>'
+          +'<div style="font-size:11px;color:var(--text3);margin-top:3px">'+x.bookings.map(bk=>bk.id+' @ '+bk.pickup).join(' · ')+'</div></div>').join('')
+          +'<div style="font-size:11px;color:var(--text3);margin-top:8px;font-style:italic">Pattern flag triggers at more than 2 early no-show incidents per driver per month.</div>';
+    }
+  }
+}
+function frInvestigate(btn){ btn.textContent='Investigating'; btn.style.color='var(--amber)'; btn.disabled=true; }
 
 // ── PRICING ───────────────────────────────────────────────────────────────────
 async function loadPricing() {
@@ -2757,7 +3313,7 @@ async function loadAirport() {
   else { badge.className='aq-badge sim'; badge.textContent='SIMULATED'; }
   document.getElementById('aq-updated').textContent = 'Last updated '+(d.last_updated||'');
 
-  // 2 · Three queue cards
+  // 2 · Three queue cards (count = clean drivers; GPS-fraud shown separately)
   document.getElementById('aq-queue-cards').innerHTML = (d.queues||[]).map(q=>`
     <div class="aq-qcard ${q.key}">
       <div class="aq-alloc">${q.allocation_pct}%</div>
@@ -2765,7 +3321,14 @@ async function loadAirport() {
       <div class="aq-qname">${q.label}</div>
       <div class="aq-qdesc">${AQ_QDESC[q.key]||''}</div>
       <div style="font-size:10px;color:var(--text3);margin-top:8px">${q.allocation_pct}% of airport bookings allocated here</div>
+      ${q.fraud>0?`<div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--red);background:rgba(232,0,45,0.08);border:1px solid rgba(232,0,45,0.2);border-radius:6px;padding:5px 8px">⚠ ${q.fraud} GPS-fraud excluded</div>`:''}
     </div>`).join('');
+  // live KLIA2 feed indicator
+  const lf = d.live_feed||{};
+  const lfEl = document.getElementById('aq-livefeed');
+  if(lfEl) lfEl.innerHTML = lf.connected
+    ? `<span class="pdot"></span> Live KLIA2 feed connected — ${lf.count} arrivals detected`
+    : `Live feed offline — using curated schedule`;
 
   // Per-queue gap (Now)
   const qg = d.queue_gap||{};
@@ -2810,7 +3373,10 @@ async function loadAirport() {
       const delayBadge = f.delay_minutes>0
         ? `<span class="badge bg-red" style="font-size:9px">+${f.delay_minutes} min</span>`
         : `<span class="badge bg-green" style="font-size:9px">On time</span>`;
-      const actual = f.actual_pax>0 ? `<div style="font-size:10px;color:var(--text3);margin-top:6px">Live data cross-check: ${f.actual_pax} pax on board</div>` : '';
+      const srcBrk = Object.entries(f.confirmed_sources||{}).map(([k,v])=>`${v} ${k}`).join(' + ');
+      const paxNote = f.pax_used_estimate
+        ? `${f.aircraft_type} · ${f.seats} seats × ${f.load_factor_pct}% load factor (estimate)`
+        : `live passenger count`;
       fhtml += `<div class="aq-fcard">
         <div class="aq-fhead">
           <div><div class="aq-fno">${f.flight_number}</div>
@@ -2818,12 +3384,14 @@ async function loadAirport() {
           <div style="text-align:right">${delayBadge}
             <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-top:5px">${f.scheduled}${f.actual && f.actual!==f.scheduled?' → '+f.actual:''}</div></div>
         </div>
-        <div style="font-size:11px;color:var(--text2)">Estimated passengers: <b style="color:var(--text)">${f.est_pax}</b>
-          <span style="color:var(--text3)">(${f.aircraft_type} · ${f.seats} seats × ${f.load_factor_pct}% load factor)</span></div>
+        <div style="font-size:11px;color:var(--text2)">Passengers: <b style="color:var(--text)">${f.pax_count}</b>
+          <span style="color:var(--text3)">(${paxNote})</span></div>
         <div class="aq-calc">
-          <div><b>${f.est_pax}</b> pax <span class="step">× 10%</span> AAR booking rate <span class="step">=</span> <span class="res">${f.aar_bookings}</span> expected AAR bookings</div>
-          <div style="border-top:1px solid var(--border);margin-top:5px;padding-top:5px">Expected AAR bookings: <span class="res">${f.aar_bookings}</span></div>
-        </div>${actual}
+          <div style="color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px">Forecasted demand</div>
+          <div><b>${f.pax_count}</b> pax <span class="step">× 10%</span> <span class="step">=</span> <span class="res">${f.forecasted}</span> expected AAR bookings</div>
+          <div style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px;color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px">Confirmed demand</div>
+          <div>Confirmed: <b style="color:${f.confirmed>0?'var(--green)':'var(--text3)'}">${f.confirmed}</b>${srcBrk?` <span style="color:var(--text3)">(${srcBrk})</span>`:''} booking${f.confirmed===1?'':'s'} on this flight</div>
+        </div>
       </div>`;
     });
   });
@@ -2858,7 +3426,8 @@ async function loadAirport() {
   const a = d.assumptions||{};
   if(a.aar_booking_rate_pct) document.getElementById('aq-a-ride').textContent = a.aar_booking_rate_pct+'% of arriving passengers';
   if(a.cycle_hours) document.getElementById('aq-a-cycle').textContent = a.cycle_hours+' hours per trip (1h trip + 1h return)';
-  if(a.load_factor_pct) document.getElementById('aq-a-load').textContent = a.load_factor_pct+'% of aircraft capacity';
+  if(a.load_factor_pct) document.getElementById('aq-a-load').textContent = a.load_factor_pct+'% of aircraft capacity when pax count unavailable';
+  if(a.gps_fraud_threshold_km) document.getElementById('aq-a-gps').textContent = a.gps_fraud_threshold_km+'km radius from KLIA2';
 }
 
 function deployAirportDriver(btn){
@@ -2874,6 +3443,7 @@ async function loadAll() {
   else if (id === 'tab-tower-content') await loadTower();
   else if (id === 'tab-driver-content') await loadDriverSupport();
   else if (id === 'tab-driverteam-content') await loadDriverTeam();
+  else if (id === 'tab-incentive-content') await loadIncentiveFraud();
   else if (id === 'tab-customer-content') await loadCustomerSupport();
   else if (id === 'tab-pricing-content') await loadPricing();
   else if (id === 'tab-spark-content') await loadSpark();
@@ -2893,34 +3463,34 @@ const BQ_NOTE = "Demo uses Google Sheet as data source. In production each agent
 
 const TAB_FLOWS = {
   nerve: {
-    source: {demo:"Google Sheet (Bookings, Drivers, WATI, Flights tabs)", prod:"BigQuery — aar_bookings, aar_drivers tables", updated:"every 5 minutes via Master Intelligence agent"},
-    agent: {name:"MASTER INTELLIGENCE", lines:["Reads all agent outputs simultaneously every 5 minutes.","Detects cross-table patterns.","Calculates KPIs: GMV, completion rate, avg fare.","Generates alerts when thresholds crossed."]},
-    output: ["Live KPI dashboard.","Master Intelligence alert panel.","Performance comparison week on week.","Morning email to management at 7AM."]
+    source: {demo:"Google Sheet — Bookings, Drivers, Flights, WATI Messages, CS Escalations, Driver Onboarding, Incentive & Fraud tabs", prod:"BigQuery", updated:"every 5 minutes via Master Intelligence agent"},
+    agent: {name:"MASTER INTELLIGENCE", lines:["Reads all agent outputs every 5 minutes.","Calculates all KPIs including the 6 new Operations Intelligence cards: EVP Quota Used, Onboarding Pipeline, Active Fraud Alerts, Open Escalations (Customer Support), Weekly Incentive Pool, Delayed Flights."]},
+    output: ["Full business performance dashboard.","Master Intelligence alerts.","Operations Intelligence KPIs.","Morning email to management at 7AM."]
   },
   master: {
-    source: {demo:"Google Sheet (all tabs) + aar_master_alerts table", prod:"BigQuery across all aar_ datasets", updated:"every 5 minutes via Master Intelligence agent"},
-    agent: {name:"MASTER INTELLIGENCE", lines:["Reads every agent’s output together.","Correlates patterns across compliance, bookings, support and demand.","Scores each agent’s health and throughput.","Surfaces one prioritised, de-duplicated alert feed."]},
-    output: ["Cross-agent pattern cards.","Agent health monitor.","Unified alert feed filtered by priority.","Nerve-centre escalations."]
+    source: {demo:"All 7 other agent outputs. Agent Health Sheet tab.", prod:"BigQuery cross-table reads", updated:"every 5 minutes via Master Intelligence agent"},
+    agent: {name:"MASTER INTELLIGENCE", lines:["Reads all agent outputs simultaneously every 5 minutes.","Detects cross-agent patterns: compliance risks tied to confirmed bookings, zone supply gaps, cancellation patterns, and fraud patterns across GPS data and trip patterns."]},
+    output: ["Cross-agent alert feed.","Agent health monitoring.","Unified alert feed with High/Medium priority filter."]
   },
   tower: {
-    source: {demo:"Google Sheet — Bookings tab (advance bookings only)", prod:"AAR Admin Portal API or BigQuery bookings table", updated:"every 10 minutes via TOWER agent"},
-    agent: {name:"TOWER", lines:["Reads all advance bookings for current shift.","Sets 45-minute reminder timer per booking.","Monitors driver response after reminder.","Flags no-response bookings as urgent after 10 minutes.","Detects premature No Show (pressed before pickup + 5 min).","Monitors B2B partner bookings separately."]},
-    output: ["Live booking board colour coded Green/Yellow/Red/Orange.","Urgent bookings surfaced at top with driver phone number.","Premature No Show log with timestamps.","Cancellation alerts with reason.","B2B partner completion rates."]
+    source: {demo:"Google Sheet — Bookings tab (advance bookings only), Flights tab for delay data. Malaysia Airports scraper for live delay status.", prod:"AAR Admin Portal API or BigQuery", updated:"every 10 minutes via TOWER agent"},
+    agent: {name:"TOWER", lines:["Reads all advance bookings every 10 minutes.","Sets 45-minute driver reminders.","Flags no-response bookings urgent after 10 minutes.","Detects premature No Show (before pickup time + 5 minutes).","Reads flight delay data from the Malaysia Airports scraper.","Identifies affected bookings when a flight is delayed.","Surfaces driver contact details for immediate reassignment action."]},
+    output: ["Live colour-coded booking board.","Urgent bookings with driver phone numbers.","Flight Delay Management panel with affected bookings, Notify Driver and Flag for Reassignment buttons.","Premature No Show log.","Cancellation alerts.","B2B partner completion rates."]
   },
   driver: {
-    source: {demo:"Google Sheet — Drivers tab", prod:"BigQuery — aar_drivers table", updated:"once daily at 12:01 AM via PULSE agent"},
-    agent: {name:"PULSE", lines:["Runs at 12:01 AM daily.","Checks each driver’s 4 documents: PSV, EVP, Insurance, PUSPAKOM.","Calculates days until expiry for each document.","Updates compliance status: Active, Lapsing, Lapsed.","Sends WATI reminder to drivers within 30 days of expiry.","Calculates BUDI95 tier based on monthly KM.","Generates APAD report on demand."]},
-    output: ["Driver compliance dashboard.","Lapsing drivers table sorted by urgency.","Lapsed drivers table with BLOCKED status.","BUDI95 tier counts with Download Report button.","APAD compliance report on button click."]
+    source: {demo:"Google Sheet — Drivers tab for compliance and EVP data. Compliance Summary tab for EVP quota config. Driver Onboarding tab for 50 new applicants.", prod:"BigQuery aar_drivers table", updated:"once daily at 12:01 AM via PULSE agent"},
+    agent: {name:"PULSE", lines:["Runs at 12:01 AM daily.","Checks PSV, EVP, Insurance, PUSPAKOM per driver.","Sends WATI reminders 30 days before expiry.","Blocks lapsed drivers from jobs.","Tracks EVP quota: total purchased vs assigned active vs assigned inactive vs available.","Flags inactive EVPs for reclaim.","Monitors 50 driver applicants through 4 onboarding stages.","Flags anyone stuck beyond SLA threshold."]},
+    output: ["Driver compliance dashboard.","EVP Management panel with quota overview and recommendations.","Driver Onboarding Pipeline with flagged applicants.","BUDI95 report 1st of month.","APAD report on demand."]
   },
   driverteam: {
-    source: {demo:"Google Sheet — Flights tab, Drivers tab", prod:"Malaysia Airports scraper for flights, BigQuery for driver data", updated:"every 30 minutes via SPARK agent"},
-    agent: {name:"SPARK", lines:["Scrapes KLIA2 arrivals every 30 minutes.","Calculates demand per zone using passenger counts.","Monitors events from Ticket2u and Eventbrite.","Identifies supply gaps per zone.","Generates incentive recommendations.","Sends Driver Team Lead positioning brief at 6AM."]},
-    output: ["Zone demand map with driver counts.","Airport demand by hour chart.","Active incentives table.","Driver performance table.","Supply gap alerts."]
+    source: {demo:"Google Sheet — Drivers tab, Flights tab, Zone Demand tab", prod:"BigQuery", updated:"every 30 minutes via SPARK agent"},
+    agent: {name:"SPARK", lines:["Reads KLIA2 arrivals every 30 minutes from the Malaysia Airports scraper.","Calculates zone demand.","Monitors events.","Identifies supply gaps.","Generates incentive recommendations for undersupplied zones."]},
+    output: ["Zone demand map.","Airport demand by hour.","Active incentives table.","Driver performance table.","Supply gap alerts.","6AM morning brief to Driver Team Lead."]
   },
   customer: {
-    source: {demo:"Google Sheet — WATI Messages tab", prod:"WATI webhook (live incoming messages) + Salesforce email integration", updated:"every 15 minutes via RELAY agent"},
-    agent: {name:"RELAY", lines:["Reads all incoming WATI messages.","Classifies each: Driver Status Check, Refund, Reschedule, Driver Complaint, General Enquiry.","Auto-resolves straightforward cases.","Routes complex cases to the correct team with context.","Monitors the 24-hour chat expiry window.","Sends promo code on validated complaint."]},
-    output: ["WATI message feed with classification badges.","SLA expiry colour coding.","Salesforce escalation list with severity.","Refund workflow tracker (4-stage).","Safety incident panel.","Resolution rate KPI."]
+    source: {demo:"Google Sheet — WATI Messages tab, CS Salesforce Escalations tab, CS Safety Incidents tab, CS Refunds tab, CS Driver Complaints tab", prod:"WATI webhook live + Salesforce email integration", updated:"every 15 minutes via RELAY agent"},
+    agent: {name:"RELAY", lines:["Reads all WATI messages every 15 minutes.","Classifies and auto-resolves where possible.","Routes escalations with context.","Monitors SLA expiry.","Reputation Intelligence section monitors social media mentions and Google Reviews.","Production: connects to a social listening API and the Google Business API."]},
+    output: ["WATI message feed with classification and SLA badges.","Salesforce escalation tracker.","Safety incident panel.","Refund workflow 4-stage tracker.","Driver complaints with escalation to Driver Team.","Reputation Intelligence: social media flags and Google Reviews monitor."]
   },
   pricing: {
     source: {demo:"Google Sheet — Fare Intelligence + Flights tabs", prod:"BigQuery fare + trips tables, competitor feeds", updated:"every 15 minutes via Fare Intelligence agent"},
@@ -2933,14 +3503,19 @@ const TAB_FLOWS = {
     output: ["Klang Valley live demand map.","Zone status list (supply vs demand).","SPARK incentive recommendations.","Activation log."]
   },
   airport: {
-    source: {demo:"Malaysia Airports website scraper + Google Sheet Flights tab fallback", prod:"Malaysia Airports scraper + AviationStack API for passenger counts", updated:"every 30 minutes via SPARK agent"},
-    agent: {name:"SPARK", lines:["Scrapes KLIA2 arrivals.","Estimates passengers using 84% load factor × aircraft type.","Calculates AAR demand: passengers × 10% = expected AAR bookings.","Calculates drivers needed using 2-hour cycle logic.","Checks current driver supply per queue type.","Generates 2-hour forecast.","Triggers deployment recommendation when gap detected."]},
-    output: ["Three queue status cards with driver counts.","2-hour forecast timeline.","Flight-by-flight demand breakdown with visible logic.","Deployment recommendation panel.","Assumptions panel."]
+    source: {demo:"Malaysia Airports scraper (live — 60 arrivals detected) for real flight data. Google Sheet Flights tab as stable demo source and fallback. Bookings tab for confirmed demand matching. Drivers tab for GPS coordinates and queue positions.", prod:"Malaysia Airports live feed or AirAsia internal flight data", updated:"every 30 minutes via SPARK agent"},
+    agent: {name:"SPARK", lines:["Scrapes KLIA2 arrivals every 30 minutes.","Estimates passengers using 84% load factor × aircraft type.","Calculates forecasted AAR demand: passengers × 10%.","Reads confirmed demand from the Bookings Sheet matching flight numbers.","Checks driver GPS coordinates against the 3km KLIA2 radius.","Flags GPS fraud where a driver holds a queue position but GPS shows outside the 3km threshold.","Builds a 2-hour deployment forecast with colour-coded gap analysis."]},
+    output: ["Three queue cards with fraud-excluded counts.","Forecasted vs confirmed demand per flight.","2-hour colour-coded forecast timeline.","GPS fraud warning on queue cards.","Deployment recommendation panel.","Assumptions panel always visible."]
+  },
+  incentive: {
+    source: {demo:"Google Sheet — Incentive & Fraud tab (INCENTIVE_DATA, REFERRAL_DATA, FRAUD_DATA sections). Drivers tab for GPS fraud flags. Bookings tab for No Show timing.", prod:"BigQuery trip data + admin portal GPS API", updated:"every 5 minutes via Master Intelligence"},
+    agent: {name:"INCENTIVE & FRAUD AGENT", lines:["Calculates weekly incentive eligibility across 3 tiers (Tier 1: 50 trips RM50, Tier 2: 100 trips RM150, Tier 3: 200 trips RM350).","Cross-checks every eligible driver against fraud alerts before approving payout.","Auto-disqualifies fraud-flagged drivers.","Tracks the referral programme (RM150 per successful referral — referred driver completes 10 trips).","Detects GPS fraud (outside 3km KLIA2 radius while holding queue position).","Detects incentive fraud patterns.","Flags early No Show fraud (pressed before pickup time + 5 minutes)."]},
+    output: ["Approved weekly payout list (fraud-clean drivers only).","Disqualified drivers panel with reason and amount lost.","Referral tracking with payment status.","Fraud Detection dashboard: GPS fraud, incentive fraud, early No Show fraud.","Total weekly incentive pool.","Production note: GPS fraud detection connects to admin portal API for live coordinates after hiring."]
   },
   companion: {
-    source: {demo:"Google Sheet — Drivers tab for driver context", prod:"BigQuery driver data + live WATI messages", updated:"real-time on driver message receipt"},
-    agent: {name:"DRIVER AI COMPANION", lines:["Layer 1: FAQ cache — 30 pre-loaded questions, zero API cost.","Layer 2: Response cache — repeated questions, zero API cost.","Layer 3: Claude API call — personalised questions only.","Driver memory updated nightly at midnight, injected into every Layer 3 response.","Supports Malay, English, Tamil."]},
-    output: ["Instant driver response via WhatsApp simulation.","Cache hit rate displayed (cost savings visible).","Conversation log per driver.","FAQ hit count per question."]
+    source: {demo:"Google Sheet — Drivers tab for driver context and earnings. Driver — Earnings tab.", prod:"BigQuery driver data + live WATI messages", updated:"real-time on driver message receipt"},
+    agent: {name:"DRIVER AI COMPANION", lines:["3-layer response system.","Layer 1: FAQ cache — 30 questions, zero API cost.","Layer 2: Response cache for repeated questions, zero API cost.","Layer 3: Claude API call with driver memory injected for personalised responses.","Memory updated nightly at midnight per driver.","Supports Malay, English, Tamil."]},
+    output: ["Instant driver responses via WhatsApp simulation.","Cache hit rate showing API cost savings.","Conversation log per driver.","FAQ hit count per question."]
   }
 };
 
@@ -3003,6 +3578,57 @@ function injectHowWorks(){
   });
 }
 injectHowWorks();
+
+// ═══════════════ GLOBAL 10-ROW SHOW MORE / SHOW LESS ═══════════════
+// Generic, applied after every render via a MutationObserver so it survives the
+// 30s refresh. Tables (<tbody>) are auto-detected; listed div-row panels too.
+const SM_LIMIT = 10;
+window._smExpand = window._smExpand || {};
+// div-based row lists (rows = direct children) that should also collapse
+const SM_DIV_LISTS = ['spark-zone-list','dt-gaps','n-demand-gap','n-supply-ok','nerve-zones',
+  'master-alerts-list','mi-alerts-list','cs-complaints-panel','cs-refund-workflow',
+  'rep-social','rep-google','rep-passenger','rep-driver','cs-safety-panel','dt-complaints-panel','if-disq-panel','fr-inc-panel',
+  'onb-flagged','aq-flights','ct-cancels','ct-noshow-list'];
+// NEVER collapse these (always show all rows)
+const SM_EXCEPT = ['fr-gps-body','ct-urgent-list'];
+let _smBusy=false, _smSched=false;
+
+function smKey(el){ return el.id || (el.closest('[id]') ? el.closest('[id]').id+'__t' : ''); }
+function smHideBtn(key){ const h=document.getElementById('sm-'+key); if(h) h.remove(); }
+function smBtn(anchor, key, expanded){
+  let h=document.getElementById('sm-'+key);
+  if(!h){ h=document.createElement('div'); h.id='sm-'+key; h.style.cssText='text-align:center;padding:10px 0';
+    anchor.parentNode.insertBefore(h, anchor.nextSibling); }
+  h.innerHTML='<button onclick="smToggle(\''+key+'\')" style="padding:6px 16px;border-radius:6px;font-size:11px;font-weight:400;letter-spacing:0.5px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer">'+(expanded?'Show Less':'Show More')+'</button>';
+}
+function smCollapse(rows, key, anchor, pinFn){
+  if(rows.length<=SM_LIMIT){ rows.forEach(r=>r.style.display=''); smHideBtn(key); return; }
+  const expanded=!!window._smExpand[key];
+  rows.forEach((r,i)=>{ r.style.display=(expanded || i<SM_LIMIT || (pinFn&&pinFn(r)))?'':'none'; });
+  smBtn(anchor, key, expanded);
+}
+function collapseAllTables(){
+  _smBusy=true;
+  try{
+    document.querySelectorAll('.tab-content table tbody').forEach(tb=>{
+      const key=smKey(tb); if(!key) return;
+      if(SM_EXCEPT.some(ex=> tb.id===ex || tb.closest('#'+ex))) return;
+      const rows=Array.from(tb.children).filter(c=>c.tagName==='TR');
+      const anchor=tb.closest('.tbl-wrap')||tb.closest('table')||tb;
+      const pin=(tb.id==='ct-bookings-body')?(r=>r.textContent.indexOf('Call Now')>-1 || !!r.querySelector('.bg-orange')):null;
+      smCollapse(rows, key, anchor, pin);
+    });
+    SM_DIV_LISTS.forEach(id=>{
+      const c=document.getElementById(id); if(!c) return;
+      const rows=Array.from(c.children).filter(ch=>ch.nodeType===1 && ch.id!==('sm-'+id));
+      smCollapse(rows, id, c, null);
+    });
+  } finally { _smBusy=false; }
+}
+function smToggle(key){ window._smExpand[key]=!window._smExpand[key]; collapseAllTables(); }
+function _smSchedule(){ if(_smSched) return; _smSched=true; setTimeout(()=>{_smSched=false; collapseAllTables();},150); }
+const _smObserver=new MutationObserver(()=>{ if(_smBusy) return; _smSchedule(); });
+document.querySelectorAll('.tab-content').forEach(tc=>_smObserver.observe(tc,{childList:true,subtree:true}));
 
 loadAll();
 setInterval(loadAll, 30000);

@@ -98,6 +98,17 @@ def run_relay():
     _safe("RELAY", _job)
 
 
+def run_malaysia_airports():
+    """Refresh the real KLIA2 arrivals cache from the Malaysia Airports feed
+    (every 30 min). Serves live data to the dashboard; does NOT write to the
+    Flights Sheet — the Flights tab stays the stable curated source."""
+    def _job():
+        from scrapers.malaysia_airports_scraper import get_klia2_arrivals
+        flights = get_klia2_arrivals(force=True)
+        return f"refreshed {len(flights)} KLIA2 arrivals"
+    _safe("MALAYSIA_AIRPORTS", _job)
+
+
 # ---------------------------------------------------------------------------
 # Scheduler assembly
 # ---------------------------------------------------------------------------
@@ -142,6 +153,15 @@ def build_scheduler():
         trigger=IntervalTrigger(minutes=15),
         id="relay_support_triage",
         name="RELAY customer-support triage",
+        replace_existing=True,
+    )
+
+    # MALAYSIA AIRPORTS — refresh real KLIA2 arrivals cache every 30 minutes
+    sched.add_job(
+        run_malaysia_airports,
+        trigger=IntervalTrigger(minutes=30),
+        id="malaysia_airports_refresh",
+        name="Malaysia Airports KLIA2 arrivals refresh",
         replace_existing=True,
     )
 

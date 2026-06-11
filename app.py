@@ -68,6 +68,141 @@ def api_refunds():
 def api_driver_complaints():
     return jsonify(read_all("CS — Driver Complaints"))
 
+@app.route("/api/evp")
+def api_evp():
+    from datetime import datetime
+    drivers = get_drivers()
+    cfg = get_compliance_summary()
+    c0 = cfg[0] if cfg else {}
+    def _num(v, d=0):
+        try:
+            return int(float(str(v).replace(",", "") or d))
+        except Exception:
+            return d
+    quota_total = _num(c0.get("EVP Quota Total"), 1000)
+    def days_until(s):
+        try:
+            return (datetime.strptime(str(s)[:10], "%Y-%m-%d") - datetime.now()).days
+        except Exception:
+            return None
+    table, active, inactive, cancelled = [], 0, 0, 0
+    for d in drivers:
+        comp = (d.get("Compliance Status") or "").strip()
+        driver_status = "Inactive" if comp == "Lapsed" else "Active"
+        du = days_until(d.get("EVP Expiry Date", ""))
+        if du is None:
+            evp_status = "Unknown"
+        elif du <= 0:
+            evp_status = "Expired"
+        elif du <= 30:
+            evp_status = "Expiring"
+        else:
+            evp_status = "Active"
+        if driver_status == "Inactive":
+            inactive += 1; colour = "red"
+        elif evp_status == "Expired":
+            cancelled += 1; colour = "red"
+        elif evp_status == "Expiring":
+            active += 1; colour = "amber"
+        else:
+            active += 1; colour = "green"
+        table.append({
+            "driver_id": d.get("Driver ID"), "name": d.get("Driver Name"),
+            "evp_number": d.get("EVP Number", ""), "evp_expiry": d.get("EVP Expiry Date", ""),
+            "days_until_expiry": du, "driver_status": driver_status,
+            "evp_status": evp_status, "colour": colour,
+        })
+    available = quota_total - active - inactive - cancelled
+    return jsonify({
+        "quota_total": quota_total, "assigned_active": active, "assigned_inactive": inactive,
+        "cancelled": cancelled, "available": available,
+        "last_purchase": c0.get("EVP Last Purchase Date", ""),
+        "notes": c0.get("EVP Quota Notes", ""), "drivers": table,
+    })
+
+@app.route("/api/onboarding")
+def api_onboarding():
+    return jsonify(read_all("Driver Onboarding"))
+
+@app.route("/api/app-reviews")
+def api_app_reviews():
+    try:
+        from scrapers.app_reviews_scraper import get_app_reviews
+        return jsonify(get_app_reviews())
+    except Exception as e:
+        print(f"app-reviews error: {e}")
+        return jsonify({"passenger": {"reviews": []}, "driver": {"reviews": []}})
+
+def _rm(v):
+    try:
+        return int(float(str(v).replace(",", "") or 0))
+    except Exception:
+        return 0
+
+@app.route("/api/incentives")
+def api_incentives():
+    rows = read_all("Incentive & Fraud")
+    eligible = [r for r in rows if r.get("Incentive Status") in ("Eligible", "Paid", "Pending")]
+    disq = [r for r in rows if r.get("Incentive Status") == "Disqualified"]
+    paid = [r for r in rows if r.get("Incentive Status") == "Paid"]
+    return jsonify({
+        "rows": rows,
+        "eligible_count": len(eligible),
+        "total_payout": sum(_rm(r.get("Bonus Amount RM")) for r in eligible),
+        "disqualified_count": len(disq),
+        "disqualified_amount": sum(_rm(r.get("Bonus Amount RM")) for r in disq),
+        "paid_count": len(paid),
+    })
+
+@app.route("/api/referrals")
+def api_referrals():
+    rows = read_all("Incentive & Fraud - Referrals")
+    return jsonify({
+        "rows": rows, "total": len(rows),
+        "paid": len([r for r in rows if r.get("Payment Status") == "Paid"]),
+        "pending": len([r for r in rows if r.get("Payment Status") == "Pending"]),
+        "disqualified": len([r for r in rows if r.get("Payment Status") == "Disqualified"]),
+    })
+
+@app.route("/api/fraud")
+def api_fraud():
+    import math
+    from collections import defaultdict
+    KLIA2 = (2.7456, 101.7072)
+    def hav(a, b, c, d):
+        R = 6371; p = math.pi / 180
+        x = math.sin((c - a) * p / 2) ** 2 + math.cos(a * p) * math.cos(c * p) * math.sin((d - b) * p / 2) ** 2
+        return 2 * R * math.asin(math.sqrt(x))
+    drivers = get_drivers()
+    gps = []
+    for dd in drivers:
+        if dd.get("GPS Fraud Flag") == "Yes":
+            try:
+                lat = float(dd.get("GPS Latitude")); lng = float(dd.get("GPS Longitude"))
+                dist = round(hav(KLIA2[0], KLIA2[1], lat, lng), 1)
+            except Exception:
+                lat = lng = dist = None
+            gps.append({"driver_id": dd.get("Driver ID"), "name": dd.get("Driver Name"),
+                        "queue_type": dd.get("queue_type"), "gps_lat": lat, "gps_lng": lng,
+                        "distance_km": dist})
+    incfraud = read_all("Incentive & Fraud - Fraud")
+    # early no-show from Bookings (Control Tower no-show log); flag drivers with > 2 this month
+    noshow = defaultdict(list)
+    for b in get_bookings():
+        if b.get("Booking Status") == "No Show" and b.get("Driver Name"):
+            noshow[b.get("Driver Name")].append({"id": b.get("Booking ID"), "pickup": b.get("Pickup Time"),
+                                                 "flight": b.get("Flight Number", "")})
+    incidents = [{"driver": k, "count": len(v), "bookings": v} for k, v in noshow.items()]
+    early = [x for x in incidents if x["count"] > 2]
+    inc = read_all("Incentive & Fraud")
+    disq_amount = sum(_rm(r.get("Bonus Amount RM")) for r in inc if r.get("Incentive Status") == "Disqualified")
+    return jsonify({
+        "gps_fraud": gps, "incentive_fraud": incfraud,
+        "early_noshow": early, "noshow_incidents": incidents,
+        "gps_count": len(gps), "incentive_count": len(incfraud), "early_count": len(early),
+        "total_disqualified_rm": disq_amount,
+    })
+
 @app.route("/api/airport-queue")
 def api_airport_queue():
     try:

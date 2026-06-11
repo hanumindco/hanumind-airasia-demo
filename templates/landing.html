@@ -125,7 +125,7 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-e
       <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
       <div class="agent-icon">💬</div>
       <div class="agent-name">WATI Agent</div>
-      <div class="agent-desc">Classifies and responds to all WhatsApp messages. Escalates refunds and monitors expiry windows.</div>
+      <div class="agent-desc">Classifies every WATI message into 5 types. Auto-resolves the routine ones and routes the rest with full context.</div>
       <div class="agent-status"><div class="status-dot"></div>Live</div>
       <div class="click-hint">CLICK TO LEARN MORE</div>
     </div>
@@ -134,7 +134,7 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-e
       <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
       <div class="agent-icon">🗼</div>
       <div class="agent-name">Control Tower Agent</div>
-      <div class="agent-desc">Monitors all advance bookings. Manages B2B intake, driver reminders, and cancellation escalations.</div>
+      <div class="agent-desc">Monitors advance bookings and live KLIA2 flight delays. Surfaces affected bookings with driver contact for action.</div>
       <div class="agent-status"><div class="status-dot"></div>Live</div>
       <div class="click-hint">CLICK TO LEARN MORE</div>
     </div>
@@ -143,7 +143,7 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-e
       <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
       <div class="agent-icon">📡</div>
       <div class="agent-name">Forecast Agent</div>
-      <div class="agent-desc">Forecasts demand using KLIA2 flight data. Positions drivers and activates incentives before peaks.</div>
+      <div class="agent-desc">Live KLIA2 flight data into forecasted and confirmed AAR demand, a 2-hour deployment forecast, and a zone heatmap.</div>
       <div class="agent-status"><div class="status-dot"></div>Live</div>
       <div class="click-hint">CLICK TO LEARN MORE</div>
     </div>
@@ -152,7 +152,7 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-e
       <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
       <div class="agent-icon">📋</div>
       <div class="agent-name">Document Agent</div>
-      <div class="agent-desc">Monitors driver compliance. Handles BUDI95 reconciliation and APAD reporting automatically.</div>
+      <div class="agent-desc">Daily document checks, EVP quota tracking, and the 50-applicant onboarding pipeline monitored against SLA.</div>
       <div class="agent-status"><div class="status-dot"></div>Live</div>
       <div class="click-hint">CLICK TO LEARN MORE</div>
     </div>
@@ -175,11 +175,11 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-e
       <div class="click-hint">CLICK TO LEARN MORE</div>
     </div>
 
-    <div class="agent-card" onclick="openModal('earnings')">
+    <div class="agent-card" onclick="openModal('incentive')">
       <div class="hb hb-tl"></div><div class="hb hb-tr"></div><div class="hb hb-bl"></div><div class="hb hb-br"></div>
-      <div class="agent-icon">📊</div>
-      <div class="agent-name">Driver Earnings Coach</div>
-      <div class="agent-desc">Sends personalised daily earnings summary to each driver at end of shift with zone recommendations.</div>
+      <div class="agent-icon">🛡️</div>
+      <div class="agent-name">Incentive &amp; Fraud Agent</div>
+      <div class="agent-desc">Calculates weekly payouts across 3 tiers, then auto-disqualifies fraud-flagged drivers before any ringgit goes out.</div>
       <div class="agent-status"><div class="status-dot"></div>Live</div>
       <div class="click-hint">CLICK TO LEARN MORE</div>
     </div>
@@ -218,122 +218,114 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-e
 const agents = {
   wati: {
     icon:'💬', name:'WATI Agent', isMaster:false,
-    title:'Your WhatsApp operations, fully automated',
-    summary:'Every WhatsApp message from a driver or customer is read, classified, and responded to automatically. Your team only steps in when human judgment is needed.',
+    title:'Every WhatsApp message read, classified, and routed automatically',
+    summary:'Monitors all incoming WATI messages from customers and drivers. Classifies each into five types, auto-resolves the routine ones, and routes the rest to the right team with full context.',
     tasks:[
-      'Reads every incoming WATI message and classifies it — refund request, promo enquiry, booking question, driver complaint, or general query',
-      'Sends auto-responses immediately for routine messages — no customer waiting hours for a reply',
-      'Flags refund requests and escalates to the Customer Support team with full context',
-      'Monitors every open conversation for the 24-hour expiry window — alerts the team before a message times out',
-      'Delivers promo codes automatically when a passenger qualifies',
-      'Logs every interaction with timestamp, classification, and resolution status on the dashboard'
+      'Monitors all incoming WATI messages from customers and drivers',
+      'Classifies each message into 5 types — Driver Status Check, Refund, Reschedule, Driver Complaint, General Enquiry',
+      'Auto-resolves driver status checks, refund requests, and general enquiries',
+      'Routes complaints and reschedule requests to the correct team with full context',
+      'Monitors the 24-hour chat expiry window and alerts before timeout',
+      'Sends promo codes automatically on validated complaints'
     ],
-    value:'Every customer message is acknowledged in seconds, not hours. Your CS team works on exceptions, not routine replies.'
+    value:'Produces a real-time message feed with classification badges, an auto-resolution rate KPI, and an escalation queue for human action.'
   },
   tower: {
     icon:'🗼', name:'Control Tower Agent', isMaster:false,
-    title:'Every advance booking monitored from confirmation to pickup',
-    summary:'Control Tower watches every advance booking from the moment it is confirmed. It sends driver reminders, flags non-responses, and manages all B2B partner intake automatically.',
+    title:'Every advance booking and every flight delay, monitored end to end',
+    summary:'Watches all advance bookings for the current shift plus real-time flight arrivals and delay status from the Malaysia Airports scraper, surfacing affected bookings with driver contact details.',
     tasks:[
-      'Monitors all advance bookings — KLOOK, KKdays, KPJ, Sunway Medical, Hospital Form, and direct bookings',
-      'Sends WATI reminder to driver at T-45 minutes before pickup',
-      'Flags unresponsive drivers at T-35 minutes — Control Tower team prompted to call immediately',
-      'Detects cancellations in real time and notifies the Control Tower dashboard instantly',
-      'Tracks B2B partner booking completion rates — surfaces underperforming partners',
-      'Monitors premature No Show attempts — flags drivers who press No Show before the 5-minute wait rule',
-      'Routes all control tower alerts to the Master Intelligence for cross-agent pattern detection'
+      'Monitors all advance bookings for the current shift, plus live flight arrivals and delays from the Malaysia Airports scraper',
+      'Sets 45-minute driver reminders per booking',
+      'Escalates no-response bookings to urgent status after 10 minutes',
+      'Detects premature No Show — before pickup time + 5 minutes',
+      'Monitors flight delays and identifies affected bookings',
+      'Surfaces delay alerts with driver contact details for immediate action'
     ],
-    value:'Zero advance booking goes unmonitored. Your Control Tower team responds to exceptions — not routine check-ins.'
+    value:'Produces a live colour-coded booking board, urgent bookings with driver phone numbers, a flight delay management panel, cancellation notifications, and B2B partner completion rates.'
   },
   forecast: {
     icon:'📡', name:'Forecast Agent', isMaster:false,
-    title:'Demand intelligence built on your own flight data',
-    summary:'FORECAST reads live KLIA2 arrival data and converts it into zone-level demand forecasts. Drivers are in position before passengers land. Incentives activate automatically.',
+    title:'Forecasted and confirmed airport demand from your own flight data',
+    summary:'Reads live KLIA2 flight arrivals, zone demand, weather and events. Calculates forecasted AAR demand per flight and confirmed demand from advance bookings tied to flight numbers.',
     tasks:[
-      'Scrapes KLIA2 arrival data continuously — flight number, arrival time, passenger count, origin',
-      'Calculates expected ride demand by zone and hour based on flight load',
-      'Identifies surge zones before they happen — not after',
-      'Recommends driver positioning — which zones need more drivers in the next 2 hours',
-      'Activates incentives automatically when a zone is forecast to surge',
-      'Sends morning positioning brief to the Driver Team Lead at 6AM',
-      'Feeds zone demand data to the Master Intelligence for cross-agent analysis'
+      'Monitors live KLIA2 flight arrivals via the Malaysia Airports scraper, Klang Valley zone demand, weather, and upcoming events',
+      'Calculates forecasted AAR demand per flight (passengers × 10%)',
+      'Identifies confirmed demand from advance bookings tied to flight numbers',
+      'Builds a 2-hour driver deployment forecast',
+      'Generates a zone demand heatmap',
+      'Triggers incentive recommendations for undersupplied zones'
     ],
-    value:'AirAsia Ride has something no competitor can replicate — its own group flight data. FORECAST turns that into a supply advantage every single day.'
+    value:'Produces Airport Queue intelligence with forecasted vs confirmed demand, a 2-hour forecast timeline, a zone demand map, a 6AM Driver Team brief, and surge incentive recommendations.'
   },
   document: {
     icon:'📋', name:'Document Agent', isMaster:false,
-    title:'AirAsia Ride will never face what Maxim and inDrive faced',
-    summary:'DOCUMENT monitors every driver document continuously. PSV licences, EVP, insurance, PUSPAKOM. Lapsing drivers get reminders. Lapsed drivers are blocked automatically. APAD reports generate on demand.',
+    title:'Compliance, EVP quota, and the onboarding pipeline — all watched daily',
+    summary:'Checks every driver document daily at 12:01 AM, tracks EVP quota against the purchased total, and monitors 50 new applicants through the 4-stage onboarding pipeline against SLA.',
     tasks:[
-      'Monitors PSV licence, EVP, insurance, and PUSPAKOM expiry for all 100 drivers continuously',
-      'Flags drivers with documents expiring within 30 days — sends WATI reminder automatically',
-      'Blocks lapsed drivers from receiving bookings immediately upon expiry',
-      'Calculates BUDI95 fuel subsidy eligibility — Tier 1 below 2,000 km, Tier 2 above 2,000 km',
-      'Generates BUDI95 subsidy report for Ministry of Finance submission on demand',
-      'Generates APAD fleet compliance report on demand — one click, ready for submission',
-      'Logs all compliance events with timestamps for full audit trail'
+      'Monitors every driver\'s PSV, EVP, Insurance and PUSPAKOM documents daily at 12:01 AM',
+      'Flags documents expiring within 30 days and sends WATI reminders automatically',
+      'Blocks job assignment for lapsed drivers',
+      'Tracks EVP quota health and recommends purchase timing',
+      'Monitors 50 new driver applicants through the 4 onboarding stages and flags those stuck beyond SLA',
+      'Calculates BUDI95 tier and generates APAD compliance reports on demand'
     ],
-    value:'Maxim had its licence revoked. inDrive was suspended. Both for compliance failures that DOCUMENT would have caught weeks in advance.'
+    value:'Produces a driver compliance dashboard, an EVP quota management panel, the driver onboarding pipeline with flagged applicants, the BUDI95 submission report, and the APAD compliance report.'
   },
   companion: {
     icon:'🤖', name:'Driver AI Companion', isMaster:false,
     title:'Every driver has a 24/7 intelligent assistant in their pocket',
-    summary:'Drivers ask questions in any language at any hour and get instant, accurate answers. Earnings, zone guidance, compliance status, booking help — all without calling anyone.',
+    summary:'A three-layer response system that answers driver questions instantly — FAQ cache, response cache, then a Claude API call with the driver\'s own memory injected — in Malay, English and Tamil.',
     tasks:[
-      'Answers driver questions 24/7 in any language — English, Bahasa Malaysia, Tamil, Mandarin',
-      'Shows driver their earnings today, this week, and progress toward weekly target',
-      'Guides driver to the highest-demand zones based on FORECAST agent data',
-      'Answers compliance questions — when documents expire, what needs renewing',
-      'Explains booking issues, cancellation policies, and platform rules',
-      'Three-layer response cache — FAQ cache first, then conversation cache, then Claude AI — minimises API cost',
-      'Accessible via the Driver AI tab on the dashboard — phone frame interface for realistic demo'
+      'Monitors driver questions via WhatsApp simulation, conversation history, and earnings/compliance data',
+      'Layer 1 — FAQ cache: 30 pre-loaded questions, zero API cost',
+      'Layer 2 — response cache: repeated questions, zero API cost',
+      'Layer 3 — Claude API call with driver memory injected for personalised responses',
+      'Supports Malay, English, and Tamil',
+      'Learns from every conversation; driver memory updated nightly'
     ],
-    value:'Drivers stop calling your team for routine questions. Your team stops answering the same 10 questions 50 times a day.'
+    value:'Produces instant driver responses, a FAQ hit-rate KPI showing API cost savings, a per-driver conversation log, and a nightly memory update per driver.'
   },
   fare: {
     icon:'💰', name:'Dynamic Fare Intelligence', isMaster:false,
-    title:'Fare recommendations that reflect what is actually happening right now',
-    summary:'Every 15 minutes, Dynamic Fare Intelligence reads live traffic, weather, flight demand, and competitor signals. It recommends the optimal fare multiplier for each zone so you capture revenue without losing passengers.',
+    title:'Zone-level fare recommendations that reflect what is happening right now',
+    summary:'Every 15 minutes it reads live traffic, weather, flight demand, events and competitor pricing, then recommends the optimal fare multiplier per zone — precision instead of blanket surge.',
     tasks:[
-      'Reads live traffic conditions via Google Maps API every 15 minutes',
-      'Monitors weather conditions — rain events trigger automatic fare review',
-      'Cross-references KLIA2 flight demand from the FORECAST agent',
-      'Reads competitor fare signals across Grab and Gojek',
-      'Recommends zone-level fare multipliers — not a blanket surge',
-      'Shows fare timeline — what multipliers applied across the day and why',
-      'Feeds multiplier data to the Pricing tab on the dashboard for team review'
+      'Monitors live traffic via Google Maps API and weather via OpenWeatherMap',
+      'Cross-references KLIA2 flight arrival demand and upcoming events',
+      'Reads competitor pricing signals',
+      'Calculates a fare multiplier recommendation per zone every 15 minutes from a weighted combination of all streams',
+      'Triggers surge recommendations when demand exceeds the supply threshold'
     ],
-    value:'You stop leaving revenue on the table during peaks and you stop losing passengers with blunt surge pricing. Zone-level precision replaces platform-wide blunt force.'
+    value:'Produces a real-time fare multiplier per zone, competitor comparison, and a surge activation log. In production it connects to AAR\'s internal pricing API to activate live fare adjustments.'
   },
-  earnings: {
-    icon:'📊', name:'Driver Earnings Coach', isMaster:false,
-    title:'Every driver knows exactly where they stand at the end of every shift',
-    summary:'At the end of each shift, every driver receives a personalised earnings summary via WhatsApp. How much they earned, how close they are to their weekly target, and which zones to hit tomorrow.',
+  incentive: {
+    icon:'🛡️', name:'Incentive & Fraud Agent', isMaster:false,
+    title:'Calculates every payout, then disqualifies fraud before a single ringgit goes out',
+    summary:'Calculates weekly incentive eligibility across three tiers, cross-checks every eligible driver against fraud alerts, and auto-disqualifies fraud-flagged drivers from incentives and referrals.',
     tasks:[
-      'Calculates each driver\'s earnings at end of shift — trips completed, total fare, platform fee deducted',
-      'Compares earnings against weekly target — percentage achieved, amount remaining',
-      'Identifies the top-earning zones for the next morning based on FORECAST data',
-      'Sends personalised WhatsApp message to each driver via WATI — reads as a personal message, not a broadcast',
-      'Tracks drivers consistently below target — flags to Driver Team for outreach',
-      'Monthly earnings summary generated automatically for BUDI95 tier calculation',
-      'Feeds driver performance data to the Driver Team dashboard'
+      'Monitors weekly trip counts, driver GPS vs airport queue positions, trip patterns for fake bookings, and No Show timing',
+      'Calculates weekly incentive eligibility across 3 tiers (RM 50 / RM 150 / RM 350)',
+      'Cross-checks every eligible driver against fraud alerts before approving payout',
+      'Auto-disqualifies fraud-flagged drivers from incentives and referrals',
+      'Flags GPS fraud (driver outside 3km of KLIA2 while holding queue position), incentive fraud patterns, and early No Show fraud',
+      'Tracks the referral programme — RM 150 per successful referral'
     ],
-    value:'Drivers who know their numbers work smarter. Drivers who get zone guidance show up where they are needed. Retention improves. Earnings improve. Platform performance improves.'
+    value:'Produces an approved weekly payout list, disqualified drivers with reasons, a fraud dashboard (GPS / incentive / No Show), and referral tracking with payment status.'
   },
   master: {
     icon:'⚡', name:'Master Intelligence', isMaster:true,
-    title:'The agent that reads all other agents and finds what none of them can see alone',
-    summary:'Master Intelligence sits above all 7 agents. It reads their outputs simultaneously, finds cross-agent patterns, and routes prioritised alerts to the right team before situations escalate.',
+    title:'The agent that reads all other agents and finds what none can see alone',
+    summary:'Sits above all 7 other agents, reading their outputs every 5 minutes to detect cross-agent patterns — compliance risks tied to confirmed bookings, supply gaps, cancellation and fraud patterns.',
     tasks:[
-      'Reads outputs from all 7 agents simultaneously — WATI, Control Tower, Forecast, Document, Companion, Fare Intelligence, Earnings Coach',
-      'Detects cross-agent patterns — a surge zone with lapsed drivers and unresponding B2B bookings is a pattern no single agent can see',
-      'Routes alerts to the correct team — Control Tower, Driver Backend, Driver Team, Customer Support, or Pricing',
-      'Assigns priority levels — High, Medium, Plan — based on operational impact',
-      'Surfaces alerts on the Nerve Centre dashboard for management visibility',
-      'Triggers escalation protocols when multiple agents flag the same zone or driver simultaneously',
-      'Logs every alert with timestamp, source agent, team routed to, and resolution status'
+      'Monitors all 7 other agents simultaneously every 5 minutes for cross-agent patterns',
+      'Detects compliance risks tied to confirmed bookings — e.g. a driver\'s EVP expires before a KLOOK booking date',
+      'Identifies zone supply gaps before they become no-shows',
+      'Flags cancellation patterns by driver',
+      'Detects fraud patterns across GPS data, trip patterns, and incentive claims',
+      'Surfaces all alerts to the Nerve Centre for senior management action'
     ],
-    value:'Seven agents watching seven things. One agent watching all seven. That is the difference between operations that react and operations that anticipate.'
+    value:'Produces cross-agent intelligence alerts on the Nerve Centre, a unified alert feed with priority ranking, and an agent health monitoring dashboard.'
   }
 };
 
